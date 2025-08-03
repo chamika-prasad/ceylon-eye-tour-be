@@ -1,0 +1,171 @@
+import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
+import path from "path";
+import categoryService from "../services/category.service.js";
+
+const getCategories = async (req, res) => {
+  try {
+    const categories = await categoryService.getCategories();
+    return res.status(200).json({
+      success: true,
+      message: "Categories retrived successfully",
+      data: categories,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving categories",
+      error: error,
+    });
+  }
+};
+
+const createCategory = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Category name is required",
+      });
+    }
+
+    if (!description) {
+      return res.status(400).json({
+        success: false,
+        message: "Category description is required",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Category image is required",
+      });
+    }
+
+    const ext = path.extname(req.file.originalname);
+    const filename = `${uuidv4()}${ext}`;
+    const uploadDir = path.join("uploads", "categories");
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const filePath = path.join(uploadDir, filename);
+    fs.writeFileSync(filePath, req.file.buffer);
+
+    const imageUrl = `/uploads/categories/${filename}`;
+
+    const newCategory = await categoryService.createCategory({
+      name,
+      description,
+      image_url: imageUrl,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Category created successfully",
+      data: newCategory,
+    });
+  } catch (error) {
+    console.error("Error adding category:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error adding category",
+      error: error.message,
+    });
+  }
+};
+
+const updateCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description } = req.body;
+
+    if (!name && !description) {
+      return res.status(400).json({
+        success: false,
+        message: "Nothing to update. Provide at least name or description.",
+      });
+    }
+
+    const updatedCategory = await categoryService.updateCategory(id, {
+      ...(name && { name }),
+      ...(description && { description }),
+    });
+
+    if (!updatedCategory) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Category updated successfully",
+      data: updatedCategory,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating category",
+      error: error.message,
+    });
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedCategory = await categoryService.deleteCategory(id);
+
+    if (!deletedCategory) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Category deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting category",
+      error: error.message,
+    });
+  }
+};
+
+const getCategoriesWithPackageCount = async (req, res) => {
+  try {
+    const categories = await categoryService.getCategoriesWithPackageCount();
+    return res.status(200).json({
+      success: true,
+      message: "Categories with package count retrieved successfully",
+      data: categories,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving categories with package count",
+      error: error.message,
+    });
+  }
+};
+
+export default {
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  // getCategoriesByTourType,
+  getCategoriesWithPackageCount,
+};

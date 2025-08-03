@@ -1,0 +1,35 @@
+import express from "express";
+import categoryController from "./../controllers/category.controller.js";
+import tokenMiddleware from "./../middlewares/token.middleware.js";
+import upload from "../middlewares/upload.middleware.js";
+
+const router = express.Router();
+
+router.get(
+  "/get-all",
+  // tokenMiddleware.verifyToken,
+  categoryController.getCategories
+);
+
+router.get("/", categoryController.getCategoriesWithPackageCount);
+
+router.post(
+  "/create",
+  // tokenMiddleware.verifyToken,
+  upload.single("image"),
+  categoryController.createCategory
+);
+
+router.put(
+  "/update/:id",
+  // tokenMiddleware.verifyToken,
+  categoryController.updateCategory
+);
+
+router.delete(
+  "/delete/:id",
+  // tokenMiddleware.verifyToken,
+  categoryController.deleteCategory
+);
+
+export default router;

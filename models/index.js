@@ -1,0 +1,124 @@
+import Activity from "./Activity.model.js";
+import Admin from "./Admin.model.js";
+import Booking from "./Booking.model.js";
+import Category from "./Category.model.js";
+import Customer from "./Customer.model.js";
+import Package from "./Package.model.js";
+import PackagePlace from "./PackagePlace.model.js";
+import Payment from "./Payment.model.js";
+import Place from "./Place.model.js";
+import PlaceActivity from "./PlaceActivity.model.js";
+import PackageCategory from "./PackageCategory.model.js";
+import PackageImage from "./packageImage.model.js";
+import TourType from "./TourType.model.js";
+
+// Define all associations here
+const initModels = () => {
+  //Place - Package
+  Place.belongsToMany(Package, {
+    through: PackagePlace,
+    foreignKey: "place_id",
+    otherKey: "package_id",
+    as: "Packages",
+  });
+  Package.belongsToMany(Place, {
+    through: PackagePlace,
+    foreignKey: "package_id",
+    otherKey: "place_id",
+    as: "Places",
+  });
+
+  PackagePlace.belongsTo(Package, {
+    foreignKey: "package_id",
+    as: "Package", // Match the alias used in include
+  });
+  PackagePlace.belongsTo(Place, {
+    foreignKey: "place_id",
+    as: "Place", // Match the alias used in include
+  });
+
+  //Place - Activity
+  Place.belongsToMany(Activity, {
+    through: PlaceActivity,
+    foreignKey: "place_id",
+    otherKey: "activity_id",
+    as: "Activities",
+  });
+  Activity.belongsToMany(Place, {
+    through: PlaceActivity,
+    foreignKey: "activity_id",
+    otherKey: "place_id",
+    as: "Places",
+  });
+
+  PlaceActivity.belongsTo(Activity, {
+    foreignKey: "activity_id",
+    as: "Activity", // Match the alias used in include
+  });
+  PlaceActivity.belongsTo(Place, {
+    foreignKey: "place_id",
+    as: "Place", // Match the alias used in include
+  });
+
+  // Package - PackageImage (one-to-many)
+  Package.hasMany(PackageImage, {
+    foreignKey: "package_id",
+    as: "Images",
+  });
+
+  PackageImage.belongsTo(Package, {
+    foreignKey: "package_id",
+    as: "Package",
+  });
+
+  // Package - Category (many-to-many)
+  Package.belongsToMany(Category, {
+    through: PackageCategory,
+    foreignKey: "package_id",
+    otherKey: "category_id",
+    as: "Categories",
+  });
+
+  Category.belongsToMany(Package, {
+    through: PackageCategory,
+    foreignKey: "category_id",
+    otherKey: "package_id",
+    as: "Packages",
+  });
+
+  PackageCategory.belongsTo(Package, {
+    foreignKey: "package_id",
+    as: "Package",
+  });
+
+  PackageCategory.belongsTo(Category, {
+    foreignKey: "category_id",
+    as: "Category",
+  });
+  TourType.hasMany(Package, {
+    foreignKey: "tour_type_id",
+    as: "Packages",
+  });
+  Package.belongsTo(TourType, {
+    foreignKey: "tour_type_id",
+    as: "TourType",
+  });
+};
+
+initModels(); // Call it immediately so models are ready when exported
+
+export {
+  Activity,
+  Admin,
+  Booking,
+  Category,
+  Customer,
+  Package,
+  PackagePlace,
+  Payment,
+  Place,
+  PlaceActivity,
+  PackageCategory,
+  PackageImage,
+  TourType,
+};
