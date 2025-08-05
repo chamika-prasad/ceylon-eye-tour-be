@@ -10,7 +10,6 @@ import Place from "./Place.model.js";
 import PlaceActivity from "./PlaceActivity.model.js";
 import PackageCategory from "./PackageCategory.model.js";
 import PackageImage from "./packageImage.model.js";
-import TourType from "./TourType.model.js";
 
 // Define all associations here
 const initModels = () => {
@@ -95,14 +94,6 @@ const initModels = () => {
     foreignKey: "category_id",
     as: "Category",
   });
-  TourType.hasMany(Package, {
-    foreignKey: "tour_type_id",
-    as: "Packages",
-  });
-  Package.belongsTo(TourType, {
-    foreignKey: "tour_type_id",
-    as: "TourType",
-  });
 };
 
 initModels(); // Call it immediately so models are ready when exported
@@ -120,5 +111,4 @@ export {
   PlaceActivity,
   PackageCategory,
   PackageImage,
-  TourType,
 };

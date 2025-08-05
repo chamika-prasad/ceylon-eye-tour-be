@@ -145,35 +145,20 @@ const addPackage = async (data) => {
   }
 };
 
-const getPackagesByTourType = async (tour_type_id) => {
-  try {
-    const packages = await Package.findAll({
-      where: { tour_type_id },
-      include: [
-        {
-          model: PackageImage,
-          as: "Images",
-        },
-      ],
-    });
-
-    return packages;
-  } catch (error) {
-    throw new Error(`Error in getPackagessByTourType: ${error}`);
-  }
-};
-
-const getPackagesByCategoryId = async (categoryId) => {
+const getPackagesByCategoryId = async (categoryId, tourType) => {
+  const isTourTypeValid = tourType === 0 || tourType === 1;
   try {
     const category = await Category.findByPk(categoryId, {
       include: {
         model: Package,
         as: "Packages",
+        where: isTourTypeValid ? { tour_type: tourType } : undefined,
         through: { attributes: [] },
         include: {
           model: PackageImage,
           as: "Images",
         },
+        required: false,
       },
     });
 
@@ -191,6 +176,5 @@ export default {
   getPackages,
   addPackage,
   getPackageById,
-  getPackagesByTourType,
   getPackagesByCategoryId,
 };

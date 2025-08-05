@@ -1,14 +1,4 @@
 import categoryRepository from "../repositories/category.repository.js";
-// import packageRepository from "../repositories/package.repository.js";
-
-const getCategories = async () => {
-  try {
-    const categories = await categoryRepository.getCategories();
-    return categories;
-  } catch (error) {
-    throw new Error(`Error in CategoryService getCategories: ${error}`);
-  }
-};
 
 const createCategory = async ({ name, description, image_url }) => {
   try {
@@ -39,38 +29,13 @@ const deleteCategory = async (id) => {
   }
 };
 
-// const getCategoriesByTourType = async (tour_type_id) => {
-//   try {
-//     const packages = await packageRepository.getPackagesByTourType(
-//       tour_type_id
-//     );
-//     // Flatten and deduplicate categories
-//     const allCategories = packages.flatMap((pkg) => pkg.Categories);
-//     const uniqueMap = new Map();
-
-//     for (const cat of allCategories) {
-//       if (!uniqueMap.has(cat.id)) {
-//         uniqueMap.set(cat.id, cat);
-//       }
-//     }
-
-//     return Array.from(uniqueMap.values());
-//   } catch (error) {
-//     throw new Error(
-//       `Error in CategoryService getCategoriesByTourType: ${error}`
-//     );
-//   }
-// };
-
-const getCategoriesWithPackageCount = async () => {
-  return await categoryRepository.getCategoriesWithPackageCount();
+const getCategories = async (tourType) => {
+  return await categoryRepository.getCategories(tourType);
 };
 
 export default {
-  getCategories,
   createCategory,
   updateCategory,
   deleteCategory,
-  // getCategoriesByTourType,
-  getCategoriesWithPackageCount,
+  getCategories,
 };

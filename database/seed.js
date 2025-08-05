@@ -70,14 +70,6 @@ function generateSampleData(tableName, count) {
           name: `Place ${i}`,
         });
         break;
-      case "tour_types":
-        data.push({
-          id: uuidv4(),
-          name: `Tour Type ${i}`,
-          description: `Description for tour type ${i}`,
-          image_url: `https://example.com/tour-type-${i}.jpg`,
-        });
-        break;
     }
   }
 
@@ -111,7 +103,7 @@ async function seedDatabase() {
     console.log("✓ Customers seeded");
 
     // Seed Tables: categories, activities, places, tour_types
-    const tableNames = ["categories", "activities", "places", "tour_types"];
+    const tableNames = ["categories", "activities", "places"];
 
     for (const table of tableNames) {
       const data = generateSampleData(table, 10);
@@ -131,9 +123,8 @@ async function seedDatabase() {
     }
 
     // Seed Packages (after tour_types are created)
-    const [tourTypes] = await connection.query("SELECT id FROM tour_types LIMIT 10");
     const packageData = [];
-    
+
     for (let i = 1; i <= 10; i++) {
       packageData.push({
         id: uuidv4(),
@@ -141,7 +132,7 @@ async function seedDatabase() {
         description: `Description for package ${i}`,
         package_highlights: `[heighlight1, highlight2, highlight3]`,
         price: (Math.random() * 500 + 50).toFixed(2),
-        tour_type_id: tourTypes[i % tourTypes.length].id, // Assign a tour type
+        tour_type: Math.round(Math.random()), // Assign a tour type
       });
     }
 

@@ -25,12 +25,8 @@ const getPackageById = async (id) => {
   }
 };
 
-const getPackagesByCategoryId = async (categoryId) => {
-  return await packageRepository.getPackagesByCategoryId(categoryId);
-};
-
-const getPackagesByTourType = async (tour_type_id) => {
-  return await packageRepository.getPackagesByTourType(tour_type_id);
+const getPackagesByCategoryId = async (categoryId,tourType) => {
+  return await packageRepository.getPackagesByCategoryId(categoryId,tourType);
 };
 
 export default {
@@ -38,5 +34,4 @@ export default {
   addPackage,
   getPackageById,
   getPackagesByCategoryId,
-  getPackagesByTourType,
 };

@@ -1,17 +1,6 @@
 import { Category, Package, PackageCategory } from "../models/index.js";
 import { Sequelize } from "sequelize";
 
-const getCategories = async () => {
-  try {
-    const categories = await Category.findAll({
-      attributes: ["id", "name", "description", "image_url"],
-    });
-    return categories;
-  } catch (error) {
-    throw new Error(`Error in Get All Categories: ${error}`);
-  }
-};
-
 const createCategory = async ({ name, description, image_url }) => {
   try {
     const category = await Category.create({
@@ -49,7 +38,8 @@ const deleteCategory = async (id) => {
   }
 };
 
-const getCategoriesWithPackageCount = async () => {
+const getCategories = async (tourType) => {
+  const isTourTypeValid = tourType === 0 || tourType === 1;
   try {
     const categories = await Category.findAll({
       attributes: {
@@ -62,6 +52,12 @@ const getCategoriesWithPackageCount = async () => {
           association: "Packages",
           attributes: [], // Don't load full package data, only count
           through: { attributes: [] }, // Don't include join table fields
+          where: isTourTypeValid
+            ? {
+                tour_type: tourType, // Filter by passed tourType
+              }
+            : undefined,
+          required: false,
         },
       ],
       group: ["Category.id"],
@@ -80,5 +76,4 @@ export default {
   createCategory,
   updateCategory,
   deleteCategory,
-  getCategoriesWithPackageCount,
 };

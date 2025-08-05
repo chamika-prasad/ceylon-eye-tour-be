@@ -18,7 +18,6 @@ router.get(
 );
 
 router.get("/category/:categoryId", packageController.getPackagesByCategoryId);
-router.get("/tour-type/:tour_type_id", packageController.getPackagesByTourType);
 
 router.post(
   "/add",

@@ -6,7 +6,6 @@ import sequelize from "./config/sequelize.js";
 import authRoutes from "./routes/auth.route.js";
 import categoryRoutes from "./routes/category.route.js";
 import packageRoutes from "./routes/package.route.js";
-import tourTypeRoutes from "./routes/tourType.route.js";
 import activityRoutes from "./routes/activity.route.js";
 import placeActivityRoutes from "./routes/placeActivity.routes.js";
 
@@ -23,7 +22,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/packages", packageRoutes);
-app.use("/api/tour-types", tourTypeRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/place-activities", placeActivityRoutes);
 

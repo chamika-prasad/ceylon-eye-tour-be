@@ -13,8 +13,8 @@ const Package = sequelize.define(
     description: DataTypes.TEXT,
     package_highlights: DataTypes.TEXT,
     price: DataTypes.DECIMAL(10, 2),
-    tour_type_id: {
-      type: DataTypes.STRING(36),
+    tour_type: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },

@@ -5,8 +5,12 @@ import categoryService from "../services/category.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
 
 const getCategories = async (req, res) => {
+  const { tourType } = req.query;
   try {
-    const categories = await categoryService.getCategories();
+    // const categories = await categoryService.getCategories();
+    const categories = await categoryService.getCategories(
+      Number(tourType)
+    );
     return res.status(200).json({
       success: true,
       message: "Categories retrived successfully",
@@ -147,28 +151,9 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-const getCategoriesWithPackageCount = async (req, res) => {
-  try {
-    const categories = await categoryService.getCategoriesWithPackageCount();
-    return res.status(200).json({
-      success: true,
-      message: "Categories with package count retrieved successfully",
-      data: categories,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error retrieving categories with package count",
-      error: error.message,
-    });
-  }
-};
-
 export default {
   getCategories,
   createCategory,
   updateCategory,
   deleteCategory,
-  // getCategoriesByTourType,
-  getCategoriesWithPackageCount,
 };

@@ -66,7 +66,7 @@ const addPackage = async (req, res) => {
       description,
       package_highlights: packageHighlights,
       price,
-      tour_type_id: tourType,
+      tour_type: tourType,
       categoryIds: parseCategoryIds, // array of category UUID strings
       placeIds: parsePlaceIds, // array of place UUID strings
       images,
@@ -112,9 +112,10 @@ const getPackageById = async (req, res) => {
 
 const getPackagesByCategoryId = async (req, res) => {
   const { categoryId } = req.params;
+  const { tourType } = req.query;
 
   try {
-    const packages = await packageService.getPackagesByCategoryId(categoryId);
+    const packages = await packageService.getPackagesByCategoryId(categoryId,Number(tourType));
 
     if (!packages) {
       return res.status(404).json({
@@ -137,44 +138,9 @@ const getPackagesByCategoryId = async (req, res) => {
   }
 };
 
-const getPackagesByTourType = async (req, res) => {
-  try {
-    const { tour_type_id } = req.params;
-
-    if (!tour_type_id) {
-      return res.status(400).json({
-        success: false,
-        message: "tour_type_id is required",
-      });
-    }
-
-    const packages = await packageService.getPackagesByTourType(tour_type_id);
-
-    if (!packages) {
-      return res.status(404).json({
-        success: false,
-        message: "Tour type not found",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Packages retrieved successfully",
-      data: packages,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error retrieving packages by tour type",
-      error: error.message,
-    });
-  }
-};
-
 export default {
   getPackages,
   addPackage,
   getPackageById,
   getPackagesByCategoryId,
-  getPackagesByTourType,
 };

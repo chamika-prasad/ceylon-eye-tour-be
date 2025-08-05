@@ -11,8 +11,6 @@ router.get(
   categoryController.getCategories
 );
 
-router.get("/", categoryController.getCategoriesWithPackageCount);
-
 router.post(
   "/create",
   // tokenMiddleware.verifyToken,
