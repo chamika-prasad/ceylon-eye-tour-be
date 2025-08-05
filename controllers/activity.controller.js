@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
 import activityService from "../services/activity.service.js";
+import fileUploadService from "../services/fileUpload.service.js";
 
 const createActivity = async (req, res) => {
   try {
@@ -14,16 +15,18 @@ const createActivity = async (req, res) => {
       });
     }
 
-    const ext = path.extname(req.file.originalname);
-    const filename = `${uuidv4()}${ext}`;
+    // const ext = path.extname(req.file.originalname);
+    // const filename = `${uuidv4()}${ext}`;
     const uploadDir = path.join("uploads", "activities");
 
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+    // if (!fs.existsSync(uploadDir)) {
+    //   fs.mkdirSync(uploadDir, { recursive: true });
+    // }
 
-    const filePath = path.join(uploadDir, filename);
-    fs.writeFileSync(filePath, req.file.buffer);
+    // const filePath = path.join(uploadDir, filename);
+    // fs.writeFileSync(filePath, req.file.buffer);
+
+    const filename = fileUploadService.uploadFile(uploadDir, file);
 
     const imageUrl = `/uploads/activities/${filename}`;
 
@@ -79,6 +82,8 @@ const getActivityById = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
 
 export default {
   createActivity,

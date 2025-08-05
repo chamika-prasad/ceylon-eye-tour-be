@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
 import path from "path";
 import packageService from "../services/package.service.js";
+import fileUploadService from "../services/fileUpload.service.js";
 
 const getPackages = async (req, res) => {
   try {
@@ -39,22 +39,21 @@ const addPackage = async (req, res) => {
       });
     }
 
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Package images are required",
+      });
+    }
+
     const packageId = uuidv4();
 
     // Prepare upload directory: uploads/packages/{packageId}
     const uploadDir = path.join("uploads", "packages", packageId.toString());
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
     const images = [];
 
     for (const file of req.files) {
-      const ext = path.extname(file.originalname); // e.g., .jpg
-      const filename = `${uuidv4()}${ext}`; // generate unique name
-      const filepath = path.join(uploadDir, filename);
-      fs.writeFileSync(filepath, file.buffer); // save to disk
-
+      const filename = fileUploadService.uploadFile(uploadDir, file);
       images.push(`/uploads/packages/${packageId}/${filename}`);
     }
 

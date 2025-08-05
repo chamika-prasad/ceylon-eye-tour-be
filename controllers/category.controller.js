@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
 import categoryService from "../services/category.service.js";
+import fileUploadService from "../services/fileUpload.service.js";
 
 const getCategories = async (req, res) => {
   try {
@@ -45,16 +46,18 @@ const createCategory = async (req, res) => {
       });
     }
 
-    const ext = path.extname(req.file.originalname);
-    const filename = `${uuidv4()}${ext}`;
+    // const ext = path.extname(req.file.originalname);
+    // const filename = `${uuidv4()}${ext}`;
     const uploadDir = path.join("uploads", "categories");
 
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+    // if (!fs.existsSync(uploadDir)) {
+    //   fs.mkdirSync(uploadDir, { recursive: true });
+    // }
 
-    const filePath = path.join(uploadDir, filename);
-    fs.writeFileSync(filePath, req.file.buffer);
+    // const filePath = path.join(uploadDir, filename);
+    // fs.writeFileSync(filePath, req.file.buffer);
+
+    const filename = fileUploadService.uploadFile(uploadDir, file);
 
     const imageUrl = `/uploads/categories/${filename}`;
 
