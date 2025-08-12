@@ -97,6 +97,51 @@ const getPackageById = async (id) => {
   }
 };
 
+const getPackageByUrlPrefix = async (urlPrefix) => {
+  try {
+    const selectedPackage = await Package.findOne({
+      where: { url_prefix: urlPrefix },
+      attributes: { exclude: ["created_at", "updated_at"] },
+      include: [
+        {
+          model: Place,
+          as: "Places", // Match the alias defined in the Package -> Place association
+          attributes: { exclude: ["created_at", "updated_at"] },
+          through: {
+            attributes: [], // Exclude PackagePlace attributes from the result
+          },
+          include: [
+            {
+              model: Activity,
+              as: "Activities", // Match the alias defined in Place -> Activity association
+              attributes: { exclude: ["created_at", "updated_at"] }, // Exclude timestamps from Activity
+              through: {
+                attributes: [], // Exclude PlaceActivity attributes
+              },
+            },
+          ],
+        },
+        {
+          model: Category,
+          as: "Categories", // Alias defined in association
+          attributes: { exclude: ["created_at", "updated_at"] },
+          through: {
+            attributes: [], // Exclude PackageCategory attributes
+          },
+        },
+      ],
+    });
+    if (!selectedPackage) {
+      return false;
+    }
+    return selectedPackage;
+  } catch (error) {
+    console.log(`Error in Get Package: ${error}`);
+
+    throw new Error(`Error in Get Package: ${error}`);
+  }
+};
+
 const addPackage = async (data) => {
   let transaction;
   try {
@@ -140,36 +185,11 @@ const addPackage = async (data) => {
     const result = await getPackageById(newPackage.id);
     return result;
   } catch (error) {
+    console.log(error);
+
     // Rollback the transaction if any error occurs
     if (transaction) await transaction.rollback();
     throw new Error(`Error in addPackage repository: ${error.message}`);
-  }
-};
-
-const getPackagesByCategoryId = async (categoryId, tourType) => {
-  const isTourTypeValid = tourType === 0 || tourType === 1;
-  try {
-    const category = await Category.findByPk(categoryId, {
-      include: {
-        model: Package,
-        as: "Packages",
-        where: isTourTypeValid ? { tour_type: tourType } : undefined,
-        through: { attributes: [] },
-        include: {
-          model: PackageImage,
-          as: "Images",
-        },
-        required: false,
-      },
-    });
-
-    if (!category) return null;
-
-    return category;
-  } catch (error) {
-    throw new Error(
-      "Failed to fetch packages by category ID: " + error.message
-    );
   }
 };
 
@@ -177,5 +197,5 @@ export default {
   getPackages,
   addPackage,
   getPackageById,
-  getPackagesByCategoryId,
+  getPackageByUrlPrefix,
 };

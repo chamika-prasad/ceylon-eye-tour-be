@@ -11,6 +11,14 @@ router.get(
   categoryController.getCategories
 );
 
+router.get("/get-by-id/:categoryId", categoryController.getCategoryById);
+
+router.get(
+  "/get-by-urlprefix/:urlPrefix",
+  // tokenMiddleware.verifyToken,
+  categoryController.getCategoryByUrlPrefix
+);
+
 router.post(
   "/create",
   // tokenMiddleware.verifyToken,

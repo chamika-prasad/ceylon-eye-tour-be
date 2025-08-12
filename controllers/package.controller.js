@@ -84,6 +84,7 @@ const addPackage = async (req, res) => {
       duration,
       excludes: excludes,
       includes: includes,
+      url_prefix: title.toLowerCase().replace(/\s+/g, "-"),
     });
 
     return res.status(201).json({
@@ -124,29 +125,25 @@ const getPackageById = async (req, res) => {
   }
 };
 
-const getPackagesByCategoryId = async (req, res) => {
-  const { categoryId } = req.params;
-  const { tourType } = req.query;
-
+const getPackageByUrlPrefix = async (req, res) => {
   try {
-    const packages = await packageService.getPackagesByCategoryId(categoryId,Number(tourType));
-
-    if (!packages) {
+    const { urlPrefix } = req.params;
+    const result = await packageService.getPackageByUrlPrefix(urlPrefix);
+    if (!result) {
       return res.status(404).json({
         success: false,
-        message: "Category not found",
+        message: "Package not found",
       });
     }
-
     return res.status(200).json({
       success: true,
-      message: "Packages retrieved successfully",
-      data: packages,
+      message: "Package retrived successfully",
+      data: result,
     });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: "Error retrieving packages by category",
+      message: "Error retriving package",
       error: error.message,
     });
   }
@@ -156,5 +153,5 @@ export default {
   getPackages,
   addPackage,
   getPackageById,
-  getPackagesByCategoryId,
+  getPackageByUrlPrefix,
 };

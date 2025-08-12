@@ -17,7 +17,11 @@ router.get(
   packageController.getPackageById
 );
 
-router.get("/category/:categoryId", packageController.getPackagesByCategoryId);
+router.get(
+  "/get-by-urlprefix/:urlPrefix",
+  // tokenMiddleware.verifyToken,
+  packageController.getPackageByUrlPrefix
+);
 
 router.post(
   "/add",

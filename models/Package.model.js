@@ -46,6 +46,14 @@ const Package = sequelize.define(
         return rawValue ? JSON.parse(rawValue) : [];
       },
     },
+    url_prefix: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
   },
   {
     tableName: "packages",

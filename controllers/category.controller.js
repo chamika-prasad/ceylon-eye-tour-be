@@ -8,9 +8,7 @@ const getCategories = async (req, res) => {
   const { tourType } = req.query;
   try {
     // const categories = await categoryService.getCategories();
-    const categories = await categoryService.getCategories(
-      Number(tourType)
-    );
+    const categories = await categoryService.getCategories(Number(tourType));
     return res.status(200).json({
       success: true,
       message: "Categories retrived successfully",
@@ -60,6 +58,7 @@ const createCategory = async (req, res) => {
       name,
       description,
       image_url: imageUrl,
+      url_prefix: name.toLowerCase().replace(/\s+/g, "-"),
     });
 
     return res.status(201).json({
@@ -142,9 +141,73 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+const getCategoryById = async (req, res) => {
+  const { categoryId } = req.params;
+  const { tourType } = req.query;
+
+  try {
+    const packages = await categoryService.getCategoryById(
+      categoryId,
+      Number(tourType)
+    );
+
+    if (!packages) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Category retrieved successfully",
+      data: packages,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving category by id",
+      error: error.message,
+    });
+  }
+};
+
+const getCategoryByUrlPrefix = async (req, res) => {
+  const { urlPrefix } = req.params;
+  const { tourType } = req.query;
+
+  try {
+    const packages = await categoryService.getCategoryByUrlPrefix(
+      urlPrefix,
+      Number(tourType)
+    );
+
+    if (!packages) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Category retrieved successfully",
+      data: packages,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving Category by urlprefix",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   getCategories,
   createCategory,
   updateCategory,
   deleteCategory,
+  getCategoryById,
+  getCategoryByUrlPrefix,
 };

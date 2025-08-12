@@ -25,13 +25,17 @@ const getPackageById = async (id) => {
   }
 };
 
-const getPackagesByCategoryId = async (categoryId,tourType) => {
-  return await packageRepository.getPackagesByCategoryId(categoryId,tourType);
+const getPackageByUrlPrefix = async (urlPrefix) => {
+  try {
+    return await packageRepository.getPackageByUrlPrefix(urlPrefix);
+  } catch (error) {
+    throw new Error(`Error in getPackageById service: ${error.message}`);
+  }
 };
 
 export default {
   getPackages,
   addPackage,
   getPackageById,
-  getPackagesByCategoryId,
+  getPackageByUrlPrefix,
 };

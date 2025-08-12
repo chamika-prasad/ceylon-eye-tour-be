@@ -1,14 +1,14 @@
-import { Category, Package, PackageCategory } from "../models/index.js";
+import {
+  Category,
+  Package,
+  PackageCategory,
+  PackageImage,
+} from "../models/index.js";
 import { Sequelize } from "sequelize";
 
-const createCategory = async ({ name, description, image_url }) => {
+const createCategory = async (data) => {
   try {
-    const category = await Category.create({
-      // id: uuidv4(),
-      name,
-      description,
-      image_url,
-    });
+    const category = await Category.create(data);
     return category;
   } catch (error) {
     console.error("Error creating category:", error.message);
@@ -75,9 +75,66 @@ const getCategories = async (tourType) => {
   }
 };
 
+const getCategoryById = async (categoryId, tourType) => {
+  const isTourTypeValid = tourType === 0 || tourType === 1;
+  try {
+    const category = await Category.findByPk(categoryId, {
+      include: {
+        model: Package,
+        as: "Packages",
+        where: isTourTypeValid ? { tour_type: tourType } : undefined,
+        through: { attributes: [] },
+        include: {
+          model: PackageImage,
+          as: "Images",
+        },
+        required: false,
+      },
+    });
+
+    if (!category) return null;
+
+    return category;
+  } catch (error) {
+    throw new Error(
+      "Failed to fetch category by category ID: " + error.message
+    );
+  }
+};
+
+const getCategoryByUrlPrefix = async (urlPrefix, tourType) => {
+  const isTourTypeValid = tourType === 0 || tourType === 1;
+  try {
+    const category = await Category.findOne({
+      where: { url_prefix: urlPrefix },
+      include: {
+        model: Package,
+        as: "Packages",
+        where: isTourTypeValid ? { tour_type: tourType } : undefined,
+        through: { attributes: [] },
+        include: {
+          model: PackageImage,
+          as: "Images",
+        },
+        required: false,
+      },
+    });
+
+    if (!category) return null;
+
+    return category;
+  } catch (error) {
+    throw new Error(
+      "Failed to fetch packages by category ID: " + error.message
+    );
+  }
+};
+
 export default {
   getCategories,
   createCategory,
   updateCategory,
   deleteCategory,
+  getCategoryById,
+  getCategoryByUrlPrefix,
 };

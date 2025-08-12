@@ -15,6 +15,14 @@ const Category = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    url_prefix: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
   },
   {
     tableName: "categories",
