@@ -77,6 +77,9 @@ const SQL_STATEMENTS = [
     departure_description TEXT,
     arrival_location VARCHAR(255) NOT NULL,
     arrival_description TEXT,
+    duration VARCHAR(255) NOT NULL,
+    excludes TEXT,
+    includes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )`,

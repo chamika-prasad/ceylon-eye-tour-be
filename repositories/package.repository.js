@@ -44,6 +44,7 @@ const getPackages = async () => {
         },
       ],
     });
+
     return packages;
   } catch (error) {
     console.log(`Error in Get All Packages: ${error}`);

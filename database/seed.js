@@ -133,17 +133,22 @@ async function seedDatabase() {
         const departure =
         locations[Math.floor(Math.random() * locations.length)];
 
+        const days = Math.floor(Math.random() * 5) + 1;
+
       packageData.push({
         id: uuidv4(),
         title: `Package ${i}`,
         description: `Description for package ${i}`,
-        package_highlights: `[heighlight1, highlight2, highlight3]`,
+        package_highlights: `["heighlight1", "highlight2", "highlight3"]`,
         price: (Math.random() * 500 + 50).toFixed(2),
         tour_type: Math.round(Math.random()), // Assign a tour type
         departure_location: departure,
         departure_description: `${departure} Departure description for package ${i}`,
         arrival_location: arrival,
         arrival_description: `${arrival} Arrival description for package ${i}`,
+        duration: `${days} days / ${days - 1} nights`,
+        excludes: `["Meals", "Insurance", "Tips"]`,
+        includes: `["Accommodation", "Transport", "Guide"]`,
       });
     }
 

@@ -11,7 +11,15 @@ const Package = sequelize.define(
     },
     title: DataTypes.STRING,
     description: DataTypes.TEXT,
-    package_highlights: DataTypes.TEXT,
+    // package_highlights: DataTypes.TEXT,
+    package_highlights: {
+      type: DataTypes.TEXT,
+      get() {
+        const rawValue = this.getDataValue("package_highlights");
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+    },
+
     price: DataTypes.DECIMAL(10, 2),
     tour_type: {
       type: DataTypes.INTEGER,
@@ -21,6 +29,23 @@ const Package = sequelize.define(
     departure_description: DataTypes.TEXT,
     arrival_location: { type: DataTypes.STRING, allowNull: false },
     arrival_description: DataTypes.TEXT,
+    duration: DataTypes.STRING,
+    // excludes: DataTypes.TEXT,
+    excludes: {
+      type: DataTypes.TEXT,
+      get() {
+        const rawValue = this.getDataValue("excludes");
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+    },
+    // includes: DataTypes.TEXT,
+    includes: {
+      type: DataTypes.TEXT,
+      get() {
+        const rawValue = this.getDataValue("includes");
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+    },
   },
   {
     tableName: "packages",

@@ -34,6 +34,9 @@ const addPackage = async (req, res) => {
       departure,
       arrivalDescription,
       departureDescription,
+      duration,
+      excludes,
+      includes,
     } = req.body;
 
     if (!title || !price || !description || !packageHighlights) {
@@ -78,6 +81,9 @@ const addPackage = async (req, res) => {
       departure_location: departure,
       arrival_description: arrivalDescription,
       departure_description: departureDescription,
+      duration,
+      excludes: excludes,
+      includes: includes,
     });
 
     return res.status(201).json({
