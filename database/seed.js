@@ -58,7 +58,8 @@ function generateSampleData(tableName, count) {
         data.push({
           id: uuidv4(),
           name: `Activity ${i}`,
-          image_url: `https://example.com/tour-type-${i}.jpg`,
+          description: `Description for activity ${i}`,
+          image_url: `https://picsum.photos/1920/1080`,
         });
         break;
       case "places":
@@ -68,6 +69,7 @@ function generateSampleData(tableName, count) {
           longitude: (79 + Math.random()).toFixed(6),
           latitude: (6 + Math.random()).toFixed(6),
           name: `Place ${i}`,
+          image_url: `https://picsum.photos/1920/1080`,
         });
         break;
     }

@@ -10,6 +10,7 @@ const Activity = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
     },
     name: DataTypes.STRING,
+    description: DataTypes.TEXT,
     image_url: {
       type: DataTypes.STRING,
       allowNull: true,

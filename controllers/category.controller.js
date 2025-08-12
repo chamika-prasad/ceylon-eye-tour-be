@@ -50,18 +50,9 @@ const createCategory = async (req, res) => {
       });
     }
 
-    // const ext = path.extname(req.file.originalname);
-    // const filename = `${uuidv4()}${ext}`;
     const uploadDir = path.join("uploads", "categories");
 
-    // if (!fs.existsSync(uploadDir)) {
-    //   fs.mkdirSync(uploadDir, { recursive: true });
-    // }
-
-    // const filePath = path.join(uploadDir, filename);
-    // fs.writeFileSync(filePath, req.file.buffer);
-
-    const filename = fileUploadService.uploadFile(uploadDir, file);
+    const filename = await fileUploadService.uploadFile(uploadDir, req.file);
 
     const imageUrl = `/uploads/categories/${filename}`;
 

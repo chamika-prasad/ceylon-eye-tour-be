@@ -60,7 +60,7 @@ const addPackage = async (req, res) => {
     const images = [];
 
     for (const file of req.files) {
-      const filename = fileUploadService.uploadFile(uploadDir, file);
+      const filename = await fileUploadService.uploadFile(uploadDir, file);
       images.push(`/uploads/packages/${packageId}/${filename}`);
     }
 

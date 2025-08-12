@@ -25,22 +25,25 @@ const createPlaceActivities = async (req, res) => {
 
     // Save files to disk and create image URLs
     const uploadDir = path.join("uploads", "placeactivities");
-    const activityRecords = parseActivities.map((activity, index) => {
-      const file = files[index];
-      let imageUrl = null;
-      if (file) {
-        const filename = fileUploadService.uploadFile(uploadDir, file);
-        imageUrl = `/uploads/placeactivities/${filename}`;
-      }
+    const activityRecords = await Promise.all(
+      parseActivities.map(async (activity, index) => {
+        const file = files[index];
+        let imageUrl = null;
 
-      return {
-        place_id: placeid,
-        activity_id: activity.id,
-        description: activity.description,
-        price: activity.price,
-        image_url: imageUrl,
-      };
-    });
+        if (file) {
+          const filename = await fileUploadService.uploadFile(uploadDir, file);
+          imageUrl = `/uploads/placeactivities/${filename}`;
+        }
+
+        return {
+          place_id: placeid,
+          activity_id: activity.id,
+          description: activity.description,
+          price: activity.price,
+          image_url: imageUrl,
+        };
+      })
+    );
 
     await placeActivityService.bulkCreateActivities(activityRecords);
 
