@@ -10,6 +10,7 @@ const DB_CONFIG = {
 };
 
 const SQL_STATEMENTS = [
+  `DROP DATABASE ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `USE ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `CREATE TABLE IF NOT EXISTS customers (
@@ -72,6 +73,10 @@ const SQL_STATEMENTS = [
     package_highlights TEXT,
     price DECIMAL(10, 2) NOT NULL,
     tour_type INT NOT NULL,
+    departure_location VARCHAR(255) NOT NULL,
+    departure_description TEXT,
+    arrival_location VARCHAR(255) NOT NULL,
+    arrival_description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )`,

@@ -17,6 +17,10 @@ const Package = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    departure_location: { type: DataTypes.STRING, allowNull: false },
+    departure_description: DataTypes.TEXT,
+    arrival_location: { type: DataTypes.STRING, allowNull: false },
+    arrival_description: DataTypes.TEXT,
   },
   {
     tableName: "packages",

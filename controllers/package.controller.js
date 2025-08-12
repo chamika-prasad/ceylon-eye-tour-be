@@ -30,6 +30,10 @@ const addPackage = async (req, res) => {
       categoryIds,
       placeIds,
       tourType,
+      arrival,
+      departure,
+      arrivalDescription,
+      departureDescription,
     } = req.body;
 
     if (!title || !price || !description || !packageHighlights) {
@@ -70,6 +74,10 @@ const addPackage = async (req, res) => {
       categoryIds: parseCategoryIds, // array of category UUID strings
       placeIds: parsePlaceIds, // array of place UUID strings
       images,
+      arrival_location: arrival,
+      departure_location: departure,
+      arrival_description: arrivalDescription,
+      departure_description: departureDescription,
     });
 
     return res.status(201).json({

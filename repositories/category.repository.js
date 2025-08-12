@@ -63,7 +63,11 @@ const getCategories = async (tourType) => {
       group: ["Category.id"],
     });
 
-    return categories;
+    const filteredCategories = categories.filter(
+      (category) => Number(category.get("packageCount")) > 0
+    );
+
+    return filteredCategories;
   } catch (error) {
     throw new Error(
       "Error fetching categories with package count: " + error.message

@@ -102,7 +102,7 @@ async function seedDatabase() {
     }
     console.log("✓ Customers seeded");
 
-    // Seed Tables: categories, activities, places, tour_types
+    // Seed Tables: categories, activities, places
     const tableNames = ["categories", "activities", "places"];
 
     for (const table of tableNames) {
@@ -126,6 +126,13 @@ async function seedDatabase() {
     const packageData = [];
 
     for (let i = 1; i <= 10; i++) {
+      const locations = ["Katunayaka", "mattala"];
+      const arrival =
+        locations[Math.floor(Math.random() * locations.length)];
+
+        const departure =
+        locations[Math.floor(Math.random() * locations.length)];
+
       packageData.push({
         id: uuidv4(),
         title: `Package ${i}`,
@@ -133,6 +140,10 @@ async function seedDatabase() {
         package_highlights: `[heighlight1, highlight2, highlight3]`,
         price: (Math.random() * 500 + 50).toFixed(2),
         tour_type: Math.round(Math.random()), // Assign a tour type
+        departure_location: departure,
+        departure_description: `${departure} Departure description for package ${i}`,
+        arrival_location: arrival,
+        arrival_description: `${arrival} Arrival description for package ${i}`,
       });
     }
 
