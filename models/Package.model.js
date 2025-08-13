@@ -10,8 +10,13 @@ const Package = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
     },
     title: DataTypes.STRING,
-    description: DataTypes.TEXT,
-    // package_highlights: DataTypes.TEXT,
+    description: {
+      type: DataTypes.TEXT,
+      get() {
+        const rawValue = this.getDataValue("description");
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+    },
     package_highlights: {
       type: DataTypes.TEXT,
       get() {

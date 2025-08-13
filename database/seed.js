@@ -131,18 +131,16 @@ async function seedDatabase() {
 
     for (let i = 1; i <= 10; i++) {
       const locations = ["Katunayaka", "mattala"];
-      const arrival =
-        locations[Math.floor(Math.random() * locations.length)];
+      const arrival = locations[Math.floor(Math.random() * locations.length)];
 
-        const departure =
-        locations[Math.floor(Math.random() * locations.length)];
+      const departure = locations[Math.floor(Math.random() * locations.length)];
 
-        const days = Math.floor(Math.random() * 5) + 1;
+      const days = Math.floor(Math.random() * 5) + 1;
 
       packageData.push({
         id: uuidv4(),
         title: `Package ${i}`,
-        description: `Description for package ${i}`,
+        description: `["description 1", "description 2", "description 3"]`,
         package_highlights: `["heighlight1", "highlight2", "highlight3"]`,
         price: (Math.random() * 500 + 50).toFixed(2),
         tour_type: Math.round(Math.random()), // Assign a tour type
