@@ -98,6 +98,9 @@ const SQL_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS package_places (
     package_id VARCHAR(36) NOT NULL,
     place_id VARCHAR(36) NOT NULL,
+    description TEXT,
+    sort_order INT NOT NULL,
+    day_no INT NOT NULL,
     PRIMARY KEY (package_id, place_id),
     FOREIGN KEY (package_id) REFERENCES packages(id) ON DELETE CASCADE,
     FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE,

@@ -4,6 +4,7 @@ import {
   Activity,
   Category,
   PackageImage,
+  PackagePlace,
 } from "../models/index.js";
 import sequelize from "../config/sequelize.js";
 
@@ -63,7 +64,7 @@ const getPackageById = async (id) => {
           as: "Places", // Match the alias defined in the Package -> Place association
           attributes: { exclude: ["created_at", "updated_at"] },
           through: {
-            attributes: [], // Exclude PackagePlace attributes from the result
+            attributes: ["description", "sort_order", "day_no"],
           },
           include: [
             {
@@ -89,6 +90,11 @@ const getPackageById = async (id) => {
     if (!selectedPackage) {
       return false;
     }
+
+    if (selectedPackage.Places) {
+      selectedPackage.Places.sort((a, b) => a.PackagePlace.sort_order - b.PackagePlace.sort_order);
+    }
+
     return selectedPackage;
   } catch (error) {
     console.log(`Error in Get Package: ${error}`);
@@ -108,7 +114,7 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
           as: "Places", // Match the alias defined in the Package -> Place association
           attributes: { exclude: ["created_at", "updated_at"] },
           through: {
-            attributes: [], // Exclude PackagePlace attributes from the result
+            attributes: ["description", "sort_order", "day_no"],
           },
           include: [
             {
@@ -134,6 +140,11 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
     if (!selectedPackage) {
       return false;
     }
+
+    if (selectedPackage.Places) {
+      selectedPackage.Places.sort((a, b) => a.PackagePlace.sort_order - b.PackagePlace.sort_order);
+    }
+
     return selectedPackage;
   } catch (error) {
     console.log(`Error in Get Package: ${error}`);
@@ -166,7 +177,16 @@ const addPackage = async (data) => {
 
     // Set places if any
     if (placeIds.length) {
-      await newPackage.setPlaces(placeIds, { transaction });
+      // await newPackage.setPlaces(placeIds, { transaction });
+      const records = placeIds.map((p) => ({
+        package_id: newPackage.id,
+        place_id: p.place_id,
+        description: p.description || null,
+        sort_order: Number(p.order) || 0,
+        day_no: Number(p.day_no) || 1,
+      }));
+
+      await PackagePlace.bulkCreate(records, { transaction });
     }
 
     // Save images

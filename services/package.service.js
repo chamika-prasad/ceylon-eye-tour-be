@@ -29,7 +29,7 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
   try {
     return await packageRepository.getPackageByUrlPrefix(urlPrefix);
   } catch (error) {
-    throw new Error(`Error in getPackageById service: ${error.message}`);
+    throw new Error(`Error in getPackageByUrlPrefix service: ${error.message}`);
   }
 };
 

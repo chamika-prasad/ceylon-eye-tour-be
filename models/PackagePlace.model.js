@@ -22,6 +22,18 @@ const PackagePlace = sequelize.define(
         key: "id",
       },
     },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    sort_order: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    day_no: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
     tableName: "package_places",
