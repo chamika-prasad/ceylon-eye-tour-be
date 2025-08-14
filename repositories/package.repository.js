@@ -85,6 +85,10 @@ const getPackageById = async (id) => {
             attributes: [], // Exclude PackageCategory attributes
           },
         },
+        {
+          model: PackageImage,
+          as: "Images",
+        },
       ],
     });
     if (!selectedPackage) {
@@ -92,7 +96,9 @@ const getPackageById = async (id) => {
     }
 
     if (selectedPackage.Places) {
-      selectedPackage.Places.sort((a, b) => a.PackagePlace.sort_order - b.PackagePlace.sort_order);
+      selectedPackage.Places.sort(
+        (a, b) => a.PackagePlace.sort_order - b.PackagePlace.sort_order
+      );
     }
 
     return selectedPackage;
@@ -135,6 +141,10 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
             attributes: [], // Exclude PackageCategory attributes
           },
         },
+        {
+          model: PackageImage,
+          as: "Images",
+        },
       ],
     });
     if (!selectedPackage) {
@@ -142,7 +152,9 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
     }
 
     if (selectedPackage.Places) {
-      selectedPackage.Places.sort((a, b) => a.PackagePlace.sort_order - b.PackagePlace.sort_order);
+      selectedPackage.Places.sort(
+        (a, b) => a.PackagePlace.sort_order - b.PackagePlace.sort_order
+      );
     }
 
     return selectedPackage;
