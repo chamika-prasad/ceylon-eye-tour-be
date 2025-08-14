@@ -59,6 +59,16 @@ const Package = sequelize.define(
         notEmpty: true,
       },
     },
+    review: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    user_count: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
   },
   {
     tableName: "packages",
