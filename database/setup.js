@@ -34,6 +34,7 @@ const SQL_STATEMENTS = [
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     name VARCHAR(255) NOT NULL,
     description TEXT,
+    hero_description TEXT,
     image_url VARCHAR(500),
     url_prefix VARCHAR(255) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
