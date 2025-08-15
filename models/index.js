@@ -10,6 +10,9 @@ import Place from "./Place.model.js";
 import PlaceActivity from "./PlaceActivity.model.js";
 import PackageCategory from "./PackageCategory.model.js";
 import PackageImage from "./packageImage.model.js";
+import Review from "./Review.model.js";
+import Hotel from "./Hotel.model.js";
+import Gallery from "./Gallery.model.js";
 
 // Define all associations here
 const initModels = () => {
@@ -94,6 +97,39 @@ const initModels = () => {
     foreignKey: "category_id",
     as: "Category",
   });
+
+  // Place - Hotel (one-to-many)
+  Place.hasMany(Hotel, {
+    foreignKey: "place_id",
+    as: "Hotels",
+  });
+
+  Hotel.belongsTo(Place, {
+    foreignKey: "place_id",
+    as: "Place",
+  });
+
+  // Customer - Review (one-to-many)
+  Customer.hasMany(Review, {
+    foreignKey: "customer_id",
+    as: "Reviews",
+  });
+
+  Review.belongsTo(Customer, {
+    foreignKey: "customer_id",
+    as: "Customer",
+  });
+
+  // Customer - Gallery (one-to-many)
+  Customer.hasMany(Gallery, {
+    foreignKey: "customer_id",
+    as: "Galleries",
+  });
+
+  Gallery.belongsTo(Customer, {
+    foreignKey: "customer_id",
+    as: "Customer",
+  });
 };
 
 initModels(); // Call it immediately so models are ready when exported
@@ -111,4 +147,7 @@ export {
   PlaceActivity,
   PackageCategory,
   PackageImage,
+  Hotel,
+  Review,
+  Gallery,
 };

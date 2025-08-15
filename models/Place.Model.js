@@ -13,6 +13,14 @@ const Place = sequelize.define(
     longitude: DataTypes.DECIMAL,
     latitude: DataTypes.DECIMAL,
     name: DataTypes.STRING,
+    url_prefix: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
     description: DataTypes.TEXT,
     image_url: {
       type: DataTypes.STRING,

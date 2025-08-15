@@ -59,7 +59,7 @@ const Package = sequelize.define(
         notEmpty: true,
       },
     },
-    review: {
+    rating: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,

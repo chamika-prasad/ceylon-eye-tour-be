@@ -53,7 +53,7 @@ function generateSampleData(tableName, count) {
           name: `Category ${i}`,
           description: `Description for category ${i}`,
           hero_description: `Hero description for category ${i}`,
-          image_url: `https://picsum.photos/1920/1080?`,
+          image_url: `https://picsum.photos/1920/1080?random=${i}`,
           url_prefix: `category-${i}`,
         });
         break;
@@ -62,7 +62,7 @@ function generateSampleData(tableName, count) {
           id: uuidv4(),
           name: `Activity ${i}`,
           description: `Description for activity ${i}`,
-          image_url: `https://picsum.photos/1920/1080`,
+          image_url: `https://picsum.photos/1920/1080?random=${i}`,
         });
         break;
       case "places":
@@ -72,7 +72,9 @@ function generateSampleData(tableName, count) {
           longitude: (79 + Math.random()).toFixed(6),
           latitude: (6 + Math.random()).toFixed(6),
           name: `Place ${i}`,
-          image_url: `https://picsum.photos/1920/1080`,
+          url_prefix: `place-${i}`,
+          description: `Description for place ${i}`,
+          image_url: `https://picsum.photos/1920/1080?random=${i}`,
         });
         break;
     }
@@ -127,24 +129,22 @@ async function seedDatabase() {
       console.log(`✓ ${table} seeded with 10 records`);
     }
 
-    // Seed Packages (after tour_types are created)
+    // Seed Packages
     const packageData = [];
 
     for (let i = 1; i <= 10; i++) {
-      const locations = ["Katunayaka", "mattala"];
+      const locations = ["Katunayaka", "Mattala"];
       const arrival = locations[Math.floor(Math.random() * locations.length)];
-
       const departure = locations[Math.floor(Math.random() * locations.length)];
-
       const days = Math.floor(Math.random() * 5) + 1;
 
       packageData.push({
         id: uuidv4(),
         title: `Package ${i}`,
         description: `["description 1", "description 2", "description 3"]`,
-        package_highlights: `["heighlight1", "highlight2", "highlight3"]`,
+        package_highlights: `["highlight1", "highlight2", "highlight3"]`,
         price: (Math.random() * 500 + 50).toFixed(2),
-        tour_type: Math.round(Math.random()), // Assign a tour type
+        tour_type: Math.round(Math.random()),
         departure_location: departure,
         departure_description: `${departure} Departure description for package ${i}`,
         arrival_location: arrival,
@@ -166,9 +166,9 @@ async function seedDatabase() {
         console.error("⚠️ Failed to insert package:", err.message);
       }
     }
-    console.log("✓ packages seeded with 10 records");
+    console.log("✓ Packages seeded with 10 records");
 
-    // Seed Junction Tables and Bookings
+    // Fetch IDs for relationships
     const [places] = await connection.query("SELECT id FROM places LIMIT 10");
     const [activities] = await connection.query(
       "SELECT id FROM activities LIMIT 10"
@@ -181,6 +181,59 @@ async function seedDatabase() {
     );
     const [customers] = await connection.query("SELECT id FROM customers");
 
+    // Seed Hotels
+    for (let i = 0; i < 10; i++) {
+      const place = places[Math.floor(Math.random() * places.length)];
+      try {
+        await connection.query("INSERT INTO hotels SET ?", {
+          id: uuidv4(),
+          place_id: place.id,
+          name: `Hotel ${i + 1}`,
+          description: `["description 1", "description 2", "description 3"]`,
+          facilities: `["facility 1", "facility 2", "facility 3"]`,
+          images: `["https://picsum.photos/seed/hotel${i}/600/400", "https://picsum.photos/seed/hotel${i}/600/400", "https://picsum.photos/seed/hotel${i}/600/400"]`,
+          rooms_details: `["rooms details 1", "rooms details 2", "rooms details 3"]`,
+          rating: Math.floor(Math.random() * 5) + 1,
+        });
+      } catch (error) {
+        console.error("⚠️ Failed to insert hotel:", error.message);
+      }
+    }
+    console.log("✓ Hotels seeded with 10 records");
+
+    // Seed Reviews
+    for (let i = 0; i < 10; i++) {
+      const customer = customers[Math.floor(Math.random() * customers.length)];
+      try {
+        await connection.query("INSERT INTO reviews SET ?", {
+          id: uuidv4(),
+          customer_id: customer.id,
+          rating: Math.floor(Math.random() * 5) + 1,
+          review: `This is review ${i + 1}`,
+        });
+      } catch (error) {
+        console.error("⚠️ Failed to insert review:", error.message);
+      }
+    }
+    console.log("✓ Reviews seeded with 10 records");
+
+    // ✅ Seed Gallery
+    for (let i = 0; i < 10; i++) {
+      const customer = customers[Math.floor(Math.random() * customers.length)];
+      try {
+        await connection.query("INSERT INTO gallery SET ?", {
+          id: uuidv4(),
+          customer_id: customer.id,
+          image_url: `https://picsum.photos/seed/gallery${i}/800/600`,
+          is_approved: Math.random() > 0.5 ? 1 : 0,
+        });
+      } catch (error) {
+        console.error("⚠️ Failed to insert gallery:", error.message);
+      }
+    }
+    console.log("✓ Gallery seeded with 10 records");
+
+    // Seed Junction Tables and Bookings
     for (let i = 0; i < 10; i++) {
       const customer = customers[Math.floor(Math.random() * customers.length)];
       const place = places[i];

@@ -8,6 +8,8 @@ import categoryRoutes from "./routes/category.route.js";
 import packageRoutes from "./routes/package.route.js";
 import activityRoutes from "./routes/activity.route.js";
 import placeActivityRoutes from "./routes/placeActivity.routes.js";
+import hotelRoutes from "./routes/hotel.routes.js";
+import placeRoutes from "./routes/place.routes.js";
 
 dotenv.config();
 
@@ -24,6 +26,8 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/packages", packageRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/place-activities", placeActivityRoutes);
+app.use("/api/hotels", hotelRoutes);
+app.use("/api/places", placeRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
