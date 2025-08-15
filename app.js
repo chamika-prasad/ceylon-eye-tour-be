@@ -13,6 +13,8 @@ import placeActivityRoutes from "./routes/placeActivity.routes.js";
 import hotelRoutes from "./routes/hotel.routes.js";
 import placeRoutes from "./routes/place.routes.js";
 import hotelTypeRoutes from "./routes/hotelType.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
+import galleryRoutes from "./routes/gallery.routes.js";
 
 
 dotenv.config();
@@ -39,6 +41,8 @@ app.use("/api/place-activities", placeActivityRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/places", placeRoutes);
 app.use("/api/hotel-types", hotelTypeRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/gallery", galleryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
