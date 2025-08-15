@@ -39,6 +39,21 @@ const CUSTOMERS = [
   },
 ];
 
+// ✅ Hotel Types
+const HOTEL_TYPES = [
+  "Galle Fort",
+  "City",
+  "Country side",
+  "Nature",
+  "WILD",
+].map((name, index) => ({
+  id: uuidv4(),
+  name,
+  description: `Description for ${name}`,
+  image_url: `https://picsum.photos/seed/hoteltype${index}/600/400`,
+  url_prefix: `${name.toLowerCase().replace(/\s+/g, "-")}`,
+}));
+
 // -----------------------------
 // Sample Data Generator
 // -----------------------------
@@ -108,6 +123,15 @@ async function seedDatabase() {
       );
     }
     console.log("✓ Customers seeded");
+
+    // ✅ Seed Hotel Types
+    for (const hotelType of HOTEL_TYPES) {
+      await connection.query(
+        "INSERT INTO hotel_types SET ? ON DUPLICATE KEY UPDATE name = name",
+        hotelType
+      );
+    }
+    console.log("✓ Hotel Types seeded");
 
     // Seed Tables: categories, activities, places
     const tableNames = ["categories", "activities", "places"];
@@ -181,13 +205,19 @@ async function seedDatabase() {
     );
     const [customers] = await connection.query("SELECT id FROM customers");
 
+    const [hotelTypes] = await connection.query(
+      "SELECT id FROM hotel_types LIMIT 5"
+    );
+
     // Seed Hotels
     for (let i = 0; i < 10; i++) {
       const place = places[Math.floor(Math.random() * places.length)];
+      const type = hotelTypes[Math.floor(Math.random() * hotelTypes.length)];
       try {
         await connection.query("INSERT INTO hotels SET ?", {
           id: uuidv4(),
           place_id: place.id,
+          type_id: type.id,
           name: `Hotel ${i + 1}`,
           description: `["description 1", "description 2", "description 3"]`,
           facilities: `["facility 1", "facility 2", "facility 3"]`,

@@ -13,6 +13,7 @@ import PackageImage from "./packageImage.model.js";
 import Review from "./Review.model.js";
 import Hotel from "./Hotel.model.js";
 import Gallery from "./Gallery.model.js";
+import HotelType from "./HotelType.model.js";
 
 // Define all associations here
 const initModels = () => {
@@ -130,6 +131,17 @@ const initModels = () => {
     foreignKey: "customer_id",
     as: "Customer",
   });
+
+  // ✅ HotelType - Hotel (one-to-many)
+  HotelType.hasMany(Hotel, {
+    foreignKey: "type_id",
+    as: "Hotels",
+  });
+
+  Hotel.belongsTo(HotelType, {
+    foreignKey: "type_id",
+    as: "Type",
+  });
 };
 
 initModels(); // Call it immediately so models are ready when exported
@@ -150,4 +162,5 @@ export {
   Hotel,
   Review,
   Gallery,
+  HotelType,
 };

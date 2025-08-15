@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import sequelize from "./config/sequelize.js";
 import authRoutes from "./routes/auth.route.js";
 import categoryRoutes from "./routes/category.route.js";
@@ -10,10 +12,18 @@ import activityRoutes from "./routes/activity.route.js";
 import placeActivityRoutes from "./routes/placeActivity.routes.js";
 import hotelRoutes from "./routes/hotel.routes.js";
 import placeRoutes from "./routes/place.routes.js";
+import hotelTypeRoutes from "./routes/hotelType.routes.js";
+
 
 dotenv.config();
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Middleware
 app.use(cors());
@@ -28,6 +38,7 @@ app.use("/api/activities", activityRoutes);
 app.use("/api/place-activities", placeActivityRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/places", placeRoutes);
+app.use("/api/hotel-types", hotelTypeRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
