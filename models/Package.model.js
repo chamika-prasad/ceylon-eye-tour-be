@@ -35,7 +35,6 @@ const Package = sequelize.define(
     arrival_location: { type: DataTypes.STRING, allowNull: false },
     arrival_description: DataTypes.TEXT,
     duration: DataTypes.STRING,
-    // excludes: DataTypes.TEXT,
     excludes: {
       type: DataTypes.TEXT,
       get() {
@@ -43,7 +42,6 @@ const Package = sequelize.define(
         return rawValue ? JSON.parse(rawValue) : [];
       },
     },
-    // includes: DataTypes.TEXT,
     includes: {
       type: DataTypes.TEXT,
       get() {

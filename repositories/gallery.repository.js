@@ -33,8 +33,39 @@ const updateGalleryApproval = async (id, isApproved) => {
   }
 };
 
+// Add a new gallery item
+const addGalleryItem = async (galleryData) => {
+  try {
+    return await Gallery.create(galleryData);
+  } catch (error) {
+    throw new Error(`Error adding gallery item: ${error.message}`);
+  }
+};
+
+// Delete a gallery item by ID
+const deleteGalleryItemById = async (id) => {
+  try {
+    const deleted = await Gallery.destroy({ where: { id } });
+    return deleted > 0;
+  } catch (error) {
+    throw new Error(`Error deleting gallery item: ${error.message}`);
+  }
+};
+
+// Get a gallery item by ID
+const getGalleryItemById = async (id) => {
+  try {
+    return await Gallery.findByPk(id);
+  } catch (error) {
+    throw new Error(`Error fetching gallery item by ID: ${error.message}`);
+  }
+};
+
 export default {
   getAllGallery,
   updateGalleryApproval,
   getAllApprovedGallery,
+  addGalleryItem,
+  deleteGalleryItemById,
+  getGalleryItemById,
 };

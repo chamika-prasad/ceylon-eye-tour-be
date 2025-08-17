@@ -142,6 +142,39 @@ const initModels = () => {
     foreignKey: "type_id",
     as: "Type",
   });
+
+  // Booking - Review (one-to-one)
+  Booking.hasOne(Review, {
+    foreignKey: "booking_id",
+    as: "Review",
+  });
+
+  Review.belongsTo(Booking, {
+    foreignKey: "booking_id",
+    as: "Booking",
+  });
+
+  // Package - Booking (one-to-many)
+  Package.hasMany(Booking, {
+    foreignKey: "package_id",
+    as: "Bookings", // Alias for including bookings with package
+  });
+
+  Booking.belongsTo(Package, {
+    foreignKey: "package_id",
+    as: "Package", // Alias for including package with booking
+  });
+
+  // Customer - Booking (one-to-many)
+  Customer.hasMany(Booking, {
+    foreignKey: "customer_id",
+    as: "Bookings", // Alias for including bookings with customer
+  });
+
+  Booking.belongsTo(Customer, {
+    foreignKey: "customer_id",
+    as: "Customer", // Alias for including customer with booking
+  });
 };
 
 initModels(); // Call it immediately so models are ready when exported

@@ -231,22 +231,6 @@ async function seedDatabase() {
     }
     console.log("✓ Hotels seeded with 10 records");
 
-    // Seed Reviews
-    for (let i = 0; i < 10; i++) {
-      const customer = customers[Math.floor(Math.random() * customers.length)];
-      try {
-        await connection.query("INSERT INTO reviews SET ?", {
-          id: uuidv4(),
-          customer_id: customer.id,
-          rating: Math.floor(Math.random() * 5) + 1,
-          review: `This is review ${i + 1}`,
-        });
-      } catch (error) {
-        console.error("⚠️ Failed to insert review:", error.message);
-      }
-    }
-    console.log("✓ Reviews seeded with 10 records");
-
     // ✅ Seed Gallery
     for (let i = 0; i < 10; i++) {
       const customer = customers[Math.floor(Math.random() * customers.length)];
@@ -298,9 +282,10 @@ async function seedDatabase() {
         });
 
         // Bookings
-        await connection.query("INSERT INTO booking SET ?", {
+        await connection.query("INSERT INTO bookings SET ?", {
           id: uuidv4(),
-          passenger_count: Math.floor(Math.random() * 5) + 1,
+          adult_count: Math.floor(Math.random() * 5) + 1,
+          child_count: Math.floor(Math.random() * 5) + 1,
           status: ["pending", "confirmed", "completed", "cancelled"][
             Math.floor(Math.random() * 4)
           ],
@@ -311,6 +296,7 @@ async function seedDatabase() {
             .split("T")[0],
           package_id: packageItem.id,
           customer_id: customer.id,
+          message: `Booking message for ${customer.name} on package ${packageItem.title}`,
         });
       } catch (error) {
         console.error("⚠️ Insert failed (junction/bookings):", error.message);
@@ -319,7 +305,7 @@ async function seedDatabase() {
 
     // Seed Payments
     const [bookings] = await connection.query(
-      "SELECT id FROM booking LIMIT 10"
+      "SELECT id FROM bookings LIMIT 10"
     );
 
     for (let i = 0; i < 10; i++) {
@@ -337,6 +323,25 @@ async function seedDatabase() {
         console.error("⚠️ Failed to seed payments:", error.message);
       }
     }
+
+    // Seed Reviews
+    for (let i = 0; i < 10; i++) {
+      const customer = customers[Math.floor(Math.random() * customers.length)];
+      const booking = bookings[Math.floor(Math.random() * bookings.length)];
+      try {
+        await connection.query("INSERT INTO reviews SET ?", {
+          id: uuidv4(),
+          customer_id: customer.id,
+          booking_id: booking.id,
+          rating: Math.floor(Math.random() * 5) + 1,
+          review: `This is review ${i + 1}`,
+        });
+      } catch (error) {
+        console.error("⚠️ Failed to insert review:", error.message);
+      }
+    }
+    console.log("✓ Reviews seeded with 10 records");
+    console.log("✓ Bookings seeded with 10 records");
 
     console.log("✓ Junction tables and payments seeded");
     console.log("🎉 Database seeding completed successfully!");

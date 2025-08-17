@@ -9,17 +9,37 @@ const Booking = sequelize.define(
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
     },
-    passenger_count: DataTypes.INTEGER,
+    adult_count: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    child_count: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM("pending", "confirmed", "cancelled", "completed"),
       defaultValue: "pending",
     },
-    start_date: DataTypes.DATEONLY,
-    package_id: DataTypes.STRING(36),
-    customer_id: DataTypes.STRING(36),
+    start_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    package_id: {
+      type: DataTypes.STRING(36),
+      allowNull: false,
+    },
+    customer_id: {
+      type: DataTypes.STRING(36),
+      allowNull: false,
+    },
+    message: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
-    tableName: "booking",
+    tableName: "bookings",
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at",

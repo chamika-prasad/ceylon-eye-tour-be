@@ -1,11 +1,12 @@
 import reviewService from "../services/review.service.js";
+import packageService from "../services/package.service.js";
 
 // ✅ Add new review
 const createReview = async (req, res) => {
   try {
-    const { customer_id, rating, review } = req.body;
+    const { customerId, bookingId, packageId, rating, review } = req.body;
 
-    if (!customer_id || !rating) {
+    if (!customerId || !rating) {
       return res.status(400).json({
         success: false,
         message: "Customer ID and rating are required",
@@ -20,10 +21,26 @@ const createReview = async (req, res) => {
     }
 
     const newReview = await reviewService.createReview({
-      customer_id,
+      customer_id: customerId,
+      booking_id: bookingId,
       rating: Number(rating),
       review,
     });
+
+    const result = await packageService.getPackageById(packageId);
+
+    if (result) {
+      console.log(result.user_count);
+      console.log(result.rating);
+
+      const updatedRatingPackage = await packageService.updatePackageRating(
+        packageId,
+        {
+          rating: Number(result.rating) + Number(rating),
+          user_count: Number(result.user_count) + 1,
+        }
+      );
+    }
 
     return res.status(201).json({
       success: true,

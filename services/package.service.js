@@ -33,9 +33,18 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
   }
 };
 
+const updatePackageRating = async (id, data) => {
+  try {
+    return await packageRepository.updatePackageRating(id, data);
+  } catch (error) {
+    throw new Error(`Error in updatePackageRating service: ${error.message}`);
+  }
+};
+
 export default {
   getPackages,
   addPackage,
   getPackageById,
   getPackageByUrlPrefix,
+  updatePackageRating,
 };

@@ -225,9 +225,43 @@ const addPackage = async (data) => {
   }
 };
 
+const updatePackageRating = async (id, data) => {
+  let transaction;
+  try {
+    // Start a transaction
+    transaction = await sequelize.transaction();
+
+    // Destructure the related data
+    const { rating, user_count } = data;
+
+    // Find the package to update
+    const existingPackage = await Package.findByPk(id, { transaction });
+    if (!existingPackage) {
+      throw new Error("Package not found");
+    }
+
+    // Update only the rating and user_count columns
+    await existingPackage.update({ rating, user_count }, { transaction });
+
+    // Commit the transaction
+    await transaction.commit();
+
+    // Reload with associations to return full data
+    const result = await getPackageById(id);
+    return result;
+  } catch (error) {
+    console.log(error);
+
+    // Rollback the transaction if any error occurs
+    if (transaction) await transaction.rollback();
+    throw new Error(`Error in updatePackage repository: ${error.message}`);
+  }
+};
+
 export default {
   getPackages,
   addPackage,
   getPackageById,
   getPackageByUrlPrefix,
+  updatePackageRating,
 };
