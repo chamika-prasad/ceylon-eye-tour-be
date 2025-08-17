@@ -16,6 +16,7 @@ import hotelTypeRoutes from "./routes/hotelType.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import galleryRoutes from "./routes/gallery.routes.js";
 import bookingRoutes from "./routes/booking.route.js";
+import vehicleRoutes from "./routes/vehicle.routes.js";
 
 
 dotenv.config();
@@ -25,13 +26,12 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Middleware
+// Middleware setup
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -45,6 +45,7 @@ app.use("/api/hotel-types", hotelTypeRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/vehicles", vehicleRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

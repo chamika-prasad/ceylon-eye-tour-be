@@ -185,6 +185,23 @@ const SQL_STATEMENTS = [
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (customer_id) REFERENCES customers(id)
 )`,
+  `CREATE TABLE IF NOT EXISTS vehicles (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  name VARCHAR(255) NOT NULL,
+  descriptions TEXT,
+  images TEXT,
+  excludes TEXT,
+  facilities TEXT,
+  terms TEXT,
+  owner VARCHAR(255) NOT NULL,
+  owner_contact VARCHAR(255) NOT NULL,
+  url_prefix VARCHAR(255) UNIQUE NOT NULL,
+  passenger_capacity INT NOT NULL,
+  location VARCHAR(255) NOT NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)`,
 ];
 
 async function setupDatabase() {

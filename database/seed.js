@@ -92,6 +92,33 @@ function generateSampleData(tableName, count) {
           image_url: `https://picsum.photos/1920/1080?random=${i}`,
         });
         break;
+      case "vehicles":
+        data.push({
+          id: uuidv4(),
+          name: `Vehicle ${i}`,
+          descriptions: `["description 1", "description 2", "description 3"]`,
+          images: JSON.stringify([
+            `https://picsum.photos/seed/vehicle${i}a/600/400`,
+            `https://picsum.photos/seed/vehicle${i}b/600/400`,
+            `https://picsum.photos/seed/vehicle${i}c/600/400`,
+          ]),
+          excludes: JSON.stringify([
+            "Fuel not included",
+            "Driver tips",
+            "Parking charges",
+          ]),
+          facilities: JSON.stringify(["AC", "WiFi", "Comfortable seats"]),
+          terms: `["Terms 1", "Terms 2", "Terms 3"]`,
+          price: (Math.random() * 100 + 20).toFixed(2),
+          owner: `Owner ${i}`,
+          owner_contact: `07${Math.floor(10000000 + Math.random() * 89999999)}`,
+          url_prefix: `vehicle-${i}`,
+          passenger_capacity: Math.floor(Math.random() * 6) + 2, // between 2 and 7
+          location: ["Colombo", "Kandy", "Galle", "Jaffna", "Negombo"][
+            Math.floor(Math.random() * 5)
+          ],
+        });
+        break;
     }
   }
 
@@ -134,7 +161,7 @@ async function seedDatabase() {
     console.log("✓ Hotel Types seeded");
 
     // Seed Tables: categories, activities, places
-    const tableNames = ["categories", "activities", "places"];
+    const tableNames = ["categories", "activities", "places", "vehicles"];
 
     for (const table of tableNames) {
       const data = generateSampleData(table, 10);

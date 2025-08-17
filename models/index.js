@@ -14,6 +14,7 @@ import Review from "./Review.model.js";
 import Hotel from "./Hotel.model.js";
 import Gallery from "./Gallery.model.js";
 import HotelType from "./HotelType.model.js";
+import Vehicle from "./Vehicle.model.js";
 
 // Define all associations here
 const initModels = () => {
@@ -196,4 +197,5 @@ export {
   Review,
   Gallery,
   HotelType,
+  Vehicle,
 };
