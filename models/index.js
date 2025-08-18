@@ -25,6 +25,7 @@ const initModels = () => {
     otherKey: "package_id",
     as: "Packages",
   });
+  
   Package.belongsToMany(Place, {
     through: PackagePlace,
     foreignKey: "package_id",

@@ -13,6 +13,10 @@ const Hotel = sequelize.define(
       type: DataTypes.STRING(36),
       allowNull: false,
     },
+    type_id: {
+      type: DataTypes.STRING(36),
+      allowNull: false,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,

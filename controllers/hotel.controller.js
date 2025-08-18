@@ -5,21 +5,29 @@ import fileUploadService from "../services/fileUpload.service.js";
 
 const createHotel = async (req, res) => {
   try {
-    const { name, place_id, description, facilities, rooms_details, rating } =
-      req.body;
+    const {
+      name,
+      placeId,
+      typeId,
+      description,
+      facilities,
+      roomsDetails,
+      rating,
+    } = req.body;
 
     if (
       !name ||
       !description ||
-      !place_id ||
+      !placeId ||
+      !typeId ||
       !facilities ||
-      !rooms_details ||
+      !roomsDetails ||
       !rating
     ) {
       return res.status(400).json({
         success: false,
         message:
-          "Name, description, place_id, facilities, rooms_details and rating are required",
+          "Name, description, placeId, typeId, facilities, rooms_details and rating are required",
       });
     }
 
@@ -42,11 +50,12 @@ const createHotel = async (req, res) => {
 
     const newHotel = await hotelService.createHotel({
       name,
-      place_id,
+      place_id: placeId,
+      type_id: typeId,
       description,
       facilities,
-      images:JSON.stringify(images) || "[]", // Ensure images is a JSON string
-      rooms_details,
+      images: JSON.stringify(images) || "[]", // Ensure images is a JSON string
+      rooms_details: JSON.stringify(roomsDetails) || "[]", // Ensure rooms_details is a JSON string
       rating: Number(rating) || 0,
     });
 

@@ -100,12 +100,13 @@ const SQL_STATEMENTS = [
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )`,
   `CREATE TABLE IF NOT EXISTS package_places (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     package_id VARCHAR(36) NOT NULL,
     place_id VARCHAR(36) NOT NULL,
     description TEXT,
     sort_order INT NOT NULL,
     day_no INT NOT NULL,
-    PRIMARY KEY (package_id, place_id),
+    events TEXT,
     FOREIGN KEY (package_id) REFERENCES packages(id) ON DELETE CASCADE,
     FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

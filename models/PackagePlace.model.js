@@ -6,9 +6,14 @@ import Place from "./Place.model.js";
 const PackagePlace = sequelize.define(
   "PackagePlace",
   {
-    package_id: {
+    id: {
       type: DataTypes.STRING(36),
       primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    package_id: {
+      type: DataTypes.STRING(36),
+      // primaryKey: true,
       references: {
         model: Package,
         key: "id",
@@ -16,7 +21,7 @@ const PackagePlace = sequelize.define(
     },
     place_id: {
       type: DataTypes.STRING(36),
-      primaryKey: true,
+      // primaryKey: true,
       references: {
         model: Place,
         key: "id",
@@ -33,6 +38,14 @@ const PackagePlace = sequelize.define(
     day_no: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    events: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue("events");
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
     },
   },
   {

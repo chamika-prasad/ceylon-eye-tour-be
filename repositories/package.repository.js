@@ -5,6 +5,7 @@ import {
   Category,
   PackageImage,
   PackagePlace,
+  PlaceActivity,
 } from "../models/index.js";
 import sequelize from "../config/sequelize.js";
 
@@ -56,52 +57,62 @@ const getPackages = async () => {
 
 const getPackageById = async (id) => {
   try {
-    const selectedPackage = await Package.findByPk(id, {
-      attributes: { exclude: ["created_at", "updated_at"] },
-      include: [
-        {
-          model: Place,
-          as: "Places", // Match the alias defined in the Package -> Place association
-          attributes: { exclude: ["created_at", "updated_at"] },
-          through: {
-            attributes: ["description", "sort_order", "day_no"],
-          },
-          include: [
-            {
-              model: Activity,
-              as: "Activities", // Match the alias defined in Place -> Activity association
-              attributes: { exclude: ["created_at", "updated_at"] }, // Exclude timestamps from Activity
-              through: {
-                attributes: [], // Exclude PlaceActivity attributes
-              },
-            },
-          ],
-        },
-        {
-          model: Category,
-          as: "Categories", // Alias defined in association
-          attributes: { exclude: ["created_at", "updated_at"] },
-          through: {
-            attributes: [], // Exclude PackageCategory attributes
-          },
-        },
-        {
-          model: PackageImage,
-          as: "Images",
-        },
-      ],
-    });
-    if (!selectedPackage) {
+    const packageData = await Package.findByPk(id);
+
+    if (!packageData) {
       return false;
     }
 
-    if (selectedPackage.Places) {
-      selectedPackage.Places.sort(
-        (a, b) => a.PackagePlace.sort_order - b.PackagePlace.sort_order
+    const packagePlaces = await PackagePlace.findAll({
+      where: { package_id: packageData.id },
+    });
+
+    const placeDetails = await Promise.all(
+      packagePlaces.map(async (packagePlace) => {
+        const packagPlaceObj = packagePlace.toJSON();
+        delete packagPlaceObj.id;
+        delete packagPlaceObj.package_id;
+        delete packagPlaceObj.place_id;
+        delete packagPlaceObj.created_at;
+
+        const place = await Place.findByPk(packagePlace.place_id, {
+          attributes: { exclude: ["created_at", "updated_at"] },
+          include: [
+            {
+              model: Activity,
+              as: "Activities",
+              attributes: { exclude: ["created_at", "updated_at"] },
+              through: {
+                attributes: [],
+              },
+            },
+          ],
+        });
+
+        const placeObj = place.toJSON();
+        delete placeObj.id;
+        delete placeObj.url_prefix;
+
+        return { place: placeObj, packagePlace: packagPlaceObj };
+      })
+    );
+
+    if (placeDetails.length > 0) {
+      placeDetails.sort(
+        (a, b) => a.packagePlace.sort_order - b.packagePlace.sort_order
       );
     }
 
-    return selectedPackage;
+    // Convert to plain object first, then delete properties
+    const packageObj = packageData.toJSON();
+    delete packageObj.created_at;
+    delete packageObj.updated_at;
+
+    const responseObj = {
+      package: packageObj,
+      places: placeDetails,
+    };
+    return responseObj;
   } catch (error) {
     console.log(`Error in Get Package: ${error}`);
 
@@ -111,53 +122,64 @@ const getPackageById = async (id) => {
 
 const getPackageByUrlPrefix = async (urlPrefix) => {
   try {
-    const selectedPackage = await Package.findOne({
+    const packageData = await Package.findOne({
       where: { url_prefix: urlPrefix },
-      attributes: { exclude: ["created_at", "updated_at"] },
-      include: [
-        {
-          model: Place,
-          as: "Places", // Match the alias defined in the Package -> Place association
-          attributes: { exclude: ["created_at", "updated_at"] },
-          through: {
-            attributes: ["description", "sort_order", "day_no"],
-          },
-          include: [
-            {
-              model: Activity,
-              as: "Activities", // Match the alias defined in Place -> Activity association
-              attributes: { exclude: ["created_at", "updated_at"] }, // Exclude timestamps from Activity
-              through: {
-                attributes: [], // Exclude PlaceActivity attributes
-              },
-            },
-          ],
-        },
-        {
-          model: Category,
-          as: "Categories", // Alias defined in association
-          attributes: { exclude: ["created_at", "updated_at"] },
-          through: {
-            attributes: [], // Exclude PackageCategory attributes
-          },
-        },
-        {
-          model: PackageImage,
-          as: "Images",
-        },
-      ],
     });
-    if (!selectedPackage) {
+
+    if (!packageData) {
       return false;
     }
 
-    if (selectedPackage.Places) {
-      selectedPackage.Places.sort(
-        (a, b) => a.PackagePlace.sort_order - b.PackagePlace.sort_order
+    const packagePlaces = await PackagePlace.findAll({
+      where: { package_id: packageData.id },
+    });
+
+    const placeDetails = await Promise.all(
+      packagePlaces.map(async (packagePlace) => {
+        const packagPlaceObj = packagePlace.toJSON();
+        delete packagPlaceObj.id;
+        delete packagPlaceObj.package_id;
+        delete packagPlaceObj.place_id;
+        delete packagPlaceObj.created_at;
+
+        const place = await Place.findByPk(packagePlace.place_id, {
+          attributes: { exclude: ["created_at", "updated_at"] },
+          include: [
+            {
+              model: Activity,
+              as: "Activities",
+              attributes: { exclude: ["created_at", "updated_at"] },
+              through: {
+                attributes: [],
+              },
+            },
+          ],
+        });
+
+        const placeObj = place.toJSON();
+        delete placeObj.id;
+        delete placeObj.url_prefix;
+
+        return { place: placeObj, packagePlace: packagPlaceObj };
+      })
+    );
+
+    if (placeDetails.length > 0) {
+      placeDetails.sort(
+        (a, b) => a.packagePlace.sort_order - b.packagePlace.sort_order
       );
     }
 
-    return selectedPackage;
+    // Convert to plain object first, then delete properties
+    const packageObj = packageData.toJSON();
+    delete packageObj.created_at;
+    delete packageObj.updated_at;
+
+    const responseObj = {
+      package: packageObj,
+      places: placeDetails,
+    };
+    return responseObj;
   } catch (error) {
     console.log(`Error in Get Package: ${error}`);
 
@@ -196,6 +218,7 @@ const addPackage = async (data) => {
         description: p.description || null,
         sort_order: Number(p.order) || 0,
         day_no: Number(p.day_no) || 1,
+        events: p.events ? JSON.stringify(p.events) : null, // Ensure events is a JSON string
       }));
 
       await PackagePlace.bulkCreate(records, { transaction });

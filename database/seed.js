@@ -295,9 +295,11 @@ async function seedDatabase() {
 
         // Junction: package_places
         await connection.query("INSERT IGNORE INTO package_places SET ?", {
+          id: uuidv4(),
           package_id: packages[0].id,
           place_id: place.id,
           description: `Description for place ${i}`,
+          events: `["event 1", "event 2", "event 3"]`,
           sort_order: i + 1,
           day_no: i + 1,
         });
