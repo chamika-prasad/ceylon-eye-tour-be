@@ -177,6 +177,17 @@ const initModels = () => {
     foreignKey: "customer_id",
     as: "Customer", // Alias for including customer with booking
   });
+
+  // Booking - Payment (one-to-one)
+  Booking.hasOne(Payment, {
+    foreignKey: "booking_id",
+    as: "Payment",
+  });
+
+  Payment.belongsTo(Booking, {
+    foreignKey: "booking_id",
+    as: "Booking",
+  });
 };
 
 initModels(); // Call it immediately so models are ready when exported
