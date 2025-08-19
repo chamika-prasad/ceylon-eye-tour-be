@@ -1,4 +1,4 @@
-import { Booking, Customer, Package, Payment, Review } from "../models/index.js";
+import { Booking, User, Package, Payment, Review } from "../models/index.js";
 
 const getAllBookings = async () => {
   return await Booking.findAll({
@@ -9,8 +9,8 @@ const getAllBookings = async () => {
         attributes: ["title"], // Include package title only
       },
       {
-        model: Customer,
-        as: "Customer",
+        model: User,
+        as: "User",
         attributes: ["name", "email"], // Include customer name and email
       },
       {

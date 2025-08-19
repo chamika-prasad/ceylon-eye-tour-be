@@ -3,8 +3,10 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import http from "http";
 import { fileURLToPath } from "url";
 import sequelize from "./config/sequelize.js";
+import { initializeSocket } from "./socket/index.js";
 import authRoutes from "./routes/auth.route.js";
 import categoryRoutes from "./routes/category.route.js";
 import packageRoutes from "./routes/package.route.js";
@@ -17,11 +19,16 @@ import reviewRoutes from "./routes/review.routes.js";
 import galleryRoutes from "./routes/gallery.routes.js";
 import bookingRoutes from "./routes/booking.route.js";
 import vehicleRoutes from "./routes/vehicle.routes.js";
-
+import paymentRoutes from "./routes/payment.route.js";
+import messageRoutes from "./routes/message.route.js";
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app); // Create HTTP server
+
+// Initialize Socket.IO with the HTTP server
+initializeSocket(server);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,6 +53,8 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/chats", messageRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

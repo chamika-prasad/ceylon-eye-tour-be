@@ -1,8 +1,7 @@
 import Activity from "./Activity.model.js";
-import Admin from "./Admin.model.js";
 import Booking from "./Booking.model.js";
 import Category from "./Category.model.js";
-import Customer from "./Customer.model.js";
+import User from "./User.model.js";
 import Package from "./Package.model.js";
 import PackagePlace from "./PackagePlace.model.js";
 import Payment from "./Payment.model.js";
@@ -15,6 +14,7 @@ import Hotel from "./Hotel.model.js";
 import Gallery from "./Gallery.model.js";
 import HotelType from "./HotelType.model.js";
 import Vehicle from "./Vehicle.model.js";
+import Message from "./Message.model.js";
 
 // Define all associations here
 const initModels = () => {
@@ -25,7 +25,7 @@ const initModels = () => {
     otherKey: "package_id",
     as: "Packages",
   });
-  
+
   Package.belongsToMany(Place, {
     through: PackagePlace,
     foreignKey: "package_id",
@@ -113,25 +113,25 @@ const initModels = () => {
   });
 
   // Customer - Review (one-to-many)
-  Customer.hasMany(Review, {
+  User.hasMany(Review, {
     foreignKey: "customer_id",
     as: "Reviews",
   });
 
-  Review.belongsTo(Customer, {
+  Review.belongsTo(User, {
     foreignKey: "customer_id",
-    as: "Customer",
+    as: "User",
   });
 
   // Customer - Gallery (one-to-many)
-  Customer.hasMany(Gallery, {
+  User.hasMany(Gallery, {
     foreignKey: "customer_id",
     as: "Galleries",
   });
 
-  Gallery.belongsTo(Customer, {
+  Gallery.belongsTo(User, {
     foreignKey: "customer_id",
-    as: "Customer",
+    as: "User",
   });
 
   // ✅ HotelType - Hotel (one-to-many)
@@ -168,14 +168,14 @@ const initModels = () => {
   });
 
   // Customer - Booking (one-to-many)
-  Customer.hasMany(Booking, {
+  User.hasMany(Booking, {
     foreignKey: "customer_id",
     as: "Bookings", // Alias for including bookings with customer
   });
 
-  Booking.belongsTo(Customer, {
+  Booking.belongsTo(User, {
     foreignKey: "customer_id",
-    as: "Customer", // Alias for including customer with booking
+    as: "User", // Alias for including customer with booking
   });
 
   // Booking - Payment (one-to-one)
@@ -188,16 +188,39 @@ const initModels = () => {
     foreignKey: "booking_id",
     as: "Booking",
   });
+
+  // A User can send many messages
+  User.hasMany(Message, {
+    foreignKey: "sender_id",
+    as: "sentMessages",
+  });
+
+  // A User can receive many messages
+  User.hasMany(Message, {
+    foreignKey: "receiver_id",
+    as: "receivedMessages",
+  });
+
+  // A Message belongs to a sender (User)
+  Message.belongsTo(User, {
+    foreignKey: "sender_id",
+    as: "sender",
+  });
+
+  // A Message belongs to a receiver (User)
+  Message.belongsTo(User, {
+    foreignKey: "receiver_id",
+    as: "receiver",
+  });
 };
 
 initModels(); // Call it immediately so models are ready when exported
 
 export {
   Activity,
-  Admin,
   Booking,
   Category,
-  Customer,
+  User,
   Package,
   PackagePlace,
   Payment,
@@ -210,4 +233,5 @@ export {
   Gallery,
   HotelType,
   Vehicle,
+  Message,
 };
