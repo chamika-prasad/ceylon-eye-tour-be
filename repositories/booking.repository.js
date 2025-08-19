@@ -1,4 +1,4 @@
-import { Booking, Customer, Package, Review } from "../models/index.js";
+import { Booking, Customer, Package, Payment, Review } from "../models/index.js";
 
 const getAllBookings = async () => {
   return await Booking.findAll({
@@ -17,6 +17,11 @@ const getAllBookings = async () => {
         model: Review,
         as: "Review",
         attributes: ["rating", "review"], // Include review rating and comment
+      },
+      {
+        model: Payment,
+        as: "Payment",
+        attributes: ["id","payment_id", "amount", "status"], // Include payment details
       },
     ],
   });
