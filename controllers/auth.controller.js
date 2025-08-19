@@ -54,8 +54,8 @@ const login = async (req, res) => {
     const existingUser = await authService.getUserByEmail(email);
     if (!existingUser.success) {
       return res
-        .status(400)
-        .json({ success: false, message: "User email Incorrect" });
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     // Varify the password
@@ -74,7 +74,7 @@ const login = async (req, res) => {
       existingUser.data.id,
       existingUser.data.name,
       existingUser.data.email,
-      "user"
+      existingUser.data.role
     );
 
     return res

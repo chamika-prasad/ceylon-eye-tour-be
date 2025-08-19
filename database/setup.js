@@ -10,23 +10,17 @@ const DB_CONFIG = {
 };
 
 const SQL_STATEMENTS = [
-  `DROP DATABASE ${process.env.DB_NAME || "ceylon_eye_tour"}`,
+  `DROP DATABASE IF EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `USE ${process.env.DB_NAME || "ceylon_eye_tour"}`,
-  `CREATE TABLE IF NOT EXISTS customers (
+  `CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     email VARCHAR(255) NOT NULL UNIQUE,
     pw VARCHAR(255) NOT NULL,
     phoneno VARCHAR(20),
     country VARCHAR(100),
     name VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)`,
-  `CREATE TABLE IF NOT EXISTS admin (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    email VARCHAR(255) NOT NULL UNIQUE,
-    pw VARCHAR(255) NOT NULL,
+    role ENUM('user', 'admin') DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )`,
@@ -130,7 +124,7 @@ const SQL_STATEMENTS = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (package_id) REFERENCES packages(id),
-    FOREIGN KEY (customer_id) REFERENCES customers(id)
+    FOREIGN KEY (customer_id) REFERENCES users(id)
 )`,
   `CREATE TABLE IF NOT EXISTS payments (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -174,7 +168,7 @@ const SQL_STATEMENTS = [
     review TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers(id),
+    FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
   `CREATE TABLE IF NOT EXISTS gallery (
@@ -184,7 +178,7 @@ const SQL_STATEMENTS = [
   is_approved BOOL NOT NULL DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (customer_id) REFERENCES customers(id)
+  FOREIGN KEY (customer_id) REFERENCES users(id)
 )`,
   `CREATE TABLE IF NOT EXISTS vehicles (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -203,6 +197,18 @@ const SQL_STATEMENTS = [
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )`,
+`CREATE TABLE IF NOT EXISTS messages (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  sender_id VARCHAR(36) NOT NULL,
+  receiver_id VARCHAR(36) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_sender_id (sender_id),
+  INDEX idx_receiver_id (receiver_id),
+  FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+);`
 ];
 
 async function setupDatabase() {

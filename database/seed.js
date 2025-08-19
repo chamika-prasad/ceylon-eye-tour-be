@@ -18,6 +18,8 @@ const ADMIN = {
   id: uuidv4(),
   email: "admin@ceyloneye.com",
   pw: "$2b$10$EXAMPLEHASHEDPASSWORD",
+  role: "admin",
+  name: "Admin",
 };
 
 const CUSTOMERS = [
@@ -137,7 +139,7 @@ async function seedDatabase() {
 
     // Seed Admin
     await connection.query(
-      "INSERT INTO admin SET ? ON DUPLICATE KEY UPDATE email = email",
+      "INSERT INTO users SET ? ON DUPLICATE KEY UPDATE email = email",
       ADMIN
     );
     console.log("✓ Admin seeded");
@@ -145,7 +147,7 @@ async function seedDatabase() {
     // Seed Customers
     for (const customer of CUSTOMERS) {
       await connection.query(
-        "INSERT INTO customers SET ? ON DUPLICATE KEY UPDATE email = email",
+        "INSERT INTO users SET ? ON DUPLICATE KEY UPDATE email = email",
         customer
       );
     }
@@ -230,10 +232,16 @@ async function seedDatabase() {
     const [categories] = await connection.query(
       "SELECT id FROM categories LIMIT 10"
     );
-    const [customers] = await connection.query("SELECT id FROM customers");
+    const [customers] = await connection.query(
+      "SELECT id FROM users WHERE role != 'admin'"
+    );
 
     const [hotelTypes] = await connection.query(
       "SELECT id FROM hotel_types LIMIT 5"
+    );
+
+    const [admins] = await connection.query(
+      "SELECT id FROM users WHERE role = 'admin'"
     );
 
     // Seed Hotels
@@ -369,6 +377,35 @@ async function seedDatabase() {
         console.error("⚠️ Failed to insert review:", error.message);
       }
     }
+
+    // Seed Messages
+
+    for (let i = 0; i < 10; i++) {
+      // Pick random user
+      const user = customers[Math.floor(Math.random() * customers.length)];
+      const admin = admins[Math.floor(Math.random() * admins.length)];
+
+      // Randomly decide sender
+      const isUserSender = Math.random() > 0.5;
+
+      const senderId = isUserSender ? user.id : admin.id;
+      const receiverId = isUserSender ? admin.id : user.id;
+
+      try {
+        await connection.query("INSERT INTO messages SET ?", {
+          id: uuidv4(),
+          sender_id: senderId,
+          receiver_id: receiverId,
+          message: `Message ${i + 1} from ${
+            isUserSender ? user.id : "Admin"
+          } to ${isUserSender ? "Admin" : user.name}`,
+        });
+      } catch (error) {
+        console.error("⚠️ Failed to insert message:", error.message);
+      }
+    }
+
+    console.log("✓ Messages seeded with 10 records");
     console.log("✓ Reviews seeded with 10 records");
     console.log("✓ Bookings seeded with 10 records");
 
