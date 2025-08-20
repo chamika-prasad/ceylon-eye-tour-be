@@ -259,6 +259,7 @@ async function seedDatabase() {
           images: `["https://picsum.photos/seed/hotel${i}/600/400", "https://picsum.photos/seed/hotel${i}/600/400", "https://picsum.photos/seed/hotel${i}/600/400"]`,
           rooms_details: `["rooms details 1", "rooms details 2", "rooms details 3"]`,
           rating: Math.floor(Math.random() * 5) + 1,
+          url_prefix: `hotel-${i + 1}`,
         });
       } catch (error) {
         console.error("⚠️ Failed to insert hotel:", error.message);

@@ -77,6 +77,23 @@ const getHotelById = async (id) => {
   }
 };
 
+const getHotelByPrefix = async (prefix) => {
+  try {
+    return await Hotel.findOne({
+      where: { url_prefix: prefix },
+      include: [
+        {
+          model: Place,
+          as: "Place",
+          attributes: ["id", "name"],
+        },
+      ],
+    });
+  } catch (error) {
+    throw new Error(`Error fetching hotel by ID: ${error.message}`);
+  }
+};
+
 export default {
   createHotel,
   updateHotel,
@@ -84,4 +101,5 @@ export default {
   getAllHotels,
   getHotelsByPlaceId,
   getHotelById,
+  getHotelByPrefix
 };

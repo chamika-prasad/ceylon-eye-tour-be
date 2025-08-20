@@ -24,6 +24,10 @@ const getHotelById = async (id) => {
   return await hotelRepository.getHotelById(id);
 };
 
+const getHotelByPrefix = async (prefix) => {
+  return await hotelRepository.getHotelByPrefix(prefix);
+};
+
 export default {
   createHotel,
   updateHotel,
@@ -31,4 +35,5 @@ export default {
   getAllHotels,
   getHotelsByPlaceId,
   getHotelById,
+  getHotelByPrefix,
 };

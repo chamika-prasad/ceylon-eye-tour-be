@@ -148,4 +148,5 @@ export default {
   updateGalleryApproval,
   getAllApprovedGallery,
   addGalleryItem,
+  deleteGalleryItem
 };

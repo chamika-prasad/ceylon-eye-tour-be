@@ -1,9 +1,17 @@
-import { Gallery } from "../models/index.js";
+import { Gallery,User } from "../models/index.js";
 
 // Get all gallery items
 const getAllGallery = async () => {
   try {
-    return await Gallery.findAll();
+    return await Gallery.findAll({
+      include: [
+        {
+          model: User,
+          as: "User",
+          attributes: ["name"],
+        },
+      ],
+    });
   } catch (error) {
     throw new Error(`Error fetching gallery items: ${error.message}`);
   }
@@ -14,6 +22,13 @@ const getAllApprovedGallery = async () => {
   try {
     return await Gallery.findAll({
       where: { is_approved: true },
+      include: [
+        {
+          model: User,
+          as: "User",
+          attributes: ["name"],
+        },
+      ],
     });
   } catch (error) {
     throw new Error(`Error fetching approved gallery items: ${error.message}`);

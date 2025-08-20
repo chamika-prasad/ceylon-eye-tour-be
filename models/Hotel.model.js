@@ -58,6 +58,14 @@ const Hotel = sequelize.define(
       allowNull: false,
       defaultValue: 0,
     },
+    url_prefix: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
   },
   {
     tableName: "hotels",
