@@ -1,5 +1,5 @@
 import express from "express";
-import activityController from "./../controllers/activity.controller.js";
+import activityController from "../controllers/activity.controller.js";
 import upload from "../middlewares/upload.middleware.js";
 
 const router = express.Router();

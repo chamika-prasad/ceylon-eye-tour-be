@@ -1,6 +1,6 @@
 import express from "express";
-import packageController from "./../controllers/package.controller.js";
-import tokenMiddleware from "./../middlewares/token.middleware.js";
+import packageController from "../controllers/package.controller.js";
+import tokenMiddleware from "../middlewares/token.middleware.js";
 import upload from "../middlewares/upload.middleware.js";
 
 const router = express.Router();

@@ -209,7 +209,40 @@ const SQL_STATEMENTS = [
   INDEX idx_receiver_id (receiver_id),
   FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
-);`
+);`,
+  `CREATE TABLE IF NOT EXISTS customize_packages (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  user_id VARCHAR(36) NOT NULL,
+  required_day_count INT,
+  is_approved BOOL NOT NULL DEFAULT 0,
+  message TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);`,
+  `CREATE TABLE IF NOT EXISTS customize_package_places (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  customize_package_id VARCHAR(36) NOT NULL,
+  place_id VARCHAR(36) NOT NULL,
+  sort_order INT,
+  day_no INT,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (customize_package_id) REFERENCES customize_packages(id) ON DELETE CASCADE,
+  FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE
+);`,
+  `CREATE TABLE IF NOT EXISTS customize_package_place_activities (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  customize_package_place_id VARCHAR(36) NOT NULL,
+  activity_id VARCHAR(36) NOT NULL,
+  description TEXT,
+  price DECIMAL(10, 2),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (customize_package_place_id) REFERENCES customize_package_places(id) ON DELETE CASCADE,
+  FOREIGN KEY (activity_id) REFERENCES activities(id) ON DELETE CASCADE
+);`,
 ];
 
 async function setupDatabase() {

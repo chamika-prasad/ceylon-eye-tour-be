@@ -7,20 +7,22 @@ import http from "http";
 import { fileURLToPath } from "url";
 import sequelize from "./config/sequelize.js";
 import { initializeSocket } from "./socket/index.js";
-import authRoutes from "./routes/auth.route.js";
-import categoryRoutes from "./routes/category.route.js";
-import packageRoutes from "./routes/package.route.js";
-import activityRoutes from "./routes/activity.route.js";
+import authRoutes from "./routes/auth.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
+import packageRoutes from "./routes/package.routes.js";
+import activityRoutes from "./routes/activity.routes.js";
 import placeActivityRoutes from "./routes/placeActivity.routes.js";
 import hotelRoutes from "./routes/hotel.routes.js";
 import placeRoutes from "./routes/place.routes.js";
 import hotelTypeRoutes from "./routes/hotelType.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import galleryRoutes from "./routes/gallery.routes.js";
-import bookingRoutes from "./routes/booking.route.js";
+import bookingRoutes from "./routes/booking.routes.js";
 import vehicleRoutes from "./routes/vehicle.routes.js";
-import paymentRoutes from "./routes/payment.route.js";
-import messageRoutes from "./routes/message.route.js";
+import paymentRoutes from "./routes/payment.routes.js";
+import messageRoutes from "./routes/message.routes.js";
+import customPackageRoutes from "./routes/customizePackage.routes.js";
+import customizePackagePlaceRoutes from "./routes/customizePackagePlace.routes.js";
 
 dotenv.config();
 
@@ -55,6 +57,8 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/chats", messageRoutes);
+app.use("/api/custom-packages", customPackageRoutes);
+app.use("/api/custom-package-places", customizePackagePlaceRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

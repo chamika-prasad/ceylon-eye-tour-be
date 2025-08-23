@@ -406,6 +406,101 @@ async function seedDatabase() {
       }
     }
 
+    // ✅ Seed Customize Packages
+    const customizePackages = [];
+    for (let i = 1; i <= 10; i++) {
+      customizePackages.push({
+        id: uuidv4(),
+        required_day_count: 10,
+        message: `description for customize package ${i}`,
+        user_id: customers[Math.floor(Math.random() * customers.length)].id,
+      });
+    }
+
+    for (const customizePackage of customizePackages) {
+      try {
+        await connection.query(
+          "INSERT INTO customize_packages SET ?",
+          customizePackage
+        );
+      } catch (error) {
+        console.error("⚠️ Failed to insert customize_package:", error.message);
+      }
+    }
+
+    // ✅ Seed Customize Package Places
+    const customizePackagePlaces = [];
+    for (const customizePackage of customizePackages) {
+      const placeCount = Math.floor(Math.random() * 3) + 2; // 2–4 places per package
+      const selectedPlaces = [...places]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, placeCount);
+
+      selectedPlaces.forEach((place, index) => {
+        customizePackagePlaces.push({
+          id: uuidv4(),
+          customize_package_id: customizePackage.id,
+          place_id: place.id,
+          description: `Description for customized place ${place.id}`,
+          day_no: index + 1,
+          sort_order: index + 1,
+        });
+      });
+    }
+
+    for (const cpp of customizePackagePlaces) {
+      try {
+        await connection.query(
+          "INSERT INTO customize_package_places SET ?",
+          cpp
+        );
+      } catch (error) {
+        console.error(
+          "⚠️ Failed to insert customize_package_place:",
+          error.message
+        );
+      }
+    }
+
+     // ✅ Seed Customize Package Place Activities
+     const customizePackagePlaceActivities = [];
+     for (const cpp of customizePackagePlaces) {
+       const activityCount = Math.floor(Math.random() * 3) + 1; // 1–3 activities per place
+       const selectedActivities = [...activities]
+         .sort(() => 0.5 - Math.random())
+         .slice(0, activityCount);
+ 
+       selectedActivities.forEach((activity) => {
+         customizePackagePlaceActivities.push({
+           id: uuidv4(),
+           customize_package_place_id: cpp.id,
+           activity_id: activity.id
+         });
+       });
+     }
+ 
+     for (const cpActivity of customizePackagePlaceActivities) {
+       try {
+         await connection.query(
+           "INSERT INTO customize_package_place_activities SET ?",
+           cpActivity
+         );
+       } catch (error) {
+         console.error(
+           "⚠️ Failed to insert customize_package_place_activity:",
+           error.message
+         );
+       }
+     }
+     
+     console.log(
+       `✓ Customize Package Place Activities seeded with ${customizePackagePlaceActivities.length} records`
+     );
+
+    console.log(
+      `✓ Customize Package Places seeded with ${customizePackagePlaces.length} records`
+    );
+    console.log("✓ Customize Packages seeded with 10 records");
     console.log("✓ Messages seeded with 10 records");
     console.log("✓ Reviews seeded with 10 records");
     console.log("✓ Bookings seeded with 10 records");
