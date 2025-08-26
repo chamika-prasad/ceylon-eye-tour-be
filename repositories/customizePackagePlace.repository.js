@@ -19,7 +19,19 @@ const getCustomizePackagePlaceById = async (id) => {
   return customizePackagePlace;
 };
 
+const getCustomizePackagePlaceByPackageIdAndSortOrder = async (
+  packageId,
+  sortOrder
+) => {
+  const customizePackagePlace = await CustomizePackagePlace.findOne({
+    where: { customize_package_id: packageId, sort_order: sortOrder },
+  });
+
+  return customizePackagePlace;
+};
+
 export default {
   updateCustomizePackagePlaceFields,
   getCustomizePackagePlaceById,
+  getCustomizePackagePlaceByPackageIdAndSortOrder
 };

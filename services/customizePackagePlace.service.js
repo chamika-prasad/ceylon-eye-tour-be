@@ -26,7 +26,20 @@ const getCustomizePackagePlaceById = async (id) => {
   return customizePackagePlace;
 };
 
+const getCustomizePackagePlaceByPackageIdAndSortOrder = async (
+  packageId,
+  sortOrder
+) => {
+  const customizePackagePlace =
+    await customizePackagePlaceRepository.getCustomizePackagePlaceByPackageIdAndSortOrder(
+      packageId,
+      sortOrder
+    );
+  return customizePackagePlace;
+};
+
 export default {
   updateCustomizePackagePlace,
   getCustomizePackagePlaceById,
+  getCustomizePackagePlaceByPackageIdAndSortOrder,
 };

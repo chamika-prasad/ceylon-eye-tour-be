@@ -13,6 +13,18 @@ const updateCustomizePackagePlace = async (req, res) => {
         .json({ success: false, message: "CustomizePackagePlace not found" });
     }
 
+    const sameSortOrderPlace =
+      await customizePackagePlaceService.getCustomizePackagePlaceByPackageIdAndSortOrder(
+        customizePackagePlace.customize_package_id,
+        sortOrder
+      );
+
+    if (sameSortOrderPlace) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Sort order number already taken" });
+    }
+
     const result =
       await customizePackagePlaceService.updateCustomizePackagePlace(id, {
         sortOrder,
