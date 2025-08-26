@@ -5,12 +5,13 @@ dotenv.config();
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
-const generateToken = async (userId, username, email, role) => {
+const generateToken = async (userId, username, email, role,profileImage) => {
   const data = {
     userId: userId,
     userName: username,
     email: email,
     role: role,
+    profileImage: profileImage
   };
 
   try {

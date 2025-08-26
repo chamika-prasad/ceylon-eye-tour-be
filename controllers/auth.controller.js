@@ -1,11 +1,20 @@
+import path from "path";
 import authService from "../services/auth.service.js";
 import passwordService from "./../services/password.service.js";
 import tokenService from "./../services/token.service.js";
+import fileUploadService from "../services/fileUpload.service.js";
 
 // Register method
 const register = async (req, res) => {
   try {
     const { name, email, country, phoneNo, password } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile image is required",
+      });
+    }
 
     // Check if user already exists
     const existingUser = await authService.getUserByEmail(email);
@@ -14,6 +23,13 @@ const register = async (req, res) => {
         .status(400)
         .json({ success: false, message: "User already exists" });
     }
+
+    // Upload profile image
+    const uploadDir = path.join("uploads", "auth");
+
+    const filename = await fileUploadService.uploadFile(uploadDir, req.file);
+
+    const profileImageUrl = `/uploads/auth/${filename}`;
 
     // Hash the password
     var hashedPassword = await passwordService.hashPassword(password);
@@ -24,6 +40,7 @@ const register = async (req, res) => {
       country,
       phoneNo,
       hashedPassword,
+      profileImage: profileImageUrl,
     });
 
     if (!createdUser.success) {
@@ -41,7 +58,7 @@ const register = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error registering user",
-      error: error,
+      error: error.message,
     });
   }
 };
@@ -74,7 +91,8 @@ const login = async (req, res) => {
       existingUser.data.id,
       existingUser.data.name,
       existingUser.data.email,
-      existingUser.data.role
+      existingUser.data.role,
+      existingUser.data.profile_image
     );
 
     return res

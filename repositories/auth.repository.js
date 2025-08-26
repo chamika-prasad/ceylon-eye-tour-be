@@ -2,7 +2,8 @@ import { User } from "./../models/index.js";
 
 const register = async (userData) => {
   try {
-    const { name, email, country, phoneNo, hashedPassword } = userData;
+    const { name, email, country, phoneNo, hashedPassword, profileImage } =
+      userData;
 
     const customer = await User.create({
       email: email,
@@ -10,6 +11,7 @@ const register = async (userData) => {
       phoneno: phoneNo,
       country: country,
       name: name,
+      profile_image: profileImage,
     });
 
     return {
