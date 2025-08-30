@@ -1,6 +1,7 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
+import passwordService from "./../services/password.service.js";
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ const DB_CONFIG = {
 const ADMIN = {
   id: uuidv4(),
   email: "admin@ceyloneye.com",
-  pw: "$2b$10$EXAMPLEHASHEDPASSWORD",
+  pw: await passwordService.hashPassword("admin123"),
   role: "admin",
   name: "Admin",
 };
@@ -26,7 +27,7 @@ const CUSTOMERS = [
   {
     id: uuidv4(),
     email: "customer1@example.com",
-    pw: "$2b$10$EXAMPLEHASHEDPASSWORD1",
+    pw: await passwordService.hashPassword("123456"),
     phoneno: "0771234567",
     country: "Sri Lanka",
     name: "John Doe",
@@ -34,7 +35,7 @@ const CUSTOMERS = [
   {
     id: uuidv4(),
     email: "customer2@example.com",
-    pw: "$2b$10$EXAMPLEHASHEDPASSWORD2",
+    pw: await passwordService.hashPassword("123456"),
     phoneno: "0769876543",
     country: "India",
     name: "Jane Smith",
