@@ -1,9 +1,10 @@
 import express from "express";
 import customizePackageController from "../controllers/customizePackage.controller.js";
+import tokenMiddleware from "../middlewares/token.middleware.js";
 
 const router = express.Router();
 
-router.post("/add", customizePackageController.createCustomizePackage);
+router.post("/add",tokenMiddleware.verifyToken, customizePackageController.createCustomizePackage);
 router.get("/get-all", customizePackageController.getAllCustomizePackages);
 router.get("/get-all/:userId", customizePackageController.getAllCustomizePackagesByUserId);
 router.get("/:id", customizePackageController.getCustomizePackageById);

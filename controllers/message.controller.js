@@ -3,16 +3,24 @@ import messageService from "../services/message.service.js";
 // ✅ Add new message
 const addMessage = async (req, res) => {
   try {
-    const { senderId, receiverId, message } = req.body;
+    // const { senderId, receiverId, message } = req.body;
+    const { receiverId, message } = req.body;
+    const { userId } = req.user;
 
-    if (!senderId || !receiverId || !message) {
+    // if (!senderId || !receiverId || !message) {
+    if (!receiverId || !message) {
       return res.status(400).json({
         success: false,
-        message: "Sender, receiver, and message are required",
+        // message: "Sender, receiver, and message are required",
+        message: "Receiver, and message are required",
       });
     }
 
-    const newMessage = await messageService.createMessage({senderId, receiverId, message});
+    const newMessage = await messageService.createMessage({
+      senderId: userId,
+      receiverId,
+      message,
+    });
 
     return res.status(201).json({
       success: true,
@@ -31,7 +39,8 @@ const addMessage = async (req, res) => {
 // ✅ Get all messages for a user (sender or receiver)
 const getMessages = async (req, res) => {
   try {
-    const { userId } = req.params;
+    // const { userId } = req.params;
+    const { userId } = req.user;
 
     const messages = await messageService.getUserMessages(userId);
 
@@ -52,9 +61,10 @@ const getMessages = async (req, res) => {
 // ✅ Get grouped messages (latest message per user)
 const getGroupedMessages = async (req, res) => {
   try {
-    const { adminId } = req.params;
+    // const { adminId } = req.params;
+    const { userId } = req.user;
 
-    const groupedMessages = await messageService.getGroupedMessages(adminId);
+    const groupedMessages = await messageService.getGroupedMessages(userId);
 
     return res.status(200).json({
       success: true,

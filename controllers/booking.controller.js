@@ -65,18 +65,17 @@ const createBooking = async (req, res) => {
       childCount,
       startDate,
       packageId,
-      customerId,
       message,
     } = req.body;
 
+    const { userId } = req.user;
     
-
     const newBooking = await bookingService.createBooking({
       adult_count: adultCount,
       child_count: childCount,
       start_date: startDate,
       package_id: packageId,
-      customer_id: customerId,
+      customer_id: userId,
       message,
     });
 

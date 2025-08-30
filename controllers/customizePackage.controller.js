@@ -1,14 +1,16 @@
 import customizePackageService from "../services/customizePackage.service.js";
 
 const createCustomizePackage = async (req, res) => {
-  const { userId, places } = req.body;
+  // const { userId, places } = req.body;
+  const { places } = req.body;
+  const { userId } = req.user;
 
   try {
-    if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User id requird" });
-    }
+    // if (!userId) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "User id requird" });
+    // }
 
     if (!places || !Array.isArray(places)) {
       return res
