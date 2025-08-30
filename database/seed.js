@@ -374,6 +374,7 @@ async function seedDatabase() {
           booking_id: booking.id,
           rating: Math.floor(Math.random() * 5) + 1,
           review: `This is review ${i + 1}`,
+          description: `Detailed description for review ${i + 1}`,
         });
       } catch (error) {
         console.error("⚠️ Failed to insert review:", error.message);

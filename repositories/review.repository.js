@@ -1,4 +1,4 @@
-import { Review,User } from "../models/index.js";
+import { Review, User } from "../models/index.js";
 
 const createReview = async (data) => {
   try {
@@ -11,13 +11,13 @@ const createReview = async (data) => {
 const getAllReviews = async () => {
   try {
     return await Review.findAll({
-        include: [
-          {
-            model: User,
-            as: "User",
-            attributes: ["id", "name", "email"], // Include customer details
-          },
-        ],
+      include: [
+        {
+          model: User,
+          as: "User",
+          attributes: ["name", "profile_image"], // Include customer details
+        },
+      ],
     });
   } catch (error) {
     throw new Error(`Error fetching reviews: ${error.message}`);

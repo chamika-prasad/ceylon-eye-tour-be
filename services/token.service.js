@@ -9,7 +9,7 @@ const generateToken = async (userId, username, email, role,profileImage) => {
   const data = {
     userId: userId,
     userName: username,
-    email: email,
+    // email: email,
     role: role,
     profileImage: profileImage
   };

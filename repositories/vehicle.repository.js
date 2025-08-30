@@ -5,8 +5,6 @@ const createVehicle = async (data) => {
 };
 
 const deleteVehicle = async (id) => {
-  console.log(`Deleting vehicle with ID: ${id}`);
-  
   return await Vehicle.destroy({
     where: { id },
   });

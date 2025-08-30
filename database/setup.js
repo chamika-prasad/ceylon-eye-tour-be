@@ -168,6 +168,7 @@ const SQL_STATEMENTS = [
     booking_id VARCHAR(36) NOT NULL,
     rating INT NOT NULL DEFAULT 0,
     review TEXT,
+    description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES users(id),
