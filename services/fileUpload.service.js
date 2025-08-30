@@ -14,6 +14,12 @@ const uploadFile = async (uploadDir, file) => {
   return filename;
 };
 
+const removeFile = async(imagePath) => {
+  const fullPath = path.join(process.cwd(), imagePath);
+  if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+};
+
 export default {
   uploadFile,
+  removeFile,
 };

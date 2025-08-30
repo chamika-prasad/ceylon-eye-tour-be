@@ -18,7 +18,26 @@ const getUserByEmail = async (email) => {
   }
 };
 
+const getUserById = async (userId) => {
+  const user = await authRepository.getUserById(userId);
+  return user;
+};
+
+const updateProfileImage = async (userId, newProfileImage) => {
+  try {
+    const result = await authRepository.updateProfileImage(
+      userId,
+      newProfileImage
+    );
+    return result;
+  } catch (error) {
+    throw new Error(`Error in AuthService updateProfileImage: ${error}`);
+  }
+};
+
 export default {
   register,
   getUserByEmail,
+  updateProfileImage,
+  getUserById,
 };

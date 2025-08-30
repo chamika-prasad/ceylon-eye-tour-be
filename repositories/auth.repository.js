@@ -25,16 +25,8 @@ const register = async (userData) => {
 };
 
 const getUserById = async (userId) => {
-  try {
-    const existUser = await User.findByPk(userId);
-    if (existing) {
-      return { success: true, data: existUser, message: "User found" };
-    } else {
-      return { success: false, message: "User not found" };
-    }
-  } catch (error) {
-    throw new Error(`Error in AuthRepository getUserById: ${error}`);
-  }
+  const existUser = await User.findByPk(userId);
+  return existUser;
 };
 
 const getUserByEmail = async (email) => {
@@ -52,8 +44,15 @@ const getUserByEmail = async (email) => {
   }
 };
 
+const updateProfileImage = async (userId, newProfileImage) => {
+  const user = await User.findByPk(userId);
+  user.profile_image = newProfileImage;
+  await user.save();
+};
+
 export default {
   register,
   getUserById,
   getUserByEmail,
+  updateProfileImage,
 };
