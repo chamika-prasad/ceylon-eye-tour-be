@@ -18,6 +18,7 @@ const getAllReviews = async () => {
           attributes: ["name", "profile_image"], // Include customer details
         },
       ],
+      attributes: ["id",'rating', 'review',"description"],
     });
   } catch (error) {
     throw new Error(`Error fetching reviews: ${error.message}`);
