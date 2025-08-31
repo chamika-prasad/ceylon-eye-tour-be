@@ -4,6 +4,14 @@ const bulkCreateActivities = async (records) => {
   return await placeActivityRepository.bulkInsert(records);
 };
 
+const create = async (data) => {
+  return await placeActivityRepository.create(data);
+};
+
+const getByPlaceIdAndActivityId = async (data) => {
+  return await placeActivityRepository.getByPlaceIdAndActivityId(data);
+};
+
 const getAllGroupedByPlace = async () => {
   return await placeActivityRepository.fetchGroupedByPlace();
 };
@@ -25,4 +33,6 @@ export default {
   getAllGroupedByPlace,
   updatePlaceActivity,
   deletePlaceActivity,
+  create,
+  getByPlaceIdAndActivityId,
 };

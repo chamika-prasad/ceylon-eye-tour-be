@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.post(
   "/add",
-  upload.array("images"), // accepts unlimited images
-  placeActivityController.createPlaceActivities
+  upload.single("image"),
+  placeActivityController.createPlaceActivitiy
 );
 
 router.get("/grouped", placeActivityController.getGroupedByPlace);

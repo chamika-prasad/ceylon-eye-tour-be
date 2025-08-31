@@ -4,6 +4,17 @@ const bulkInsert = async (records) => {
   return await PlaceActivity.bulkCreate(records);
 };
 
+const create = async (data) => {
+  return await PlaceActivity.create(data);
+};
+
+const getByPlaceIdAndActivityId = async (data) => {
+  const { placeId, activityId } = data;
+  return await PlaceActivity.findOne({
+    where: { place_id: placeId, activity_id: activityId },
+  });
+};
+
 const fetchGroupedByPlace = async () => {
   const places = await Place.findAll({
     include: [
@@ -43,7 +54,7 @@ const fetchGroupedByPlace = async () => {
 
 const update = async (place_id, activity_id, updatedData) => {
   console.log("Updating PlaceActivity:", place_id, activity_id, updatedData);
-  
+
   const [updatedCount] = await PlaceActivity.update(updatedData, {
     where: { place_id, activity_id },
   });
@@ -59,4 +70,11 @@ const remove = async (place_id, activity_id) => {
   return deletedCount > 0;
 };
 
-export default { bulkInsert, fetchGroupedByPlace, update, remove };
+export default {
+  bulkInsert,
+  fetchGroupedByPlace,
+  update,
+  remove,
+  create,
+  getByPlaceIdAndActivityId,
+};

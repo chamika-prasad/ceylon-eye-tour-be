@@ -60,6 +60,63 @@ const createPlaceActivities = async (req, res) => {
   }
 };
 
+const createPlaceActivitiy = async (req, res) => {
+  try {
+    const { placeId, activityId, description, price } = req.body;
+    const file = req.file;
+
+    if (!placeId || !activityId || !description || !price) {
+      return res.status(400).json({
+        success: false,
+        message: "place, activity, description, and price are required",
+      });
+    }
+
+    const existing = await placeActivityService.getByPlaceIdAndActivityId({
+      placeId: placeId,
+      activityId: activityId,
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: "This activity is already associated with the place",
+      });
+    }
+
+    // Save files to disk and create image URLs
+    const uploadDir = path.join("uploads", "placeactivities");
+
+    let imageUrl = null;
+
+    if (file) {
+      const filename = await fileUploadService.uploadFile(uploadDir, file);
+      imageUrl = `/uploads/placeactivities/${filename}`;
+    }
+
+    const record = await placeActivityService.create({
+      place_id: placeId,
+      activity_id: activityId,
+      description: description,
+      price: price,
+      image_url: imageUrl,
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: record,
+      message: "Activity added successfully",
+    });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
 const getGroupedByPlace = async (req, res) => {
   try {
     const data = await placeActivityService.getAllGroupedByPlace();
@@ -145,4 +202,5 @@ export default {
   getGroupedByPlace,
   updatePlaceActivity,
   deletePlaceActivity,
+  createPlaceActivitiy,
 };
