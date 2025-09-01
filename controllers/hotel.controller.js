@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import hotelService from "../services/hotel.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import { url } from "inspector";
 
 const createHotel = async (req, res) => {
   try {
@@ -57,6 +58,7 @@ const createHotel = async (req, res) => {
       images: JSON.stringify(images) || "[]", // Ensure images is a JSON string
       rooms_details: JSON.stringify(roomsDetails) || "[]", // Ensure rooms_details is a JSON string
       rating: Number(rating) || 0,
+      url_prefix: name.toLowerCase().replace(/\s+/g, "-"),
     });
 
     return res.status(201).json({
