@@ -170,6 +170,17 @@ const initModels = () => {
     as: "Package", // Alias for including package with booking
   });
 
+    // Customize Package - Booking (one-to-many)
+    CustomizePackage.hasMany(Booking, {
+      foreignKey: "custom_package_id",
+      as: "CustomeBookings", // Alias for including bookings with package
+    });
+  
+    Booking.belongsTo(CustomizePackage, {
+      foreignKey: "custom_package_id",
+      as: "CustomPackage", // Alias for including package with booking
+    });
+
   // Customer - Booking (one-to-many)
   User.hasMany(Booking, {
     foreignKey: "customer_id",

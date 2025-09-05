@@ -1,4 +1,4 @@
-import { Booking, User, Package, Payment, Review } from "../models/index.js";
+import { Booking, User, Package, Payment, Review,CustomizePackage } from "../models/index.js";
 
 const getAllBookings = async () => {
   return await Booking.findAll({
@@ -7,6 +7,11 @@ const getAllBookings = async () => {
         model: Package,
         as: "Package",
         attributes: ["title"], // Include package title only
+      },
+      {
+        model: CustomizePackage,
+        as: "CustomPackage",
+        attributes: ["message"], // Include package title only
       },
       {
         model: User,

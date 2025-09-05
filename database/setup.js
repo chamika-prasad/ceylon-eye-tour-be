@@ -112,30 +112,6 @@ const SQL_STATEMENTS = [
     image_url VARCHAR(500) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (package_id) REFERENCES packages(id) ON DELETE CASCADE
-);`,
-  `CREATE TABLE IF NOT EXISTS bookings (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    adult_count INT NOT NULL,
-    child_count INT NOT NULL,
-    status ENUM('pending', 'confirmed', 'cancelled', 'completed') DEFAULT 'pending',
-    start_date DATE NOT NULL,
-    package_id VARCHAR(36) NOT NULL,
-    customer_id VARCHAR(36) NOT NULL,
-    message TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (package_id) REFERENCES packages(id),
-    FOREIGN KEY (customer_id) REFERENCES users(id)
-)`,
-  `CREATE TABLE IF NOT EXISTS payments (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    booking_id VARCHAR(36) NOT NULL,
-    payment_id VARCHAR(255) NOT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    status ENUM('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
   `CREATE TABLE IF NOT EXISTS hotel_types (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -161,18 +137,6 @@ const SQL_STATEMENTS = [
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (place_id) REFERENCES places(id),
     FOREIGN KEY (type_id) REFERENCES hotel_types(id)
-)`,
-  `CREATE TABLE IF NOT EXISTS reviews (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    customer_id VARCHAR(36) NOT NULL,
-    booking_id VARCHAR(36) NOT NULL,
-    rating INT NOT NULL DEFAULT 0,
-    review TEXT,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES users(id),
-    FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
   `CREATE TABLE IF NOT EXISTS gallery (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -246,6 +210,49 @@ const SQL_STATEMENTS = [
   FOREIGN KEY (customize_package_place_id) REFERENCES customize_package_places(id) ON DELETE CASCADE,
   FOREIGN KEY (activity_id) REFERENCES activities(id) ON DELETE CASCADE
 );`,
+
+  `CREATE TABLE IF NOT EXISTS bookings (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  adult_count INT NOT NULL,
+  child_count INT NOT NULL,
+  status ENUM('pending', 'confirmed', 'cancelled', 'completed') DEFAULT 'pending',
+  start_date DATE NOT NULL,
+  package_id VARCHAR(36) NULL,
+  custom_package_id VARCHAR(36) NULL,
+  customer_id VARCHAR(36) NOT NULL,
+  message TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (package_id) REFERENCES packages(id),
+  FOREIGN KEY (custom_package_id) REFERENCES customize_packages(id),
+  FOREIGN KEY (customer_id) REFERENCES users(id),
+  CONSTRAINT chk_package CHECK (
+        (package_id IS NOT NULL AND custom_package_id IS NULL) OR 
+        (package_id IS NULL AND custom_package_id IS NOT NULL)
+    )
+)`,
+  `CREATE TABLE IF NOT EXISTS payments (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  booking_id VARCHAR(36) NOT NULL,
+  payment_id VARCHAR(255) NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  status ENUM('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (booking_id) REFERENCES bookings(id)
+)`,
+  `CREATE TABLE IF NOT EXISTS reviews (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    customer_id VARCHAR(36) NOT NULL,
+    booking_id VARCHAR(36) NOT NULL,
+    rating INT NOT NULL DEFAULT 0,
+    review TEXT,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES users(id),
+    FOREIGN KEY (booking_id) REFERENCES bookings(id)
+)`,
 ];
 
 async function setupDatabase() {

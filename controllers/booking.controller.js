@@ -65,23 +65,63 @@ const createBooking = async (req, res) => {
       childCount,
       startDate,
       packageId,
+      customPackageId,
       message,
     } = req.body;
 
     const { userId } = req.user;
-    
-    const newBooking = await bookingService.createBooking({
+
+    if (packageId && customPackageId) {
+      return res.status(400).json({
+        success: false,
+        message: "Provide either packageId or customPackageId, not both.",
+      });
+    }
+
+    if (!startDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Start date is required",
+      });
+    }
+
+    // Base booking data
+    const bookingData = {
       adult_count: adultCount,
       child_count: childCount,
       start_date: startDate,
-      package_id: packageId,
       customer_id: userId,
       message,
-    });
+    };
+
+    // Add package_id OR custom_package_id
+    if (packageId) {
+      bookingData.package_id = packageId;
+    } else if (customPackageId) {
+      bookingData.custom_package_id = customPackageId;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Either packageId or customPackageId is required.",
+      });
+    }
+
+    const newBooking = await bookingService.createBooking(bookingData);
+
+    // const newBooking = await bookingService.createBooking({
+    //   adult_count: adultCount,
+    //   child_count: childCount,
+    //   start_date: startDate,
+    //   package_id: packageId,
+    //   customer_id: userId,
+    //   message,
+    // });
 
     return res.status(201).json({ success: true, data: newBooking });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res
+      .status(400)
+      .json({ success: false, message: "Booking faild", error: error.message });
   }
 };
 

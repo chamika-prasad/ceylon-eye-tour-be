@@ -342,45 +342,6 @@ async function seedDatabase() {
       }
     }
 
-    // Seed Payments
-    const [bookings] = await connection.query(
-      "SELECT id FROM bookings LIMIT 10"
-    );
-
-    for (let i = 0; i < 10; i++) {
-      try {
-        await connection.query("INSERT IGNORE INTO payments SET ?", {
-          id: uuidv4(),
-          booking_id: bookings[i].id,
-          payment_id: `pay_${uuidv4().substring(0, 8)}`,
-          amount: (Math.random() * 500 + 50).toFixed(2),
-          status: ["pending", "completed", "failed"][
-            Math.floor(Math.random() * 3)
-          ],
-        });
-      } catch (error) {
-        console.error("⚠️ Failed to seed payments:", error.message);
-      }
-    }
-
-    // Seed Reviews
-    for (let i = 0; i < 10; i++) {
-      const customer = customers[Math.floor(Math.random() * customers.length)];
-      const booking = bookings[Math.floor(Math.random() * bookings.length)];
-      try {
-        await connection.query("INSERT INTO reviews SET ?", {
-          id: uuidv4(),
-          customer_id: customer.id,
-          booking_id: booking.id,
-          rating: Math.floor(Math.random() * 5) + 1,
-          review: `This is review ${i + 1}`,
-          description: `Detailed description for review ${i + 1}`,
-        });
-      } catch (error) {
-        console.error("⚠️ Failed to insert review:", error.message);
-      }
-    }
-
     // Seed Messages
 
     for (let i = 0; i < 10; i++) {
@@ -464,40 +425,101 @@ async function seedDatabase() {
       }
     }
 
-     // ✅ Seed Customize Package Place Activities
-     const customizePackagePlaceActivities = [];
-     for (const cpp of customizePackagePlaces) {
-       const activityCount = Math.floor(Math.random() * 3) + 1; // 1–3 activities per place
-       const selectedActivities = [...activities]
-         .sort(() => 0.5 - Math.random())
-         .slice(0, activityCount);
- 
-       selectedActivities.forEach((activity) => {
-         customizePackagePlaceActivities.push({
-           id: uuidv4(),
-           customize_package_place_id: cpp.id,
-           activity_id: activity.id
-         });
-       });
-     }
- 
-     for (const cpActivity of customizePackagePlaceActivities) {
-       try {
-         await connection.query(
-           "INSERT INTO customize_package_place_activities SET ?",
-           cpActivity
-         );
-       } catch (error) {
-         console.error(
-           "⚠️ Failed to insert customize_package_place_activity:",
-           error.message
-         );
-       }
-     }
-     
-     console.log(
-       `✓ Customize Package Place Activities seeded with ${customizePackagePlaceActivities.length} records`
-     );
+    // ✅ Seed Customize Package Place Activities
+    const customizePackagePlaceActivities = [];
+    for (const cpp of customizePackagePlaces) {
+      const activityCount = Math.floor(Math.random() * 3) + 1; // 1–3 activities per place
+      const selectedActivities = [...activities]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, activityCount);
+
+      selectedActivities.forEach((activity) => {
+        customizePackagePlaceActivities.push({
+          id: uuidv4(),
+          customize_package_place_id: cpp.id,
+          activity_id: activity.id,
+        });
+      });
+    }
+
+    for (const cpActivity of customizePackagePlaceActivities) {
+      try {
+        await connection.query(
+          "INSERT INTO customize_package_place_activities SET ?",
+          cpActivity
+        );
+      } catch (error) {
+        console.error(
+          "⚠️ Failed to insert customize_package_place_activity:",
+          error.message
+        );
+      }
+    }
+
+    for (let i = 0; i < 10; i++) {
+      const customer = customers[Math.floor(Math.random() * customers.length)];
+      const customPackageItem = customizePackages[i];
+
+      await connection.query("INSERT INTO bookings SET ?", {
+        id: uuidv4(),
+        adult_count: Math.floor(Math.random() * 5) + 1,
+        child_count: Math.floor(Math.random() * 5) + 1,
+        status: ["pending", "confirmed", "completed", "cancelled"][
+          Math.floor(Math.random() * 4)
+        ],
+        start_date: new Date(
+          Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000
+        )
+          .toISOString()
+          .split("T")[0],
+        custom_package_id: customPackageItem.id,
+        customer_id: customer.id,
+        message: `Booking message for ${customer.name} on customize package ${customPackageItem.title}`,
+      });
+    }
+
+    // Seed Payments
+    const [bookings] = await connection.query(
+      "SELECT id FROM bookings LIMIT 20"
+    );
+
+    for (let i = 0; i < 20; i = i + 2) {
+      try {
+        await connection.query("INSERT IGNORE INTO payments SET ?", {
+          id: uuidv4(),
+          booking_id: bookings[i].id,
+          payment_id: `pay_${uuidv4().substring(0, 8)}`,
+          amount: (Math.random() * 500 + 50).toFixed(2),
+          status: ["pending", "completed", "failed"][
+            Math.floor(Math.random() * 3)
+          ],
+        });
+      } catch (error) {
+        console.error("⚠️ Failed to seed payments:", error.message);
+      }
+    }
+
+    // Seed Reviews
+    for (let i = 0; i < 10; i = i + 2) {
+      const customer = customers[Math.floor(Math.random() * customers.length)];
+      const booking = bookings[Math.floor(Math.random() * bookings.length)];
+      try {
+        await connection.query("INSERT INTO reviews SET ?", {
+          id: uuidv4(),
+          customer_id: customer.id,
+          booking_id: booking.id,
+          rating: Math.floor(Math.random() * 5) + 1,
+          review: `This is review ${i + 1}`,
+          description: `Detailed description for review ${i + 1}`,
+        });
+      } catch (error) {
+        console.error("⚠️ Failed to insert review:", error.message);
+      }
+    }
+
+    console.log(
+      `✓ Customize Package Place Activities seeded with ${customizePackagePlaceActivities.length} records`
+    );
 
     console.log(
       `✓ Customize Package Places seeded with ${customizePackagePlaces.length} records`
@@ -505,7 +527,7 @@ async function seedDatabase() {
     console.log("✓ Customize Packages seeded with 10 records");
     console.log("✓ Messages seeded with 10 records");
     console.log("✓ Reviews seeded with 10 records");
-    console.log("✓ Bookings seeded with 10 records");
+    console.log("✓ Bookings seeded with 20 records");
 
     console.log("✓ Junction tables and payments seeded");
     console.log("🎉 Database seeding completed successfully!");

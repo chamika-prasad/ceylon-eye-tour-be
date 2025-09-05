@@ -26,9 +26,6 @@ const updateBookingStatus = async (bookingId, newStatus) => {
 };
 
 const createBooking = async (data) => {
-  if (!data.customer_id || !data.package_id || !data.start_date) {
-    throw new Error("Missing required fields");
-  }
 
   return await bookingRepository.createBooking(data);
 };

@@ -27,7 +27,11 @@ const Booking = sequelize.define(
     },
     package_id: {
       type: DataTypes.STRING(36),
-      allowNull: false,
+      allowNull: true,
+    },
+    custom_package_id: {
+      type: DataTypes.STRING(36),
+      allowNull: true,
     },
     customer_id: {
       type: DataTypes.STRING(36),
