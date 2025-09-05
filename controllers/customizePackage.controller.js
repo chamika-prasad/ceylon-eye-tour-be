@@ -6,12 +6,6 @@ const createCustomizePackage = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    // if (!userId) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "User id requird" });
-    // }
-
     if (!places || !Array.isArray(places)) {
       return res
         .status(400)
@@ -149,6 +143,41 @@ const updateMessage = async (req, res) => {
   }
 };
 
+const updatePrice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { price } = req.body;
+
+    if (!price) {
+      return res.status(400).json({
+        success: false,
+        message: "Price is required",
+      });
+    }
+
+    const customizePackage =
+      await customizePackageService.getCustomizePackageById(id);
+    if (!customizePackage) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Customize package not found" });
+    }
+
+    const result = await customizePackageService.updatePrice(id, Number(price));
+    return res.status(200).json({
+      success: true,
+      message: "Customize package price updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error in message update",
+      error: error.message,
+    });
+  }
+};
+
 const updateRequiredDayCount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -220,4 +249,5 @@ export default {
   updateRequiredDayCount,
   getCustomizePackageById,
   updateMessage,
+  updatePrice,
 };

@@ -37,7 +37,15 @@ const updateMessage = async (id, message) => {
   if (updatedRows === 0) {
     throw new Error("Customize Package not found or no changes applied");
   }
-  return { id, is_approved: message };
+  return { id, message: message };
+};
+
+const updatePrice = async (id, price) => {
+  const updatedRows = await customizePackageRepository.updatePrice(id, price);
+  if (updatedRows === 0) {
+    throw new Error("Customize Package not found or no changes applied");
+  }
+  return { id, price: price };
 };
 
 const setRequiredDayCount = async (id, dayCount) => {
@@ -65,4 +73,5 @@ export default {
   setRequiredDayCount,
   getCustomizePackageById,
   updateMessage,
+  updatePrice,
 };

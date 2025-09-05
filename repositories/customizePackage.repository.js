@@ -64,10 +64,13 @@ const getAllCustomizePackages = async () => {
     include: [
       {
         model: User,
+        as: "User",
+        attributes: ["id", "name", "country"],
       },
       {
         model: CustomizePackagePlace,
         as: "CustomizePackagePlaces",
+        attributes: ["id", "place_id", "sort_order", "day_no", "description"],
         include: [
           {
             model: Place,
@@ -127,6 +130,14 @@ const updateMessage = async (id, message) => {
   return updatedRows; // number of updated rows
 };
 
+const updatePrice = async (id, price) => {
+  const [updatedRows] = await CustomizePackage.update(
+    { price: price },
+    { where: { id } }
+  );
+  return updatedRows; // number of updated rows
+};
+
 const updateRequiredDayCount = async (id, dayCount) => {
   const [updatedRows] = await CustomizePackage.update(
     { required_day_count: dayCount },
@@ -170,4 +181,5 @@ export default {
   updateRequiredDayCount,
   getCustomizePackageById,
   updateMessage,
+  updatePrice,
 };
