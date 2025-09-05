@@ -29,7 +29,8 @@ const CustomizePackage = sequelize.define(
     },
     price: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
+      allowNull: false,
+      defaultValue: 0,
     },
   },
   {

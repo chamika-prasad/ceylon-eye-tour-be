@@ -377,6 +377,7 @@ async function seedDatabase() {
         required_day_count: 10,
         message: `description for customize package ${i}`,
         user_id: customers[Math.floor(Math.random() * customers.length)].id,
+        price: 0,
       });
     }
 
