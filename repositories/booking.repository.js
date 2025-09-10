@@ -1,4 +1,11 @@
-import { Booking, User, Package, Payment, Review,CustomizePackage } from "../models/index.js";
+import {
+  Booking,
+  User,
+  Package,
+  Payment,
+  Review,
+  CustomizePackage,
+} from "../models/index.js";
 
 const getAllBookings = async () => {
   return await Booking.findAll({
@@ -26,7 +33,24 @@ const getAllBookings = async () => {
       {
         model: Payment,
         as: "Payment",
-        attributes: ["id","payment_id", "amount", "status"], // Include payment details
+        attributes: ["id", "payment_id", "amount", "status"], // Include payment details
+      },
+    ],
+  });
+};
+
+const getBookingById = async (id) => {
+  return await Booking.findByPk(id, {
+    include: [
+      {
+        model: Package,
+        as: "Package",
+        attributes: ["title", "price"], // Include package title only
+      },
+      {
+        model: CustomizePackage,
+        as: "CustomPackage",
+        attributes: ["message", "price"], // Include package title only
       },
     ],
   });
@@ -77,4 +101,5 @@ export default {
   updateBookingStatus,
   createBooking,
   deleteBooking,
+  getBookingById,
 };

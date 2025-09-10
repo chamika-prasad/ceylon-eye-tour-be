@@ -234,9 +234,12 @@ const SQL_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS payments (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   booking_id VARCHAR(36) NOT NULL,
-  payment_id VARCHAR(255) NOT NULL,
+  payment_id VARCHAR(255),
   amount DECIMAL(10, 2) NOT NULL,
-  status ENUM('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending',
+  currency VARCHAR(10),
+  method VARCHAR(20),
+  status ENUM('success','pending','canceled','failed','chargedback') DEFAULT 'pending',
+  status_message VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (booking_id) REFERENCES bookings(id)

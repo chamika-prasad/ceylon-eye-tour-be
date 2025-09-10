@@ -15,8 +15,8 @@ router.post("/add", paymentController.createPayment);
 // // ✅ Get payment by ID
 // router.get("/:id", paymentController.getPaymentById);
 
-// // ✅ Update payment by ID
-// router.put("/:id", paymentController.updatePayment);
+// ✅ Update payment by ID
+router.post("/update", paymentController.updatePayment);
 
 // // ✅ Delete payment by ID
 // router.delete("/:id", paymentController.deletePayment);

@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import paymentService from "./../services/payment.service.js";
+import bookingService from "../services/booking.service.js";
 dotenv.config();
 
 const hashPaymentDetails = async (req, res) => {
@@ -36,26 +37,46 @@ const hashPaymentDetails = async (req, res) => {
 // ✅ Create a new payment
 const createPayment = async (req, res) => {
   try {
-    const { bookingId, paymentId, amount, status } = req.body;
+    const { bookingId, currency } = req.body;
 
-    if (!bookingId || !paymentId || !amount) {
+    if (!bookingId || !currency) {
       return res.status(400).json({
         success: false,
-        message: "bookingId, paymentId, and amount are required",
+        message: "bookingId and currency are required",
       });
     }
 
+    const booking = await bookingService.getBookingById(bookingId);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
+    const amount = booking.Package?.price || booking.CustomPackage?.price;
+
     const newPayment = await paymentService.createPayment({
       booking_id: bookingId,
-      payment_id: paymentId,
       amount,
-      status: status || "pending",
+      currency,
     });
+
+    const hash = await paymentService.hashPaymentDetails(
+      newPayment.id,
+      amount,
+      currency
+    );
 
     return res.status(201).json({
       success: true,
       message: "Payment created successfully",
-      data: newPayment,
+      data: {
+        hash,
+        amount: amount,
+        paymentId: newPayment.id,
+      },
     });
   } catch (error) {
     return res.status(500).json({
@@ -112,36 +133,46 @@ const createPayment = async (req, res) => {
 // };
 
 // // ✅ Update payment
-// const updatePayment = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { paymentId, amount, status } = req.body;
+const updatePayment = async (req, res) => {
+  try {
+    const {
+      merchant_id,
+      order_id,
+      payment_id,
+      status_code,
+      md5sig,
+      method,
+      status_message,
+    } = req.body;
 
-//     const updated = await paymentService.updatePayment(id, {
-//       payment_id: paymentId,
-//       amount,
-//       status,
-//     });
+    const status = paymentService.getPaymentStatusString(status_code);
 
-//     if (!updated) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Payment not found or not updated",
-//       });
-//     }
+    const updated = await paymentService.updatePayment(order_id, {
+      payment_id: payment_id,
+      method,
+      status_message,
+      status
+    });
 
-//     return res.status(200).json({
-//       success: true,
-//       message: "Payment updated successfully",
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       success: false,
-//       message: "Error updating payment",
-//       error: error.message,
-//     });
-//   }
-// };
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: "Payment not found or not updated",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating payment",
+      error: error.message,
+    });
+  }
+};
 
 // // ✅ Delete payment
 // const deletePayment = async (req, res) => {
@@ -175,6 +206,6 @@ export default {
   createPayment,
   // getAllPayments,
   // getPaymentById,
-  // updatePayment,
+  updatePayment,
   // deletePayment,
 };

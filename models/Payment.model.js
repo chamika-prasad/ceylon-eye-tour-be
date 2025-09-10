@@ -12,10 +12,19 @@ const Payment = sequelize.define(
     booking_id: DataTypes.STRING(36),
     payment_id: DataTypes.STRING,
     amount: DataTypes.DECIMAL(10, 2),
+    currency: DataTypes.STRING,
+    method: DataTypes.STRING,
     status: {
-      type: DataTypes.ENUM("pending", "completed", "failed", "refunded"),
+      type: DataTypes.ENUM(
+        "success",
+        "pending",
+        "canceled",
+        "failed",
+        "chargedback"
+      ),
       defaultValue: "pending",
     },
+    status_message: DataTypes.STRING,
   },
   {
     tableName: "payments",

@@ -26,6 +26,19 @@ const createPayment = async (data) => {
   return await paymentRepository.createPayment(data);
 };
 
+// Map PayHere numeric status to string
+const getPaymentStatusString = (statusCode) => {
+  const statusMap = {
+    2: "success",
+    0: "pending",
+    "-1": "canceled",
+    "-2": "failed",
+    "-3": "chargedback",
+  };
+
+  return statusMap[statusCode] || "unknown";
+};
+
 // const getAllPayments = async () => {
 //   return await paymentRepository.getAllPayments();
 // };
@@ -34,9 +47,9 @@ const createPayment = async (data) => {
 //   return await paymentRepository.getPaymentById(id);
 // };
 
-// const updatePayment = async (id, data) => {
-//   return await paymentRepository.updatePayment(id, data);
-// };
+const updatePayment = async (id, data) => {
+  return await paymentRepository.updatePayment(id, data);
+};
 
 // const deletePayment = async (id) => {
 //   return await paymentRepository.deletePayment(id);
@@ -45,8 +58,9 @@ const createPayment = async (data) => {
 export default {
   hashPaymentDetails,
   createPayment,
+  getPaymentStatusString,
   // getAllPayments,
   // getPaymentById,
-  // updatePayment,
+  updatePayment,
   // deletePayment,
 };

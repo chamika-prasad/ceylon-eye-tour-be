@@ -24,14 +24,14 @@ const createPayment = async (data) => {
 //   }
 // };
 
-// const updatePayment = async (id, data) => {
-//   try {
-//     const [updated] = await Payment.update(data, { where: { id } });
-//     return updated > 0;
-//   } catch (error) {
-//     throw new Error(`Error updating payment: ${error.message}`);
-//   }
-// };
+const updatePayment = async (id, data) => {
+  try {
+    const [updated] = await Payment.update(data, { where: { id } });
+    return updated > 0;
+  } catch (error) {
+    throw new Error(`Error updating payment: ${error.message}`);
+  }
+};
 
 // const deletePayment = async (id) => {
 //   try {
@@ -46,6 +46,6 @@ export default {
   createPayment,
 //   getAllPayments,
 //   getPaymentById,
-//   updatePayment,
+  updatePayment,
 //   deletePayment,
 };
