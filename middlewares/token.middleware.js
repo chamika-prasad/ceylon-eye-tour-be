@@ -23,13 +23,13 @@ const verifyToken = (req, res, next) => {
   try {
     // const decoded = jwt.verify(splitToken[1], process.env.JWT_SECRET_KEY);
     const decoded = decodeToken(splitToken[1]);
-    
+
     if (!decoded.success) {
       return res
         .status(401)
         .json({ success: false, message: decoded.message });
     }
-    
+
     req.user = decoded.data;
     next();
   } catch (error) {
@@ -47,14 +47,44 @@ const authorizeAdmin = (req, res, next) => {
   next();
 };
 
+const verifyUser = (req, res, next) => {
+  const token = req.headers["authorization"];
+
+  if (!token) {
+    req.user = null;
+  }
+  else {
+    const splitToken = token.split(" ");
+    // Check if the token is in the correct format (Bearer <token>)
+    if (splitToken.length !== 2 || splitToken[0] !== "Bearer") {
+      req.user = null;
+    }
+    try {
+      // const decoded = jwt.verify(splitToken[1], process.env.JWT_SECRET_KEY);
+      const decoded = decodeToken(splitToken[1]);
+
+      if (!decoded.success) {
+        req.user = null;
+        next();
+      }
+
+      req.user = decoded.data;
+
+    } catch (error) {
+      req.user = null;
+    }
+  }
+  next();
+};
+
 const decodeToken = (token) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-     return { success: true, data: decoded};
+    return { success: true, data: decoded };
   } catch (error) {
     console.log(error.message);
-    return { success: false, message: error.message};
+    return { success: false, message: error.message };
   }
 };
 
-export default { verifyToken, authorizeAdmin };
+export default { verifyToken, authorizeAdmin, verifyUser };

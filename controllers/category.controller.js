@@ -3,12 +3,14 @@ import fs from "fs";
 import path from "path";
 import categoryService from "../services/category.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import tokenService from "../services/token.service.js";
 
 const getCategories = async (req, res) => {
   const { tourType } = req.query;
+  
   try {
     // const categories = await categoryService.getCategories();
-    const categories = await categoryService.getCategories(Number(tourType));
+    const categories = await categoryService.getCategories(Number(tourType), req.user?.role === 'admin');
     return res.status(200).json({
       success: true,
       message: "Categories retrived successfully",
@@ -17,7 +19,7 @@ const getCategories = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error retrieving categories",
+      message: error.message || "Error retrieving categories",
       error: error,
     });
   }

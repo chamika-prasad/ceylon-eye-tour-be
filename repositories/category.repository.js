@@ -38,7 +38,7 @@ const deleteCategory = async (id) => {
   }
 };
 
-const getCategories = async (tourType) => {
+const getCategories = async (tourType, isAdmin) => {
   const isTourTypeValid = tourType === 0 || tourType === 1;
   try {
     const categories = await Category.findAll({
@@ -54,8 +54,8 @@ const getCategories = async (tourType) => {
           through: { attributes: [] }, // Don't include join table fields
           where: isTourTypeValid
             ? {
-                tour_type: tourType, // Filter by passed tourType
-              }
+              tour_type: tourType, // Filter by passed tourType
+            }
             : undefined,
           required: false,
         },
@@ -67,7 +67,7 @@ const getCategories = async (tourType) => {
       (category) => Number(category.get("packageCount")) > 0
     );
 
-    return filteredCategories;
+    return isAdmin ? categories : filteredCategories;
   } catch (error) {
     throw new Error(
       "Error fetching categories with package count: " + error.message

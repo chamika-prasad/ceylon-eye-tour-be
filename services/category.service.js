@@ -25,8 +25,8 @@ const deleteCategory = async (id) => {
   }
 };
 
-const getCategories = async (tourType) => {
-  return await categoryRepository.getCategories(tourType);
+const getCategories = async (tourType, isAdmin) => {
+  return await categoryRepository.getCategories(tourType, isAdmin);
 };
 
 const getCategoryById = async (categoryId, tourType) => {

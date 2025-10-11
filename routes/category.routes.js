@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get(
   "/get-all",
-  // tokenMiddleware.verifyToken,
+  tokenMiddleware.verifyUser,
   categoryController.getCategories
 );
 
