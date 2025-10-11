@@ -100,7 +100,7 @@ const getAllCustomizePackagesByUserId = async (userId) => {
           {
             model: Place,
             as: "Place",
-            attributes: ["id", "name"], // Select only what you need
+            attributes: ["id", "name","image_url"], // Select only what you need
           },
           {
             model: Activity,
