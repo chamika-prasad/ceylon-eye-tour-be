@@ -10,11 +10,11 @@ const getPackages = async () => {
 };
 
 const addPackage = async (data) => {
-  try {
-    return await packageRepository.addPackage(data);
-  } catch (error) {
-    throw new Error(`Error in addPackage service: ${error.message}`);
-  }
+  return await packageRepository.addPackage(data);
+};
+
+const updatePackage = async (data, id) => {
+  return await packageRepository.updatePackage(data, id);
 };
 
 const getPackageById = async (id) => {
@@ -47,4 +47,5 @@ export default {
   getPackageById,
   getPackageByUrlPrefix,
   updatePackageRating,
+  updatePackage
 };

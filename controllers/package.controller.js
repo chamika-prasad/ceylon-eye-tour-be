@@ -101,6 +101,107 @@ const addPackage = async (req, res) => {
   }
 };
 
+const updatePackage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Package ID is required",
+      });
+    }
+
+    // Extract fields (only those possibly included in request)
+    const {
+      title,
+      description,
+      packageHighlights,
+      price,
+      categoryIds,
+      placeIds,
+      tourType,
+      arrival,
+      departure,
+      arrivalDescription,
+      departureDescription,
+      duration,
+      excludes,
+      includes,
+      removedCategoryIds,
+      removedPlaceIds,
+      removedImages,
+    } = req.body;
+
+    // Handle uploaded images if any
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      const uploadDir = path.join("uploads", "packages", id.toString());
+      for (const file of req.files) {
+        const filename = await fileUploadService.uploadFile(uploadDir, file);
+        images.push(`/uploads/packages/${id}/${filename}`);
+      }
+    }
+
+    // Parse JSON strings if any (since body might come as stringified arrays)
+    const parseCategoryIds = categoryIds ? JSON.parse(categoryIds) : [];
+    const parsePlaceIds = placeIds ? JSON.parse(placeIds) : [];
+    const parseRemovedCategoryIds = removedCategoryIds
+      ? JSON.parse(removedCategoryIds)
+      : [];
+    const parseRemovedPlaceIds = removedPlaceIds
+      ? JSON.parse(removedPlaceIds)
+      : [];
+    const parseRemovedImages = removedImages ? JSON.parse(removedImages) : [];
+
+    // Prepare update data (only changed fields)
+    const updateData = {
+      ...(title !== undefined && { title }),
+      ...(description !== undefined && { description }),
+      ...(packageHighlights !== undefined && {
+        package_highlights: packageHighlights,
+      }),
+      ...(price !== undefined && { price }),
+      ...(tourType !== undefined && { tour_type: tourType }),
+      ...(arrival !== undefined && { arrival_location: arrival }),
+      ...(departure !== undefined && { departure_location: departure }),
+      ...(arrivalDescription !== undefined && {
+        arrival_description: arrivalDescription,
+      }),
+      ...(departureDescription !== undefined && {
+        departure_description: departureDescription,
+      }),
+      ...(duration !== undefined && { duration }),
+      ...(excludes !== undefined && { excludes }),
+      ...(includes !== undefined && { includes }),
+      ...(title && { url_prefix: title.toLowerCase().replace(/\s+/g, "-") }),
+      ...(parseCategoryIds.length && { categoryIds: parseCategoryIds }),
+      ...(parsePlaceIds.length && { placeIds: parsePlaceIds }),
+      ...(images.length && { images }),
+      ...(parseRemovedCategoryIds.length && {
+        removedCategoryIds: parseRemovedCategoryIds,
+      }),
+      ...(parseRemovedPlaceIds.length && { removedPlaceIds: parseRemovedPlaceIds }),
+      ...(parseRemovedImages.length && { removedImages: parseRemovedImages }),
+    };
+
+    const updatedPackage = await packageService.updatePackage(updateData, id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Package updated successfully",
+      data: updatedPackage,
+    });
+  } catch (error) {
+    console.error("Error updating package:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error updating package",
+      error: error.message,
+    });
+  }
+};
+
 const getPackageById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -154,4 +255,5 @@ export default {
   addPackage,
   getPackageById,
   getPackageByUrlPrefix,
+  updatePackage
 };

@@ -30,4 +30,12 @@ router.post(
   packageController.addPackage
 );
 
+router.put(
+  "/update/:id",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  upload.array("images", 10),
+  packageController.updatePackage
+);
+
 export default router;
