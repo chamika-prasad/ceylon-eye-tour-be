@@ -13,7 +13,6 @@ const verifyToken = (req, res, next) => {
   }
 
   const splitToken = token.split(" ");
-console.log(splitToken);
   // Check if the token is in the correct format (Bearer <token>)
   if (splitToken.length !== 2 || splitToken[0] !== "Bearer") {
     return res
