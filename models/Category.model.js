@@ -11,7 +11,6 @@ const Category = sequelize.define(
     },
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
-    hero_description: DataTypes.TEXT,
     image_url: {
       type: DataTypes.STRING,
       allowNull: true,

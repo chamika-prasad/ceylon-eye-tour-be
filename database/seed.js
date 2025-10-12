@@ -70,7 +70,6 @@ function generateSampleData(tableName, count) {
           id: uuidv4(),
           name: `Category ${i}`,
           description: `Description for category ${i}`,
-          hero_description: `Hero description for category ${i}`,
           image_url: `https://picsum.photos/1920/1080?random=${i}`,
           url_prefix: `category-${i}`,
         });

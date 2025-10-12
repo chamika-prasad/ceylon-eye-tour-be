@@ -27,7 +27,7 @@ const getCategories = async (req, res) => {
 
 const createCategory = async (req, res) => {
   try {
-    const { name, description, heroDescription } = req.body;
+    const { name, description } = req.body;
 
     if (!name) {
       return res.status(400).json({
@@ -40,13 +40,6 @@ const createCategory = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Category description is required",
-      });
-    }
-
-    if (!heroDescription) {
-      return res.status(400).json({
-        success: false,
-        message: "Hero description description is required",
       });
     }
 
@@ -80,7 +73,6 @@ const createCategory = async (req, res) => {
       name,
       description,
       image_url: imageUrl,
-      hero_description: heroDescription,
       url_prefix: urlPrefix,
     });
 
