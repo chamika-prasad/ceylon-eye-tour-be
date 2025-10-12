@@ -7,7 +7,7 @@ import tokenService from "../services/token.service.js";
 
 const getCategories = async (req, res) => {
   const { tourType } = req.query;
-  
+
   try {
     // const categories = await categoryService.getCategories();
     const categories = await categoryService.getCategories(Number(tourType), req.user?.role === 'admin');
@@ -27,7 +27,7 @@ const getCategories = async (req, res) => {
 
 const createCategory = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, heroDescription } = req.body;
 
     if (!name) {
       return res.status(400).json({
@@ -43,10 +43,30 @@ const createCategory = async (req, res) => {
       });
     }
 
+    if (!heroDescription) {
+      return res.status(400).json({
+        success: false,
+        message: "Hero description description is required",
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
         message: "Category image is required",
+      });
+    }
+
+    const urlPrefix = name.toLowerCase().replace(/\s+/g, "-");
+    const packages = await categoryService.getCategoryByUrlPrefix(
+      urlPrefix,
+      null
+    );
+
+    if (packages) {
+      return res.status(400).json({
+        success: false,
+        message: "Category with the same name already exists",
       });
     }
 
@@ -60,7 +80,8 @@ const createCategory = async (req, res) => {
       name,
       description,
       image_url: imageUrl,
-      url_prefix: name.toLowerCase().replace(/\s+/g, "-"),
+      hero_description: heroDescription,
+      url_prefix: urlPrefix,
     });
 
     return res.status(201).json({
@@ -70,7 +91,6 @@ const createCategory = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding category:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Error adding category",

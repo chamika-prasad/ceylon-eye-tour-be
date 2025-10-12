@@ -7,13 +7,8 @@ import {
 import { Sequelize } from "sequelize";
 
 const createCategory = async (data) => {
-  try {
-    const category = await Category.create(data);
-    return category;
-  } catch (error) {
-    console.error("Error creating category:", error.message);
-    throw new Error("Failed to create category");
-  }
+  const category = await Category.create(data);
+  return category;
 };
 
 const updateCategory = async (id, data) => {

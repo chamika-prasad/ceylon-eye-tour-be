@@ -1,12 +1,9 @@
 import categoryRepository from "../repositories/category.repository.js";
 
 const createCategory = async (data) => {
-  try {
-    const newCategory = await categoryRepository.createCategory(data);
-    return newCategory;
-  } catch (error) {
-    throw new Error(`Error in CategoryService createCategory: ${error}`);
-  }
+
+  const newCategory = await categoryRepository.createCategory(data);
+  return newCategory;
 };
 
 const updateCategory = async (id, data) => {
