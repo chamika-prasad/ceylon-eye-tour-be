@@ -21,6 +21,10 @@ const Message = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    user_id: {
+      type: DataTypes.STRING(36),
+      allowNull: false,
+    },
   },
   {
     tableName: "messages",

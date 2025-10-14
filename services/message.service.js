@@ -8,8 +8,8 @@ const getUserMessages = async (userId) => {
   return await messageRepository.getMessagesByUser(userId);
 };
 
-const getGroupedMessages = async (adminId) => {
-  return await messageRepository.getMessagesGroupedByUser(adminId);
+const getGroupedMessages = async () => {
+  return await messageRepository.getMessagesGroupedByUser();
 };
 
 export default {

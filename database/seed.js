@@ -362,6 +362,7 @@ async function seedDatabase() {
           message: `Message ${i + 1} from ${
             isUserSender ? user.id : "Admin"
           } to ${isUserSender ? "Admin" : user.name}`,
+          user_id: user.id,
         });
       } catch (error) {
         console.error("⚠️ Failed to insert message:", error.message);

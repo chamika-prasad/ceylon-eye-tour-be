@@ -215,6 +215,12 @@ const initModels = () => {
     as: "receivedMessages",
   });
 
+   // A User can have many messages
+  User.hasMany(Message, {
+    foreignKey: "user_id",
+    as: "userMessages",
+  });
+
   // A Message belongs to a sender (User)
   Message.belongsTo(User, {
     foreignKey: "sender_id",
@@ -225,6 +231,12 @@ const initModels = () => {
   Message.belongsTo(User, {
     foreignKey: "receiver_id",
     as: "receiver",
+  });
+
+   // A Message belongs to a user
+  Message.belongsTo(User, {
+    foreignKey: "user_id",
+    as: "user",
   });
 
   // ✅ User - CustomizePackage (One-to-Many)

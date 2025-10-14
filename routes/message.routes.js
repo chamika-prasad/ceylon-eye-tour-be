@@ -7,8 +7,15 @@ const router = express.Router();
 // Add a new message
 router.post("/add", tokenMiddleware.verifyToken, messageController.addMessage);
 
-// Get all messages where senderId OR receiverId = userId (order by created_at)
+// Get all messages where user_id = userId (order by created_at)
 router.get("/", tokenMiddleware.verifyToken, messageController.getMessages);
+
+// Get all messages for a specific user by userId (admin only)
+router.get("/get-by-id/:userId",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  messageController.getMessagesByUserId
+);
 
 // Get all messages grouped by user
 // Need to authorize for only admin

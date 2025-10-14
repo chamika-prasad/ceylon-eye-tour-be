@@ -168,12 +168,15 @@ const SQL_STATEMENTS = [
   sender_id VARCHAR(36) NOT NULL,
   receiver_id VARCHAR(36) NOT NULL,
   message TEXT NOT NULL,
+  user_id VARCHAR(36) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_sender_id (sender_id),
   INDEX idx_receiver_id (receiver_id),
+  INDEX idx_user_id (user_id),
   FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );`,
   `CREATE TABLE IF NOT EXISTS customize_packages (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),

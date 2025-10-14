@@ -5,7 +5,7 @@ const addMessage = async (req, res) => {
   try {
     // const { senderId, receiverId, message } = req.body;
     const { receiverId, message } = req.body;
-    const { userId } = req.user;
+    const { userId, role } = req.user;
 
     // if (!senderId || !receiverId || !message) {
     if (!receiverId || !message) {
@@ -20,6 +20,7 @@ const addMessage = async (req, res) => {
       senderId: userId,
       receiverId,
       message,
+      userId: role === 'admin' ? receiverId : userId
     });
 
     return res.status(201).json({
@@ -39,8 +40,28 @@ const addMessage = async (req, res) => {
 // ✅ Get all messages for a user (sender or receiver)
 const getMessages = async (req, res) => {
   try {
-    // const { userId } = req.params;
     const { userId } = req.user;
+
+    const messages = await messageService.getUserMessages(userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Messages retrieved successfully",
+      data: messages,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving messages",
+      error: error.message,
+    });
+  }
+};
+
+// ✅ This api access by admin only
+const getMessagesByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
 
     const messages = await messageService.getUserMessages(userId);
 
@@ -61,10 +82,8 @@ const getMessages = async (req, res) => {
 // ✅ Get grouped messages (latest message per user)
 const getGroupedMessages = async (req, res) => {
   try {
-    // const { adminId } = req.params;
-    const { userId } = req.user;
 
-    const groupedMessages = await messageService.getGroupedMessages(userId);
+    const groupedMessages = await messageService.getGroupedMessages();
 
     return res.status(200).json({
       success: true,
@@ -84,4 +103,5 @@ export default {
   addMessage,
   getMessages,
   getGroupedMessages,
+  getMessagesByUserId
 };
