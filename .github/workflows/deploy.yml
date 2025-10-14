@@ -1,0 +1,60 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for file changes
+      id: changes
+      run: |
+        # Check package.json
+        git diff --name-only HEAD~1 HEAD | grep -q "package.json" && echo "package_changed=true" >> $GITHUB_OUTPUT || echo "package_changed=false" >> $GITHUB_OUTPUT
+        
+        # Check database/setup.js
+        git diff --name-only HEAD~1 HEAD | grep -q "database/setup.js" && echo "db_changed=true" >> $GITHUB_OUTPUT || echo "db_changed=false" >> $GITHUB_OUTPUT
+
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /root/ceylon-eye-tour-be
+          
+          echo "Stopping application..."
+          pm2 stop 0
+          
+          echo "Pulling latest code..."
+          git pull origin main
+          
+          # Install dependencies only if package.json changed
+          if [ "${{ steps.changes.outputs.package_changed }}" == "true" ]; then
+            echo "package.json changed. Installing dependencies..."
+            npm install
+          else
+            echo "No changes in package.json. Skipping npm install."
+          fi
+          
+          # Run database setup only if database/setup.js changed
+          if [ "${{ steps.changes.outputs.db_changed }}" == "true" ]; then
+            echo "database/setup.js changed. Running database setup..."
+            npm run setup-db
+            npm run seed-db
+          else
+            echo "No changes in database/setup.js. Skipping database setup."
+          fi
+          
+          echo "Starting application..."
+          pm2 start 0
+          pm2 save
+          
+          echo "Deployment completed successfully!"
