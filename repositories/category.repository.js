@@ -12,25 +12,19 @@ const createCategory = async (data) => {
 };
 
 const updateCategory = async (id, data) => {
-  try {
-    const category = await Category.findByPk(id);
-    if (!category) return false;
 
-    await category.update(data);
-    return category;
-  } catch (error) {
-    throw new Error(`Error in CategoryRepository updateCategory: ${error}`);
-  }
+  const category = await Category.findByPk(id);
+  if (!category) return false;
+
+  await category.update(data);
+  return category;
 };
 
 const deleteCategory = async (id) => {
-  try {
-    const deleted = await Category.destroy({ where: { id } });
-    if (!deleted) return false;
-    return deleted;
-  } catch (error) {
-    throw new Error(`Error in CategoryRepository deleteCategory: ${error}`);
-  }
+
+  const deleted = await Category.destroy({ where: { id } });
+  if (!deleted) return false;
+  return deleted;
 };
 
 const getCategories = async (tourType, isAdmin) => {

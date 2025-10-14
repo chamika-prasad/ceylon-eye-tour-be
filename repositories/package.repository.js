@@ -373,15 +373,16 @@ const updatePackage = async (data, id) => {
     await transaction.commit();
 
     // 7️⃣ Delete files from disk AFTER commit
-    for (const img of imagesToDelete) {
-      const filePath = path.join(process.cwd(), img.image_url);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    }
+    // for (const img of imagesToDelete) {
+    //   const filePath = path.join(process.cwd(), img.image_url);
+    //   if (fs.existsSync(filePath)) {
+    //     fs.unlinkSync(filePath);
+    //   }
+    // }
 
     // 8️⃣ Reload package with relations
-    return await getPackageById(id);
+    const updatedPackage = await getPackageById(id);
+    return { updatedPackage: updatedPackage, imagesToDelete: imagesToDelete };
   } catch (error) {
     if (transaction) await transaction.rollback();
     console.error("❌ Error in updatePackage:", error);

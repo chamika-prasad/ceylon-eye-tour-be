@@ -1,4 +1,5 @@
 import packageRepository from "../repositories/package.repository.js";
+import fileUploadService from "./fileUpload.service.js";
 
 const getPackages = async () => {
   try {
@@ -14,7 +15,15 @@ const addPackage = async (data) => {
 };
 
 const updatePackage = async (data, id) => {
-  return await packageRepository.updatePackage(data, id);
+  const updatedPackage = await packageRepository.updatePackage(data, id);
+  if (!updatedPackage) return false;
+  
+  if(updatePackage.imagesToDelete > 0){
+        for (const img of imagesToDelete) {
+      await fileUploadService.removeFile(img.image_url);
+      
+    }
+  }
 };
 
 const getPackageById = async (id) => {

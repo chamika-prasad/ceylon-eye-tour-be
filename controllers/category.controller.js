@@ -103,9 +103,33 @@ const updateCategory = async (req, res) => {
       });
     }
 
+    if (name) {
+      var urlPrefix = name.toLowerCase().replace(/\s+/g, "-");
+      const packages = await categoryService.getCategoryByUrlPrefix(
+        urlPrefix,
+        null
+      );
+
+      if (packages) {
+        return res.status(400).json({
+          success: false,
+          message: "Category with the same name already exists",
+        });
+      }
+    }
+
+
+    if (req.file) {
+      const uploadDir = path.join("uploads", "categories");
+      const filename = await fileUploadService.uploadFile(uploadDir, req.file);
+      var imageUrl = `/uploads/categories/${filename}`;
+    }
+
     const updatedCategory = await categoryService.updateCategory(id, {
       ...(name && { name }),
       ...(description && { description }),
+      ...(urlPrefix && { url_prefix: urlPrefix }),
+      ...(imageUrl && { image_url: imageUrl }),
     });
 
     if (!updatedCategory) {

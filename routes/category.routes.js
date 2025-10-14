@@ -29,6 +29,7 @@ router.post(
 router.put(
   "/update/:id",
   // tokenMiddleware.verifyToken,
+  upload.single("image"),
   categoryController.updateCategory
 );
 
