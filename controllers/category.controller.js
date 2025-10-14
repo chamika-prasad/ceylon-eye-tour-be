@@ -96,10 +96,10 @@ const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { name, description } = req.body;
 
-    if (!name && !description) {
+    if (!name && !description && !req.file) {
       return res.status(400).json({
         success: false,
-        message: "Nothing to update. Provide at least name or description.",
+        message: "Nothing to update. Provide at least name or description or image.",
       });
     }
 
