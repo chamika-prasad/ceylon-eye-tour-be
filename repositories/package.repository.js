@@ -93,7 +93,7 @@ const getPackageById = async (id) => {
         });
 
         const placeObj = place.toJSON();
-        delete placeObj.id;
+        // delete placeObj.id;
         delete placeObj.url_prefix;
 
         return { place: placeObj, packagePlace: packagPlaceObj };
