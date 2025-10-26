@@ -98,7 +98,7 @@ const login = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Error registering user",
+      message: error.message,
       error: error,
     });
   }

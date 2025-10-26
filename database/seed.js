@@ -18,7 +18,7 @@ const DB_CONFIG = {
 const ADMIN = {
   id: uuidv4(),
   email: "admin@ceyloneye.com",
-  pw: await passwordService.hashPassword("admin123"),
+  pw: await passwordService.hashPassword("123456"),
   role: "admin",
   name: "Admin",
 };
@@ -302,6 +302,24 @@ async function seedDatabase() {
           image_url: `https://example.com/place-activity-${i}.jpg`,
         });
 
+        if (i < 8) {
+          await connection.query("INSERT IGNORE INTO place_activities SET ?", {
+            place_id: place.id,
+            activity_id: activities[i + 1].id,
+            description: `Description for activity ${i}`,
+            price: (Math.random() * 100 + 10).toFixed(2),
+            image_url: `https://example.com/place-activity-${i}.jpg`,
+          });
+
+          await connection.query("INSERT IGNORE INTO place_activities SET ?", {
+            place_id: place.id,
+            activity_id: activities[i + 2].id,
+            description: `Description for activity ${i}`,
+            price: (Math.random() * 100 + 10).toFixed(2),
+            image_url: `https://example.com/place-activity-${i}.jpg`,
+          });
+        }
+
         // Junction: package_places
         await connection.query("INSERT IGNORE INTO package_places SET ?", {
           id: uuidv4(),
@@ -430,9 +448,19 @@ async function seedDatabase() {
     const customizePackagePlaceActivities = [];
     for (const cpp of customizePackagePlaces) {
       const activityCount = Math.floor(Math.random() * 3) + 1; // 1–3 activities per place
-      const selectedActivities = [...activities]
-        .sort(() => 0.5 - Math.random())
-        .slice(0, activityCount);
+
+      const [placeActivitiesRows] = await connection.query(
+        "SELECT activity_id FROM place_activities WHERE place_id = ?",
+        [cpp.place_id]
+      );
+      const placeActivities = placeActivitiesRows.map((row) => ({
+        id: row.activity_id,
+      }));
+      // const selectedActivities = [...activities]
+      //   .sort(() => 0.5 - Math.random())
+      //   .slice(0, activityCount);
+
+      const selectedActivities = [...placeActivities];
 
       selectedActivities.forEach((activity) => {
         customizePackagePlaceActivities.push({

@@ -6,6 +6,12 @@ const createCustomizePackage = async (userId, places) => {
   return customizePackage;
 };
 
+const updateCustomizePackage = async (packageId, data) => {
+  const customizePackage =
+    await customizePackageRepository.updateCustomizePackage(packageId, data);
+  return customizePackage;
+};
+
 const getAllCustomizePackages = async () => {
   const customizePackage =
     await customizePackageRepository.getAllCustomizePackages();
@@ -67,6 +73,7 @@ const getCustomizePackageById = async (id) => {
 
 export default {
   createCustomizePackage,
+  updateCustomizePackage,
   getAllCustomizePackages,
   getAllCustomizePackagesByUserId,
   setIsApproved,

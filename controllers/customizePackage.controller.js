@@ -39,6 +39,51 @@ const createCustomizePackage = async (req, res) => {
   }
 };
 
+const updateCustomizePackage = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: "Package ID is required",
+    });
+  }
+
+  const { updatePlaces = [], places = [] } = req.body;
+
+  try {
+    if (updatePlaces.length === 0 && places.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Nothing to update" });
+    }
+
+    const updatedPackage = await customizePackageService.updateCustomizePackage(
+      id,
+      { updatePlaces, places }
+    );
+
+    if (!updatedPackage) {
+      return res.status(404).json({
+        success: false,
+        message: "Customize package not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Customize Package updated successfully",
+    });
+  } catch (error) {
+    console.error("Error creating customize package:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create customize package",
+      error: error.message,
+    });
+  }
+};
+
 const getAllCustomizePackages = async (req, res) => {
   try {
     const customizePackages =
@@ -243,6 +288,7 @@ const getCustomizePackageById = async (req, res) => {
 
 export default {
   createCustomizePackage,
+  updateCustomizePackage,
   getAllCustomizePackages,
   getAllCustomizePackagesByUserId,
   updateIsApproved,
