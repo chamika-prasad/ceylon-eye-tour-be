@@ -59,105 +59,6 @@ const createCustomizePackage = async (userId, places = []) => {
   }
 };
 
-// const updateCustomizePackage = async (packageId, data) => {
-//   const transaction = await sequelize.transaction();
-//   const existingPackage = await CustomizePackage.findByPk(packageId, {
-//     transaction,
-//   });
-
-//   if (!existingPackage) throw new Error("Package not found");
-
-//   try {
-//     const { updatePlaces = [], places = [] } = data;
-
-//     // First, delete existing places and their activities
-//     if (updatePlaces.length > 0) {
-//       await Promise.all(
-//         updatePlaces.map(async (place) => {
-//           if (place.remove) {
-//             // Delete associated activities first
-//             await CustomizePackagePlaceActivity.destroy({
-//               where: { customize_package_place_id: place.id },
-//               transaction,
-//             });
-//             // Then delete the place
-//             await CustomizePackagePlace.destroy({
-//               where: { id: place.id },
-//               transaction,
-//             });
-//           }
-
-//           // If there are activities to remove
-//           if (place.removedActivityIds) {
-//             await Promise.all(
-//               place.removedActivityIds.map((aId) =>
-//                 CustomizePackagePlaceActivity.destroy({
-//                   where: { id: aId },
-//                   transaction,
-//                 })
-//               )
-//             );
-//           }
-
-//           // If activities exist, insert them
-//           if (
-//             place.activityIds &&
-//             Array.isArray(place.activityIds) &&
-//             place.activityIds.length > 0
-//           ) {
-//             const activities = place.activityIds.map((activityId) => ({
-//               customize_package_place_id: place.id,
-//               activity_id: activityId,
-//             }));
-
-//             await CustomizePackagePlaceActivity.bulkCreate(activities, {
-//               transaction,
-//             });
-//           }
-//         })
-//       );
-//     }
-
-//     //Add new places if any
-//     if (places.length > 0) {
-//       await Promise.all(
-//         places.map(async (place) => {
-//           const packagePlace = await CustomizePackagePlace.create(
-//             { customize_package_id: packageId, place_id: place.placeId },
-//             { transaction }
-//           );
-
-//           // If activities exist, insert them
-//           if (
-//             place.activityIds &&
-//             Array.isArray(place.activityIds) &&
-//             place.activityIds.length > 0
-//           ) {
-//             const activities = place.activityIds.map((activityId) => ({
-//               customize_package_place_id: packagePlace.id,
-//               activity_id: activityId,
-//             }));
-
-//             await CustomizePackagePlaceActivity.bulkCreate(activities, {
-//               transaction,
-//             });
-//           }
-//         })
-//       );
-//     }
-
-//     // Commit the transaction if all operations were successful
-//     await transaction.commit();
-
-//     return true;
-//   } catch (error) {
-//     console.log(error);
-//     // Rollback the transaction if any error occurs
-//     if (transaction) await transaction.rollback();
-//     throw new Error(`Error in add customize Package update: ${error.message}`);
-//   }
-// };
-
 const updateCustomizePackage = async (packageId, data) => {
   let transaction;
   try {
@@ -291,7 +192,7 @@ const getAllCustomizePackagesByUserId = async (userId) => {
             model: Activity,
             as: "Activities",
             attributes: ["id", "name"], // Activity details
-            through: { attributes: [] }, // Hide join table columns
+            through: { attributes: ["id"] }, // Hide join table columns
           },
         ],
       },
