@@ -1,4 +1,4 @@
-import { HotelType,Hotel } from "../models/index.js";
+import { HotelType, Hotel, Place } from "../models/index.js";
 import { Sequelize } from "sequelize";
 
 const createHotelType = async (data) => {
@@ -81,6 +81,16 @@ const getHotelTypeByUrlPrefix = async (urlPrefix) => {
         {
           model: Hotel,
           as: "Hotels", // Must match the association alias
+          include: [{ model: Place, as: "Place", attributes: ["name"] }],
+          attributes: [
+            "id",
+            "name",
+            "description",
+            "facilities",
+            "images",
+            "rating",
+            "rooms_details",
+          ],
         },
       ],
     });
@@ -96,5 +106,5 @@ export default {
   updateHotelType,
   deleteHotelType,
   getAllHotelTypesWithHotelCount,
-  getHotelTypeByUrlPrefix
+  getHotelTypeByUrlPrefix,
 };
