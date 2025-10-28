@@ -1,4 +1,5 @@
 import { Activity } from "./../models/index.js";
+import { where, fn, col } from "sequelize";
 
 const createActivity = async (data) => {
   return await Activity.create(data);
@@ -24,10 +25,17 @@ const getActivityById = async (id) => {
   return await Activity.findByPk(id);
 };
 
+const getActivityByName = async (name) => {
+  return await Activity.findOne({
+    where: where(fn("lower", col("name")), name.toLowerCase()),
+  });
+};
+
 export default {
   createActivity,
   updateActivity,
   deleteActivity,
   getAllActivities,
   getActivityById,
+  getActivityByName
 };

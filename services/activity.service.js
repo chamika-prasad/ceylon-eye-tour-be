@@ -20,10 +20,15 @@ const getActivityById = async (id) => {
   return await activityRepository.getActivityById(id);
 };
 
+const getActivityByName = async (name) => {
+  return await activityRepository.getActivityByName(name);
+};
+
 export default {
   createActivity,
   updateActivity,
   deleteActivity,
   getAllActivities,
   getActivityById,
+  getActivityByName
 };

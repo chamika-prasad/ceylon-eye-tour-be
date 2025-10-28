@@ -1,18 +1,37 @@
-import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
 import path from "path";
 import activityService from "../services/activity.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
 
 const createActivity = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, description } = req.body;
 
     if (!req.file) {
       return res.status(400).json({
         success: false,
         message: "Activity logo is required",
       });
+    }
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Activity name is required",
+      });
+    }
+
+    if (!description) {
+      return res.status(400).json({
+        success: false,
+        message: "Activity description is required",
+      });
+    }
+
+    const existActivity = await activityService.getActivityByName(name);
+    if (existActivity) {
+      return res
+        .status(409)
+        .json({ success: false, message: "Activity name already exists" });
     }
 
     const uploadDir = path.join("uploads", "activities");
@@ -24,6 +43,7 @@ const createActivity = async (req, res) => {
     const activity = await activityService.createActivity({
       name,
       image_url: imageUrl,
+      description,
     });
     return res.status(201).json({ success: true, data: activity });
   } catch (error) {
@@ -34,8 +54,41 @@ const createActivity = async (req, res) => {
 const updateActivity = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
-    await activityService.updateActivity(id, { name });
+    const { name,description } = req.body;
+    if (!name && !req.file && !description) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one field (name,description or logo) is required to update",
+      });
+    }
+    const existActivity = await activityService.getActivityById(id);
+    if (!existActivity) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Activity Not found" });
+    }
+
+    if (req.file) {
+      const uploadDir = path.join("uploads", "activities");
+
+      const filename = await fileUploadService.uploadFile(uploadDir, req.file);
+
+      var imageUrl = `/uploads/activities/${filename}`;
+      var oldImagePath = existActivity.image_url;
+    }
+
+    const updatedData = {
+      ...(name && { name }),
+      ...(description && { description }),
+      ...(req.file && { image_url: imageUrl }),
+    };
+
+    // await activityService.updateActivity(id, { name });
+    await activityService.updateActivity(id, updatedData);
+    if (req.file && oldImagePath) {
+      // Delete old image file
+      await fileUploadService.removeFile(oldImagePath);
+    }
     return res.status(200).json({ success: true, message: "Activity updated" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -45,7 +98,15 @@ const updateActivity = async (req, res) => {
 const deleteActivity = async (req, res) => {
   try {
     const { id } = req.params;
+    const existActivity = await activityService.getActivityById(id);
+    if (!existActivity) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Activity Not found" });
+    }
     await activityService.deleteActivity(id);
+    // Delete old image file
+    await fileUploadService.removeFile(existActivity.image_url);
     return res.status(200).json({ success: true, message: "Activity deleted" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -73,8 +134,6 @@ const getActivityById = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
-
-
 
 export default {
   createActivity,
