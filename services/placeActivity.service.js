@@ -1,9 +1,5 @@
 import placeActivityRepository from "../repositories/placeActivity.repository.js";
 
-const bulkCreateActivities = async (records) => {
-  return await placeActivityRepository.bulkInsert(records);
-};
-
 const create = async (data) => {
   return await placeActivityRepository.create(data);
 };
@@ -29,7 +25,6 @@ const deletePlaceActivity = async (place_id, activity_id) => {
 };
 
 export default {
-  bulkCreateActivities,
   getAllGroupedByPlace,
   updatePlaceActivity,
   deletePlaceActivity,

@@ -3,63 +3,6 @@ import path from "path";
 import placeActivityService from "../services/placeActivity.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
 
-const createPlaceActivities = async (req, res) => {
-  try {
-    const { placeid, activities } = req.body;
-    const parseActivities = JSON.parse(activities); // must be stringified in frontend
-    const files = req.files;
-
-    // ✅ Validate: activity count === image count
-    if (!Array.isArray(parseActivities)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid activities format" });
-    }
-
-    if (parseActivities.length !== files.length) {
-      return res.status(400).json({
-        success: false,
-        message: `Activities count (${parseActivities.length}) and images count (${files.length}) do not match.`,
-      });
-    }
-
-    // Save files to disk and create image URLs
-    const uploadDir = path.join("uploads", "placeactivities");
-    const activityRecords = await Promise.all(
-      parseActivities.map(async (activity, index) => {
-        const file = files[index];
-        let imageUrl = null;
-
-        if (file) {
-          const filename = await fileUploadService.uploadFile(uploadDir, file);
-          imageUrl = `/uploads/placeactivities/${filename}`;
-        }
-
-        return {
-          place_id: placeid,
-          activity_id: activity.id,
-          description: activity.description,
-          price: activity.price,
-          image_url: imageUrl,
-        };
-      })
-    );
-
-    await placeActivityService.bulkCreateActivities(activityRecords);
-
-    res
-      .status(201)
-      .json({ success: true, message: "Activities added successfully" });
-  } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: err.message,
-    });
-  }
-};
-
 const createPlaceActivitiy = async (req, res) => {
   try {
     const { placeId, activityId, description, price } = req.body;
@@ -138,6 +81,33 @@ const updatePlaceActivity = async (req, res) => {
   try {
     const { place_id, activity_id } = req.params;
     const { price, description } = req.body;
+    const file = req.file;
+
+    if (!price && !description && !file) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one field (price, description, image) is required",
+      });
+    }
+
+    const existing = await placeActivityService.getByPlaceIdAndActivityId({
+      placeId: place_id,
+      activityId: activity_id,
+    });
+
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: "Place activity not found",
+      });
+    }
+
+    const uploadDir = path.join("uploads", "placeactivities");
+
+    if (file) {
+      const filename = await fileUploadService.uploadFile(uploadDir, file);
+      var imageUrl = `/uploads/placeactivities/${filename}`;
+    }
 
     const updated = await placeActivityService.updatePlaceActivity(
       place_id,
@@ -145,14 +115,13 @@ const updatePlaceActivity = async (req, res) => {
       {
         ...(price && { price }),
         ...(description && { description }),
+        ...(file && { image_url: imageUrl }),
       }
     );
 
-    if (!updated) {
-      return res.status(404).json({
-        success: false,
-        message: "Place activity not found",
-      });
+    // Delete old image file
+    if (file) {
+      await fileUploadService.removeFile(existing.image_url);
     }
 
     return res.status(200).json({
@@ -172,17 +141,24 @@ const deletePlaceActivity = async (req, res) => {
   try {
     const { place_id, activity_id } = req.params;
 
-    const deleted = await placeActivityService.deletePlaceActivity(
-      place_id,
-      activity_id
-    );
+    const existing = await placeActivityService.getByPlaceIdAndActivityId({
+      placeId: place_id,
+      activityId: activity_id,
+    });
 
-    if (!deleted) {
+    if (!existing) {
       return res.status(404).json({
         success: false,
         message: "Place activity not found",
       });
     }
+
+    const deleted = await placeActivityService.deletePlaceActivity(
+      place_id,
+      activity_id
+    );
+
+    await fileUploadService.removeFile(existing.image_url);
 
     return res.status(200).json({
       success: true,
@@ -198,7 +174,6 @@ const deletePlaceActivity = async (req, res) => {
 };
 
 export default {
-  createPlaceActivities,
   getGroupedByPlace,
   updatePlaceActivity,
   deletePlaceActivity,

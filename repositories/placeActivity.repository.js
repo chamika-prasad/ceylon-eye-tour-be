@@ -1,9 +1,5 @@
 import { PlaceActivity, Place, Activity } from "./../models/index.js";
 
-const bulkInsert = async (records) => {
-  return await PlaceActivity.bulkCreate(records);
-};
-
 const create = async (data) => {
   return await PlaceActivity.create(data);
 };
@@ -71,7 +67,6 @@ const remove = async (place_id, activity_id) => {
 };
 
 export default {
-  bulkInsert,
   fetchGroupedByPlace,
   update,
   remove,
