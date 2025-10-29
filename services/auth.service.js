@@ -23,12 +23,9 @@ const getUserById = async (userId) => {
   return user;
 };
 
-const updateProfileImage = async (userId, newProfileImage) => {
+const updateProfile = async (userId, userData) => {
   try {
-    const result = await authRepository.updateProfileImage(
-      userId,
-      newProfileImage
-    );
+    const result = await authRepository.updateProfile(userId, userData);
     return result;
   } catch (error) {
     throw new Error(`Error in AuthService updateProfileImage: ${error}`);
@@ -38,6 +35,6 @@ const updateProfileImage = async (userId, newProfileImage) => {
 export default {
   register,
   getUserByEmail,
-  updateProfileImage,
+  updateProfile,
   getUserById,
 };

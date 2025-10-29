@@ -16,10 +16,10 @@ router.post(
 router.post("/login", authController.login);
 
 router.put(
-  "/update-profile-image",
+  "/update-profile",
   tokenMiddleware.verifyToken,
   upload.single("profileImage"),
-  authController.updateProfileImage
+  authController.updateProfile
 );
 
 export default router;

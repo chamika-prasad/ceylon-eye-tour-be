@@ -104,17 +104,10 @@ const login = async (req, res) => {
   }
 };
 
-const updateProfileImage = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
     const { userId } = req.user;
-
-    // Check if file is provided
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Profile image is required",
-      });
-    }
+    const { name, email, country, phoneNo, password } = req.body;
 
     // Check if user already exists
     const existingUser = await authService.getUserById(userId);
@@ -124,31 +117,44 @@ const updateProfileImage = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    if (existingUser.profile_image) {
+    if (password) {
+      var hashedPassword = await passwordService.hashPassword(password);
+    }
+
+    if (req.file) {
+      // Upload profile image
+      const uploadDir = path.join("uploads", "auth");
+
+      const filename = await fileUploadService.uploadFile(uploadDir, req.file);
+
+      var profileImageUrl = `/uploads/auth/${filename}`;
+    }
+
+    const userData = {
+      ...(name && { name }),
+      ...(email && { email }),
+      ...(country && { country }),
+      ...(phoneNo && { phoneno: phoneNo }),
+      ...(password && { pw: hashedPassword }),
+      ...(req.file && { profile_image: profileImageUrl }),
+    };
+
+    // Update in DB
+    const updatedUser = await authService.updateProfile(userId, userData);
+
+    if (req.file && existingUser.profile_image) {
       // Remove old profile image
       await fileUploadService.removeFile(existingUser.profile_image);
     }
 
-    // Upload new profile image
-    const uploadDir = path.join("uploads", "auth");
-    const filename = await fileUploadService.uploadFile(uploadDir, req.file);
-    const profileImageUrl = `/uploads/auth/${filename}`;
-
-    // Update in DB
-    const updatedUser = await authService.updateProfileImage(
-      userId,
-      profileImageUrl
-    );
-
     return res.status(200).json({
       success: true,
-      data: updatedUser,
-      message: "Profile image updated successfully",
+      message: "Profile updated successfully",
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Error updating profile image",
+      message: "Error updating profile",
       error: error.message,
     });
   }
@@ -157,5 +163,5 @@ const updateProfileImage = async (req, res) => {
 export default {
   register,
   login,
-  updateProfileImage,
+  updateProfile,
 };

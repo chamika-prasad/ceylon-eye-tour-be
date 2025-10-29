@@ -30,8 +30,6 @@ const getUserById = async (userId) => {
 };
 
 const getUserByEmail = async (email) => {
-  console.log("getUserByEmail called with email:", email);
-
   try {
     const existUser = await User.findOne({ where: { email } });
     if (existUser) {
@@ -44,15 +42,15 @@ const getUserByEmail = async (email) => {
   }
 };
 
-const updateProfileImage = async (userId, newProfileImage) => {
-  const user = await User.findByPk(userId);
-  user.profile_image = newProfileImage;
-  await user.save();
+const updateProfile = async (userId, userData) => {
+  return await User.update(userData, {
+    where: { id: userId },
+  });
 };
 
 export default {
   register,
   getUserById,
   getUserByEmail,
-  updateProfileImage,
+  updateProfile,
 };
