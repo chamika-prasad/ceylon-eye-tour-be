@@ -1,12 +1,15 @@
 import express from "express";
 import hotelTypeController from "./../controllers/hotelType.controller.js";
 import upload from "../middlewares/upload.middleware.js";
+import tokenMiddleware from "../middlewares/token.middleware.js";
 
 const router = express.Router();
 
 // Create new hotel type
 router.post(
   "/add",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
   upload.single("image"),
   hotelTypeController.createHotelType
 );
@@ -18,10 +21,21 @@ router.get("/get-all", hotelTypeController.getAllHotelTypes);
 router.get("/get-by-id/:id", hotelTypeController.getHotelTypeById);
 
 // Update hotel type by ID
-router.put("/:id", hotelTypeController.updateHotelType);
+router.put(
+  "/:id",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  upload.single("image"),
+  hotelTypeController.updateHotelType
+);
 
 // Delete hotel type by ID
-router.delete("/:id", hotelTypeController.deleteHotelType);
+router.delete(
+  "/:id",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  hotelTypeController.deleteHotelType
+);
 
 router.get(
   "/get-all-with-hotels",
@@ -30,7 +44,6 @@ router.get(
 
 router.get(
   "/get-by-urlprefix/:urlPrefix",
-  // tokenMiddleware.verifyToken,
   hotelTypeController.getHotelTypeByUrlPrefix
 );
 

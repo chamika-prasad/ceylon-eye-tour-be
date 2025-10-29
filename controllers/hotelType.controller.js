@@ -21,16 +21,26 @@ const createHotelType = async (req, res) => {
       });
     }
 
+    const urlPrefix = name.toLowerCase().replace(/\s+/g, "-");
+
+    const existingHotelType = await hotelTypeService.getHotelTypeByUrlPrefix(
+      urlPrefix
+    );
+    if (existingHotelType) {
+      return res.status(409).json({
+        success: false,
+        message: "Hotel type with this name already exists",
+      });
+    }
+
     const uploadDir = path.join("uploads", "hotelTypes");
-
     const filename = await fileUploadService.uploadFile(uploadDir, req.file);
-
     const imageUrl = `/uploads/hotelTypes/${filename}`;
 
     const newHotelType = await hotelTypeService.createHotelType({
       name,
       description,
-      url_prefix: name.toLowerCase().replace(/\s+/g, "-"),
+      url_prefix: urlPrefix,
       image_url: imageUrl,
     });
 
@@ -100,16 +110,54 @@ const updateHotelType = async (req, res) => {
     const { id } = req.params;
     const { name, description } = req.body;
 
-    const updated = await hotelTypeService.updateHotelType(id, {
-      name,
-      description,
-    });
+    if (!name && !description && !req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Nothing to update",
+      });
+    }
 
-    if (!updated) {
+    const existingHotelType = await hotelTypeService.getHotelTypeById(id);
+
+    if (!existingHotelType) {
       return res.status(404).json({
         success: false,
-        message: "Hotel type not found or no changes made",
+        message: "Hotel type not found",
       });
+    }
+
+    if (name) {
+      var urlPrefix = name.toLowerCase().replace(/\s+/g, "-");
+      const urlPrefixExists = await hotelTypeService.getHotelTypeByUrlPrefix(
+        urlPrefix
+      );
+
+      if (urlPrefixExists) {
+        return res.status(409).json({
+          success: false,
+          message: "Hotel type with this name already exists",
+        });
+      }
+    }
+
+    if (req.file) {
+      const uploadDir = path.join("uploads", "hotelTypes");
+      const filename = await fileUploadService.uploadFile(uploadDir, req.file);
+      var imageUrl = `/uploads/hotelTypes/${filename}`;
+    }
+
+    const updatedData = {
+      ...(name && { name }),
+      ...(description && { description }),
+      ...(req.file && { image_url: imageUrl }),
+      ...(name && { url_prefix: urlPrefix }),
+    };
+
+    await hotelTypeService.updateHotelType(id, updatedData);
+
+    if (req.file) {
+      // Delete old image file
+      await fileUploadService.removeFile(existingHotelType.image_url);
     }
 
     return res.status(200).json({
@@ -130,14 +178,17 @@ const deleteHotelType = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deleted = await hotelTypeService.deleteHotelType(id);
+    const existingHotelType = await hotelTypeService.getHotelTypeById(id);
 
-    if (!deleted) {
+    if (!existingHotelType) {
       return res.status(404).json({
         success: false,
         message: "Hotel type not found",
       });
     }
+
+    await hotelTypeService.deleteHotelType(id);
+    await fileUploadService.removeFile(existingHotelType.image_url);
 
     return res.status(200).json({
       success: true,

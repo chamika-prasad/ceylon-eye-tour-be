@@ -123,6 +123,17 @@ const updateHotel = async (req, res) => {
       });
     }
 
+    if (name) {
+      var urlPrifix = name.toLowerCase().replace(/\s+/g, "-");
+      const hotelWithSameName = await hotelService.getHotelByPrefix(urlPrifix);
+      if (hotelWithSameName) {
+        return res.status(409).json({
+          success: false,
+          message: "Another hotel with the same name already exists",
+        });
+      }
+    }
+
     var updatedImages;
     if (
       removeImages &&
@@ -164,7 +175,7 @@ const updateHotel = async (req, res) => {
       ...(name && { url_prefix: name.toLowerCase().replace(/\s+/g, "-") }),
       ...(rating && { rating: Number(rating) }),
       ...(updatedImages && { images: JSON.stringify(updatedImages) }),
-      ...(name && { url_prefix: name.toLowerCase().replace(/\s+/g, "-") }),
+      ...(name && { url_prefix: urlPrifix }),
     };
 
     const updatedHotel = await hotelService.updateHotel(id, updateData);
