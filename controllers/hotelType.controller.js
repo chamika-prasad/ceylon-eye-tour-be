@@ -153,7 +153,14 @@ const updateHotelType = async (req, res) => {
       ...(name && { url_prefix: urlPrefix }),
     };
 
-    await hotelTypeService.updateHotelType(id, updatedData);
+    const updated = await hotelTypeService.updateHotelType(id, updatedData);
+
+    if (!updated) {
+      return res.status(400).json({
+        success: false,
+        message: "Failed to update hotel type",
+      });
+    }
 
     if (req.file) {
       // Delete old image file
@@ -187,7 +194,13 @@ const deleteHotelType = async (req, res) => {
       });
     }
 
-    await hotelTypeService.deleteHotelType(id);
+    const deleted = await hotelTypeService.deleteHotelType(id);
+    if (!deleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Failed to delete hotel type",
+      });
+    }
     await fileUploadService.removeFile(existingHotelType.image_url);
 
     return res.status(200).json({

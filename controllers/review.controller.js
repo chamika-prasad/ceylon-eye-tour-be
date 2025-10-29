@@ -4,7 +4,6 @@ import packageService from "../services/package.service.js";
 // ✅ Add new review
 const createReview = async (req, res) => {
   try {
-    // const { customerId, bookingId, packageId, rating, review,description } = req.body;
     const { bookingId, packageId, rating, review, description } = req.body;
     const { userId } = req.user;
 
@@ -27,7 +26,7 @@ const createReview = async (req, res) => {
       booking_id: bookingId,
       rating: Number(rating),
       review,
-      description
+      description,
     });
 
     const result = await packageService.getPackageById(packageId);
@@ -108,14 +107,47 @@ const getReviewById = async (req, res) => {
 const updateReview = async (req, res) => {
   try {
     const { id } = req.params;
-    const { rating, review } = req.body;
+    const { rating, review, description } = req.body;
 
-    const updated = await reviewService.updateReview(id, { rating, review });
+    if (!rating && !review && !description) {
+      return res.status(400).json({
+        success: false,
+        message: "Nothing to update",
+      });
+    }
+
+    if (Number(rating) < 1 || Number(rating) > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Rating must be a number between 1 and 5",
+      });
+    }
+
+    const existingReview = await reviewService.getReviewById(id);
+
+    if (!existingReview) {
+      return res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+    }
+
+    const updatedData = {
+      ...(rating && { rating: Number(rating) }),
+      ...(description && { description }),
+      ...(review && { review }),
+    };
+
+    const updated = await reviewService.updateReview(id, {
+      rating,
+      review,
+      description,
+    });
 
     if (!updated) {
       return res.status(404).json({
         success: false,
-        message: "Review not found or not updated",
+        message: "Review not updated",
       });
     }
 
