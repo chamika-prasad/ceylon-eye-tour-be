@@ -29,6 +29,10 @@ const createBooking = async (data) => {
   return await bookingRepository.createBooking(data);
 };
 
+const updateBooking = async (id, data) => {
+  return await bookingRepository.updateBooking(id, data);
+};
+
 const deleteBooking = async (bookingId) => {
   const deleted = await bookingRepository.deleteBooking(bookingId);
   if (!deleted) {
@@ -48,5 +52,6 @@ export default {
   updateBookingStatus,
   createBooking,
   deleteBooking,
-  getBookingById
+  getBookingById,
+  updateBooking,
 };

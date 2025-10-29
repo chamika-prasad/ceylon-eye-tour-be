@@ -87,6 +87,12 @@ const createBooking = async (data) => {
   return await Booking.create(data);
 };
 
+const updateBooking = async (id, data) => {
+  return await Booking.update(data, {
+    where: { id },
+  });
+};
+
 const deleteBooking = async (bookingId) => {
   const booking = await Booking.findByPk(bookingId);
   if (!booking) return null;
@@ -102,4 +108,5 @@ export default {
   createBooking,
   deleteBooking,
   getBookingById,
+  updateBooking,
 };

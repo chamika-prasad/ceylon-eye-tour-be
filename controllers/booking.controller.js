@@ -108,16 +108,11 @@ const createBooking = async (req, res) => {
 
     const newBooking = await bookingService.createBooking(bookingData);
 
-    // const newBooking = await bookingService.createBooking({
-    //   adult_count: adultCount,
-    //   child_count: childCount,
-    //   start_date: startDate,
-    //   package_id: packageId,
-    //   customer_id: userId,
-    //   message,
-    // });
-
-    return res.status(201).json({ success: true, data: newBooking });
+    return res.status(201).json({
+      success: true,
+      data: newBooking,
+      message: "Booking created successfully",
+    });
   } catch (error) {
     return res
       .status(400)
@@ -125,13 +120,80 @@ const createBooking = async (req, res) => {
   }
 };
 
+const updateBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { adultCount, childCount, startDate, message } = req.body;
+
+    if (!adultCount && !childCount && !message && !startDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Nothing to update",
+      });
+    }
+
+    const existingBooking = await bookingService.getBookingById(id);
+    if (!existingBooking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
+    if (
+      existingBooking.status === "completed" ||
+      existingBooking.status === "cancelled" ||
+      existingBooking.status === "confirmed"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot update a ${existingBooking.status} booking.`,
+      });
+    }
+
+    // Update booking data
+    const bookingUpdateData = {
+      ...(adultCount && { adult_count: adultCount }),
+      ...(childCount && { child_count: childCount }),
+      ...(startDate && { start_date: startDate }),
+      ...(message && { message }),
+    };
+
+    await bookingService.updateBooking(id, bookingUpdateData);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Booking updated successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Booking faild", error: error.message });
+  }
+};
+
 const deleteBooking = async (req, res) => {
   try {
     const { bookingId } = req.params;
+    const existingBooking = await bookingService.getBookingById(bookingId);
+    if (!existingBooking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+    if (
+      existingBooking.status === "completed" ||
+      existingBooking.status === "confirmed"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete a ${existingBooking.status} booking.`,
+      });
+    }
     await bookingService.deleteBooking(bookingId);
     return res.json({ success: true, message: "Booking deleted successfully" });
   } catch (error) {
-    return res.status(404).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -141,4 +203,5 @@ export default {
   updateBookingStatus,
   createBooking,
   deleteBooking,
+  updateBooking,
 };

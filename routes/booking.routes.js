@@ -6,7 +6,17 @@ const router = express.Router();
 
 router.get("/get-all", bookingController.getAllBookings);
 router.get("/customer/:customerId", bookingController.getBookingsByCustomerId);
-router.put("/:bookingId/status",tokenMiddleware.authorizeAdmin, bookingController.updateBookingStatus);
+router.put(
+  "/:bookingId/status",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  bookingController.updateBookingStatus
+);
+router.put(
+  "/update/:id",
+  tokenMiddleware.verifyToken,
+  bookingController.updateBooking
+);
 router.post(
   "/add",
   tokenMiddleware.verifyToken,
