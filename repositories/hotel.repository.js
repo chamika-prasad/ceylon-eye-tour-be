@@ -9,14 +9,9 @@ const createHotel = async (data) => {
 };
 
 const updateHotel = async (id, data) => {
-  try {
-    const hotel = await Hotel.findByPk(id);
-    if (!hotel) return null;
-    await hotel.update(data);
-    return hotel;
-  } catch (error) {
-    throw new Error(`Error updating hotel: ${error.message}`);
-  }
+  return await Hotel.update(data, {
+    where: { id },
+  });
 };
 
 const deleteHotel = async (id) => {
@@ -101,5 +96,5 @@ export default {
   getAllHotels,
   getHotelsByPlaceId,
   getHotelById,
-  getHotelByPrefix
+  getHotelByPrefix,
 };

@@ -109,6 +109,13 @@ const updateProfile = async (req, res) => {
     const { userId } = req.user;
     const { name, email, country, phoneNo, password } = req.body;
 
+    if( !name && !email && !country && !phoneNo && !password && !req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Nothing to update",
+      });
+    }
+
     // Check if user already exists
     const existingUser = await authService.getUserById(userId);
     if (!existingUser) {

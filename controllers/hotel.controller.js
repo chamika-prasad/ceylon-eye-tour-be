@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import hotelService from "../services/hotel.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
-import { url } from "inspector";
 
 const createHotel = async (req, res) => {
   try {
@@ -31,6 +30,15 @@ const createHotel = async (req, res) => {
           "Name, description, placeId, typeId, facilities, rooms_details and rating are required",
       });
     }
+    const urlPrifix = name.toLowerCase().replace(/\s+/g, "-");
+    const existingHotel = await hotelService.getHotelByPrefix(urlPrifix);
+
+    if (existingHotel) {
+      return res.status(400).json({
+        success: false,
+        message: "Hotel with the same name already exists",
+      });
+    }
 
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
@@ -50,6 +58,7 @@ const createHotel = async (req, res) => {
     }
 
     const newHotel = await hotelService.createHotel({
+      id: hotelId,
       name,
       place_id: placeId,
       type_id: typeId,
@@ -58,7 +67,7 @@ const createHotel = async (req, res) => {
       images: JSON.stringify(images) || "[]", // Ensure images is a JSON string
       rooms_details: JSON.stringify(roomsDetails) || "[]", // Ensure rooms_details is a JSON string
       rating: Number(rating) || 0,
-      url_prefix: name.toLowerCase().replace(/\s+/g, "-"),
+      url_prefix: urlPrifix,
     });
 
     return res.status(201).json({
@@ -78,28 +87,101 @@ const createHotel = async (req, res) => {
 const updateHotel = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = req.body;
+    const {
+      name,
+      placeId,
+      typeId,
+      description,
+      facilities,
+      roomsDetails,
+      rating,
+      removeImages,
+    } = req.body;
 
-    if (!Object.keys(data).length) {
+    if (
+      !name &&
+      !description &&
+      !placeId &&
+      !typeId &&
+      !facilities &&
+      !roomsDetails &&
+      !rating &&
+      !req.files
+    ) {
       return res.status(400).json({
         success: false,
         message: "Nothing to update",
       });
     }
 
-    const updatedHotel = await hotelService.updateHotel(id, data);
+    const existingHotel = await hotelService.getHotelById(id);
 
-    if (!updatedHotel) {
+    if (!existingHotel) {
       return res.status(404).json({
         success: false,
         message: "Hotel not found",
       });
     }
 
+    var updatedImages;
+    if (
+      removeImages &&
+      Array.isArray(JSON.parse(removeImages)) &&
+      JSON.parse(removeImages).length > 0
+    ) {
+      const currentImages = Array.isArray(existingHotel.images)
+        ? existingHotel.images
+        : JSON.parse(existingHotel.images || "[]");
+      updatedImages = currentImages.filter(
+        (img) => !JSON.parse(removeImages).includes(img)
+      );
+    }
+
+    var images = [];
+
+    if (req.files && req.files.length > 0) {
+      const uploadDir = path.join("uploads", "hotels", id);
+
+      for (const file of req.files) {
+        const filename = await fileUploadService.uploadFile(uploadDir, file);
+        images.push(`/uploads/hotels/${id}/${filename}`);
+      }
+    }
+
+    if (updatedImages && images) {
+      updatedImages = [...updatedImages, ...images];
+    } else if (images) {
+      updatedImages = images;
+    }
+
+    const updateData = {
+      ...(name && { name }),
+      ...(placeId && { place_id: placeId }),
+      ...(typeId && { type_id: typeId }),
+      ...(description && { description }),
+      ...(facilities && { facilities }),
+      ...(roomsDetails && { roomsDetails }),
+      ...(name && { url_prefix: name.toLowerCase().replace(/\s+/g, "-") }),
+      ...(rating && { rating: Number(rating) }),
+      ...(updatedImages && { images: JSON.stringify(updatedImages) }),
+      ...(name && { url_prefix: name.toLowerCase().replace(/\s+/g, "-") }),
+    };
+
+    const updatedHotel = await hotelService.updateHotel(id, updateData);
+
+    if (
+      removeImages &&
+      Array.isArray(JSON.parse(removeImages)) &&
+      JSON.parse(removeImages).length > 0
+    ) {
+      for (const removeImage of JSON.parse(removeImages)) {
+        await fileUploadService.removeFile(removeImage);
+      }
+    }
+
     return res.status(200).json({
       success: true,
       message: "Hotel updated successfully",
-      data: updatedHotel,
     });
   } catch (error) {
     return res.status(500).json({
