@@ -4,6 +4,10 @@ const createPlace = async (data) => {
   return await placeRepository.createPlace(data);
 };
 
+const updatePlace = async (id, data) => {
+  return await placeRepository.updatePlace(id, data);
+};
+
 const getAllPlaces = async () => {
   return await placeRepository.getAllPlaces();
 };
@@ -26,9 +30,10 @@ const getPlaceByUrlPrefix = async (urlPrefix) => {
 
 export default {
   createPlace,
+  updatePlace,
   getAllPlaces,
   getPlaceById,
   deletePlace,
   getAllPlacesWithHotelCount,
-  getPlaceByUrlPrefix
+  getPlaceByUrlPrefix,
 };

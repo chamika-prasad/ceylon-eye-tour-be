@@ -7,14 +7,7 @@ const createPlace = async (req, res) => {
   try {
     const { location, longitude, latitude, name, description } = req.body;
 
-    if (
-      !name ||
-      !location ||
-      !longitude ||
-      !latitude ||
-      !name ||
-      !description
-    ) {
+    if (!name || !location || !longitude || !latitude || !description) {
       return res.status(400).json({
         success: false,
         message:
@@ -25,7 +18,7 @@ const createPlace = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Category image is required",
+        message: "Place image is required",
       });
     }
 
@@ -54,6 +47,81 @@ const createPlace = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error creating place",
+      error: error.message,
+    });
+  }
+};
+
+// ✅ Create a new place
+const updatePlace = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { location, longitude, latitude, name, description } = req.body;
+
+    if (
+      !name &&
+      !location &&
+      !longitude &&
+      !latitude &&
+      !description &&
+      !req.file
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Nothing to update. Provide at least one field to update.",
+      });
+    }
+
+    if (name) {
+      var urlPrefix = name.toLowerCase().replace(/\s+/g, "-");
+    }
+
+    const existPlace = await placeService.getPlaceById(id);
+    if (!existPlace) {
+      return res.status(404).json({
+        success: false,
+        message: "Place not found",
+      });
+    }
+
+    if (existPlace.url_prefix === urlPrefix) {
+      return res.status(400).json({
+        success: false,
+        message: "Place with the same name already exists",
+      });
+    }
+
+    if (req.file) {
+      const uploadDir = path.join("uploads", "places");
+      const filename = await fileUploadService.uploadFile(uploadDir, req.file);
+      var imageUrl = `/uploads/places/${filename}`;
+    }
+
+    const updatedData = {
+      ...(location && { location }),
+      ...(longitude && { longitude }),
+      ...(latitude && { latitude }),
+      ...(name && { name }),
+      ...(name && { url_prefix: urlPrefix }),
+      ...(description && { description }),
+      ...(req.file && { image_url: imageUrl }),
+    };
+
+    await placeService.updatePlace(id, updatedData);
+
+    if (req.file) {
+      // Delete old image file
+      await fileUploadService.removeFile(existPlace.image_url);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Place updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating place",
       error: error.message,
     });
   }
@@ -110,14 +178,18 @@ const deletePlace = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deleted = await placeService.deletePlace(id);
-
-    if (!deleted) {
+    const existPlace = await placeService.getPlaceById(id);
+    if (!existPlace) {
       return res.status(404).json({
         success: false,
         message: "Place not found",
       });
     }
+
+    await placeService.deletePlace(id);
+
+    // Delete image file
+    await fileUploadService.removeFile(existPlace.image_url);
 
     return res.status(200).json({
       success: true,
@@ -179,9 +251,10 @@ const getPlaceByUrlPrefix = async (req, res) => {
 
 export default {
   createPlace,
+  updatePlace,
   getAllPlaces,
   getPlaceById,
   deletePlace,
   getAllPlacesWithHotelCount,
-  getPlaceByUrlPrefix
+  getPlaceByUrlPrefix,
 };
