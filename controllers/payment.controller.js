@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import axios from "axios";
 import paymentService from "./../services/payment.service.js";
 import bookingService from "../services/booking.service.js";
 dotenv.config();
@@ -151,7 +152,7 @@ const updatePayment = async (req, res) => {
       payment_id: payment_id,
       method,
       status_message,
-      status
+      status,
     });
 
     if (!updated) {
@@ -201,9 +202,50 @@ const updatePayment = async (req, res) => {
 //   }
 // };
 
+// Get access token from PayHere
+
+// Refund Payment
+const refundPayment = async (req, res) => {
+  try {
+    const { payment_id, description } = req.body;
+    if (!payment_id || !description) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
+    }
+
+    const token = await paymentService.getAccessToken();
+    const PAYHERE_REFUND_URL =
+      process.env.PAYHERE_MODE === "live"
+        ? "https://www.payhere.lk/merchant/v1/payment/refund"
+        : "https://sandbox.payhere.lk/merchant/v1/payment/refund";
+
+    const response = await axios.post(
+      PAYHERE_REFUND_URL,
+      { payment_id, description },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return res.json({ success: true, data: response.data });
+  } catch (err) {
+    console.error("Refund Error:", err.response?.data || err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Refund failed",
+      error: err.response?.data || err.message,
+    });
+  }
+};
+
 export default {
   hashPaymentDetails,
   createPayment,
+  refundPayment,
   // getAllPayments,
   // getPaymentById,
   updatePayment,

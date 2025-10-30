@@ -1,7 +1,12 @@
+import dotenv from "dotenv";
 import pkg from "crypto-js";
-const { MD5 } = pkg;
-
+import axios from "axios";
 import paymentRepository from "../repositories/payment.repository.js";
+const { MD5 } = pkg;
+dotenv.config();
+
+let accessToken = null;
+let tokenExpiry = null;
 
 const hashPaymentDetails = async (orderId, amount) => {
   let merchantSecret = process.env.PAYHERE_MERCHANT_SECRET;
@@ -54,6 +59,35 @@ const updatePayment = async (id, data) => {
 // const deletePayment = async (id) => {
 //   return await paymentRepository.deletePayment(id);
 // };
+const getAccessToken = async () => {
+  // If token still valid, reuse it
+  if (accessToken && tokenExpiry && Date.now() < tokenExpiry) {
+    return accessToken;
+  }
+
+  const AUTH_CODE = btoa(process.env.PAYHERE_APP_ID+":"+process.env.PAYHERE_APP_SECRET);
+  console.log(AUTH_CODE);
+  
+  const PAYHERE_TOKEN_URL =
+    process.env.PAYHERE_MODE === "live"
+      ? "https://www.payhere.lk/merchant/v1/oauth/token"
+      : "https://sandbox.payhere.lk/merchant/v1/oauth/token";
+
+  const headers = {
+    Authorization: `Basic ${AUTH_CODE}`,
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+
+  const params = new URLSearchParams();
+  params.append("grant_type", "client_credentials");
+
+  const response = await axios.post(PAYHERE_TOKEN_URL, params, { headers });
+
+  accessToken = response.data.access_token;
+  tokenExpiry = Date.now() + (response.data.expires_in - 10) * 1000;
+
+  return accessToken;
+};
 
 export default {
   hashPaymentDetails,
@@ -62,5 +96,6 @@ export default {
   // getAllPayments,
   // getPaymentById,
   updatePayment,
+  getAccessToken,
   // deletePayment,
 };

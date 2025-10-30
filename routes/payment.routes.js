@@ -18,6 +18,8 @@ router.post("/add", paymentController.createPayment);
 // ✅ Update payment by ID
 router.post("/update", paymentController.updatePayment);
 
+router.post("/refund", paymentController.refundPayment);
+
 // // ✅ Delete payment by ID
 // router.delete("/:id", paymentController.deletePayment);
 
