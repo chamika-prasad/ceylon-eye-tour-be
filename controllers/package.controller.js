@@ -131,8 +131,9 @@ const updatePackage = async (req, res) => {
       removedCategoryIds,
       removedPlaceIds,
       removedImages,
+      updateplaceIds,
     } = req.body;
-
+    
     // Handle uploaded images if any
     let images = [];
     if (req.files && req.files.length > 0) {
@@ -146,6 +147,9 @@ const updatePackage = async (req, res) => {
     // Parse JSON strings if any (since body might come as stringified arrays)
     const parseCategoryIds = categoryIds ? JSON.parse(categoryIds) : [];
     const parsePlaceIds = placeIds ? JSON.parse(placeIds) : [];
+    const parseUpdateplaceIds = updateplaceIds
+      ? JSON.parse(updateplaceIds)
+      : [];
     const parseRemovedCategoryIds = removedCategoryIds
       ? JSON.parse(removedCategoryIds)
       : [];
@@ -177,11 +181,16 @@ const updatePackage = async (req, res) => {
       ...(title && { url_prefix: title.toLowerCase().replace(/\s+/g, "-") }),
       ...(parseCategoryIds.length && { categoryIds: parseCategoryIds }),
       ...(parsePlaceIds.length && { placeIds: parsePlaceIds }),
+      ...(parseUpdateplaceIds.length && {
+        updateplaceIds: parseUpdateplaceIds,
+      }),
       ...(images.length && { images }),
       ...(parseRemovedCategoryIds.length && {
         removedCategoryIds: parseRemovedCategoryIds,
       }),
-      ...(parseRemovedPlaceIds.length && { removedPlaceIds: parseRemovedPlaceIds }),
+      ...(parseRemovedPlaceIds.length && {
+        removedPlaceIds: parseRemovedPlaceIds,
+      }),
       ...(parseRemovedImages.length && { removedImages: parseRemovedImages }),
     };
 
@@ -255,5 +264,5 @@ export default {
   addPackage,
   getPackageById,
   getPackageByUrlPrefix,
-  updatePackage
+  updatePackage,
 };

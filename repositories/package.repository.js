@@ -8,7 +8,7 @@ import {
   PackageImage,
   PackagePlace,
   PlaceActivity,
-  PackageCategory
+  PackageCategory,
 } from "../models/index.js";
 import sequelize from "../config/sequelize.js";
 
@@ -73,7 +73,7 @@ const getPackageById = async (id) => {
     const placeDetails = await Promise.all(
       packagePlaces.map(async (packagePlace) => {
         const packagPlaceObj = packagePlace.toJSON();
-        delete packagPlaceObj.id;
+        // delete packagPlaceObj.id;
         delete packagPlaceObj.package_id;
         delete packagPlaceObj.place_id;
         delete packagPlaceObj.created_at;
@@ -140,7 +140,7 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
     const placeDetails = await Promise.all(
       packagePlaces.map(async (packagePlace) => {
         const packagPlaceObj = packagePlace.toJSON();
-        delete packagPlaceObj.id;
+        // delete packagPlaceObj.id;
         delete packagPlaceObj.package_id;
         delete packagPlaceObj.place_id;
         delete packagPlaceObj.created_at;
@@ -276,8 +276,6 @@ const updatePackageRating = async (id, data) => {
     const result = await getPackageById(id);
     return result;
   } catch (error) {
-    console.log(error);
-
     // Rollback the transaction if any error occurs
     if (transaction) await transaction.rollback();
     throw new Error(`Error in updatePackage repository: ${error.message}`);
@@ -293,6 +291,7 @@ const updatePackage = async (data, id) => {
       images = [],
       removedCategoryIds = [],
       removedPlaceIds = [],
+      updateplaceIds = [],
       removedImages = [],
       ...packageData
     } = data;
@@ -344,6 +343,27 @@ const updatePackage = async (data, id) => {
 
       await PackagePlace.bulkCreate(records, { transaction });
     }
+  
+    if (updateplaceIds.length) {
+      const records = updateplaceIds.map((p) => ({
+        id: p.id,
+        data: {
+          ...(p.description && { description: p.description }),
+          ...(p.order && { sort_order: Number(p.order) }),
+          ...(p.day_no && { day_no: Number(p.day_no) }),
+          ...(p.events && { events: JSON.stringify(p.events) }),
+        },
+      }));
+
+      await Promise.all(
+        records.map(async (item) => {
+          await PackagePlace.update(item.data, {
+            where: { id: item.id },
+            transaction,
+          });
+        })
+      );
+    }
 
     // 4️⃣ Update images
     if (images.length) {
@@ -372,14 +392,6 @@ const updatePackage = async (data, id) => {
     // Commit transaction first
     await transaction.commit();
 
-    // 7️⃣ Delete files from disk AFTER commit
-    // for (const img of imagesToDelete) {
-    //   const filePath = path.join(process.cwd(), img.image_url);
-    //   if (fs.existsSync(filePath)) {
-    //     fs.unlinkSync(filePath);
-    //   }
-    // }
-
     // 8️⃣ Reload package with relations
     const updatedPackage = await getPackageById(id);
     return { updatedPackage: updatedPackage, imagesToDelete: imagesToDelete };
@@ -390,12 +402,11 @@ const updatePackage = async (data, id) => {
   }
 };
 
-
 export default {
   getPackages,
   addPackage,
   getPackageById,
   getPackageByUrlPrefix,
   updatePackageRating,
-  updatePackage
+  updatePackage,
 };
