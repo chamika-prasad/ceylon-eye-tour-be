@@ -4,6 +4,12 @@ const createVehicle = async (data) => {
   return await Vehicle.create(data);
 };
 
+const updateVehicle = async (id, updatedData) => {
+  return await Vehicle.update(updatedData, {
+    where: { id },
+  });
+};
+
 const deleteVehicle = async (id) => {
   return await Vehicle.destroy({
     where: { id },
@@ -20,9 +26,15 @@ const getVehicleByUrlPrefix = async (urlPrefix) => {
   });
 };
 
+const getVehicleById = async (id) => {
+  return await Vehicle.findByPk(id);
+};
+
 export default {
   createVehicle,
+  updateVehicle,
   deleteVehicle,
   getAllVehicles,
   getVehicleByUrlPrefix,
+  getVehicleById,
 };

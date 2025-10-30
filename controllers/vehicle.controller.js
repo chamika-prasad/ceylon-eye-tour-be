@@ -58,7 +58,7 @@ const createVehicle = async (req, res) => {
       id: vehicleId,
       name,
       descriptions,
-      images:JSON.stringify(images),
+      images: JSON.stringify(images),
       excludes,
       facilities,
       terms,
@@ -79,6 +79,146 @@ const createVehicle = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error creating vehicle",
+      error: error.message,
+    });
+  }
+};
+
+const updateVehicle = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      descriptions,
+      excludes,
+      facilities,
+      terms,
+      owner,
+      ownerContact,
+      passengerCapacity,
+      location,
+      price,
+      removeImages,
+    } = req.body;
+
+    if (
+      !name &&
+      !owner &&
+      !ownerContact &&
+      !location &&
+      !price &&
+      !passengerCapacity &&
+      !descriptions &&
+      !excludes &&
+      !facilities &&
+      !terms &&
+      !req.files
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one field is required to update",
+      });
+    }
+
+    const existingVehicle = await vehicleService.getVehicleById(id);
+
+    if (!existingVehicle) {
+      return res.status(404).json({
+        success: false,
+        message: "Vehicle not found",
+      });
+    }
+
+    if (name) {
+      var urlPrifix = name.toLowerCase().replace(/\s+/g, "-");
+      const vehicleWithSameName = await vehicleService.getVehicleByUrlPrefix(
+        urlPrifix
+      );
+      if (vehicleWithSameName) {
+        return res.status(409).json({
+          success: false,
+          message: "Another vehicle with the same name already exists",
+        });
+      }
+    }
+
+    var updatedImages;
+    if (
+      removeImages &&
+      Array.isArray(JSON.parse(removeImages)) &&
+      JSON.parse(removeImages).length > 0
+    ) {
+      const currentImages = Array.isArray(existingVehicle.images)
+        ? existingVehicle.images
+        : JSON.parse(existingVehicle.images || "[]");
+      updatedImages = currentImages.filter(
+        (img) => !JSON.parse(removeImages).includes(img)
+      );
+    }
+
+    var images = [];
+
+    if (req.files && req.files.length > 0) {
+      const uploadDir = path.join("uploads", "vehicles", id);
+
+      for (const file of req.files) {
+        const filename = await fileUploadService.uploadFile(uploadDir, file);
+        images.push(`/uploads/vehicles/${id}/${filename}`);
+      }
+    }
+
+    // Prepare upload directory: uploads/vehicles/{vehicleId}
+
+    if (updatedImages && images) {
+      updatedImages = [...updatedImages, ...images];
+    } else if (images) {
+      updatedImages = images;
+    }
+
+    const updateData = {
+      ...(name && { name }),
+      ...(excludes && { excludes }),
+      ...(facilities && { facilities }),
+      ...(descriptions && { descriptions }),
+      ...(facilities && { facilities }),
+      ...(terms && { terms }),
+      ...(name && { url_prefix: name.toLowerCase().replace(/\s+/g, "-") }),
+      ...(owner && { owner }),
+      ...(ownerContact && { owner_contact: ownerContact }),
+      ...(passengerCapacity && { passenger_capacity: passengerCapacity }),
+      ...(location && { location }),
+      ...(price && { price }),
+      ...(updatedImages && { images: JSON.stringify(updatedImages) }),
+      ...(name && { url_prefix: urlPrifix }),
+    };
+
+    const updatedVehicle = await vehicleService.updateVehicle(id, updateData);
+
+    if (!updatedVehicle) {
+      return res.status(400).json({
+        success: false,
+        message: "Vehicle update failed",
+      });
+    }
+
+    if (
+      removeImages &&
+      Array.isArray(JSON.parse(removeImages)) &&
+      JSON.parse(removeImages).length > 0
+    ) {
+      for (const removeImage of JSON.parse(removeImages)) {
+        await fileUploadService.removeFile(removeImage);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Vehicle updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating vehicle",
       error: error.message,
     });
   }
@@ -140,6 +280,7 @@ const getVehicleByUrlPrefix = async (req, res) => {
 
 export default {
   createVehicle,
+  updateVehicle,
   deleteVehicle,
   getAllVehicles,
   getVehicleByUrlPrefix,

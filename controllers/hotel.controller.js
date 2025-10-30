@@ -180,6 +180,13 @@ const updateHotel = async (req, res) => {
 
     const updatedHotel = await hotelService.updateHotel(id, updateData);
 
+    if (!updatedHotel) {
+      return res.status(400).json({
+        success: false,
+        message: "Hotel update failed",
+      });
+    }
+
     if (
       removeImages &&
       Array.isArray(JSON.parse(removeImages)) &&
