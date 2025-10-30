@@ -10,6 +10,8 @@ router.post("/add", tokenMiddleware.verifyToken, messageController.addMessage);
 // Get all messages where user_id = userId (order by created_at)
 router.get("/", tokenMiddleware.verifyToken, messageController.getMessages);
 
+router.put("/:id", tokenMiddleware.verifyToken, messageController.updateMessage);
+
 // Get all messages for a specific user by userId (admin only)
 router.get("/get-by-id/:userId",
   tokenMiddleware.verifyToken,

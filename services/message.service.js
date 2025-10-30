@@ -4,6 +4,14 @@ const createMessage = async (data) => {
   return await messageRepository.addMessage(data);
 };
 
+const getMessageById = async (id) => {
+  return await messageRepository.getMessageById(id);
+};
+
+const updateMessage = async (id,data) => {
+  return await messageRepository.updateMessage(id,data);
+};
+
 const getUserMessages = async (userId) => {
   return await messageRepository.getMessagesByUser(userId);
 };
@@ -16,4 +24,6 @@ export default {
   createMessage,
   getUserMessages,
   getGroupedMessages,
+  getMessageById,
+  updateMessage,
 };

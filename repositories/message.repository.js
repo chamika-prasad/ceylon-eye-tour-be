@@ -8,6 +8,16 @@ const addMessage = async (messageData) => {
   });
 };
 
+const updateMessage = async (id,data) => {
+  return await Message.update(data, {
+    where: { id },
+  });
+};
+
+const getMessageById = async (id) => {
+  return await Message.findByPk(id);
+};
+
 const getMessagesByUser = async (userId) => {
   return await Message.findAll({
     where: { user_id: userId },
@@ -41,10 +51,10 @@ const getMessagesGroupedByUser = async () => {
   return uniqueSenders;
 };
 
-
-
 export default {
   addMessage,
+  updateMessage,
+  getMessageById,
   getMessagesByUser,
   getMessagesGroupedByUser,
 };

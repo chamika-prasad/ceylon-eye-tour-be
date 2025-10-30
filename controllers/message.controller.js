@@ -3,15 +3,12 @@ import messageService from "../services/message.service.js";
 // ✅ Add new message
 const addMessage = async (req, res) => {
   try {
-    // const { senderId, receiverId, message } = req.body;
     const { receiverId, message } = req.body;
     const { userId, role } = req.user;
 
-    // if (!senderId || !receiverId || !message) {
     if (!receiverId || !message) {
       return res.status(400).json({
         success: false,
-        // message: "Sender, receiver, and message are required",
         message: "Receiver, and message are required",
       });
     }
@@ -20,13 +17,43 @@ const addMessage = async (req, res) => {
       senderId: userId,
       receiverId,
       message,
-      userId: role === 'admin' ? receiverId : userId
+      userId: role === "admin" ? receiverId : userId,
     });
 
     return res.status(201).json({
       success: true,
       message: "Message sent successfully",
       data: newMessage,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error sending message",
+      error: error.message,
+    });
+  }
+};
+
+const updateMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message } = req.body;
+
+    const existingMessage = await messageService.getMessageById(id);
+    if (!existingMessage) {
+      return res.status(404).json({
+        success: false,
+        message: "Message not found",
+      });
+    }
+
+    await messageService.updateMessage(id, {
+      message,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Message updated successfully",
     });
   } catch (error) {
     return res.status(500).json({
@@ -82,7 +109,6 @@ const getMessagesByUserId = async (req, res) => {
 // ✅ Get grouped messages (latest message per user)
 const getGroupedMessages = async (req, res) => {
   try {
-
     const groupedMessages = await messageService.getGroupedMessages();
 
     return res.status(200).json({
@@ -103,5 +129,6 @@ export default {
   addMessage,
   getMessages,
   getGroupedMessages,
-  getMessagesByUserId
+  getMessagesByUserId,
+  updateMessage,
 };
