@@ -4,7 +4,12 @@ import tokenMiddleware from "../middlewares/token.middleware.js";
 
 const router = express.Router();
 
-router.get("/get-all", bookingController.getAllBookings);
+router.get(
+  "/get-all",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  bookingController.getAllBookings
+);
 router.get("/customer/:customerId", bookingController.getBookingsByCustomerId);
 router.put(
   "/:bookingId/status",
