@@ -13,12 +13,12 @@ const getAllBookings = async () => {
       {
         model: Package,
         as: "Package",
-        attributes: ["title"], // Include package title only
+        attributes: ["title","price"], // Include package title only
       },
       {
         model: CustomizePackage,
         as: "CustomPackage",
-        attributes: ["message"], // Include package title only
+        attributes: ["message","price"], // Include package title only
       },
       {
         model: User,
@@ -63,12 +63,17 @@ const getBookingsByCustomerId = async (customerId) => {
       {
         model: Package,
         as: "Package",
-        attributes: ["title"], // Include package title only
+        attributes: ["title","price"], // Include package title only
       },
       {
         model: Review,
         as: "Review",
         attributes: ["rating", "review"], // Include review rating and comment
+      },
+      {
+        model: CustomizePackage,
+        as: "CustomPackage",
+        attributes: ["message", "price"], // Include custom package title and price only
       },
     ],
   });
