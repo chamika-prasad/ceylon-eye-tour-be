@@ -234,7 +234,8 @@ const refundPayment = async (req, res) => {
     return res.json({ success: true, data: response.data });
   } catch (err) {
     console.error("Refund Error:", err.response?.data || err.message);
-    return res.status(500).json({
+    
+    return res.status(err.status || 500).json({
       success: false,
       message: "Refund failed",
       error: err.response?.data || err.message,
