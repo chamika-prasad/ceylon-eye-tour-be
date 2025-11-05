@@ -2,6 +2,9 @@ import dotenv from "dotenv";
 import axios from "axios";
 import paymentService from "./../services/payment.service.js";
 import bookingService from "../services/booking.service.js";
+import packageService from "../services/package.service.js";
+import emailService from "../services/email.service.js";
+import emailTemplateService from "../services/emailTemplate.service.js";
 dotenv.config();
 
 const hashPaymentDetails = async (req, res) => {
@@ -159,6 +162,28 @@ const updatePayment = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Payment not found or not updated",
+      });
+    }
+
+    const paymentRecord = await paymentService.getPaymentById(order_id);
+    const bookingRecord = await bookingService.getBookingById(
+      paymentRecord.booking_id
+    );
+
+    if (bookingRecord) {
+      
+      const template = emailTemplateService.generateInvoiceTemplate(
+        bookingRecord.Package?.title || "Custom Package",
+        bookingRecord.User.name,
+        paymentRecord.amount,
+        paymentRecord.status,
+        paymentRecord.updated_at
+      );
+
+      await emailService.sendEmail({
+        to: bookingRecord.User.email,
+        subject: "Payment Invoice - Ceylon Eye Tours",
+        html: template,
       });
     }
 

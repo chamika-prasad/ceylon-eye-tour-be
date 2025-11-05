@@ -52,6 +52,11 @@ const getBookingById = async (id) => {
         as: "CustomPackage",
         attributes: ["message", "price"], // Include package title only
       },
+      {
+        model: User,
+        as: "User",
+        attributes: ["name", "email"], // Include customer name and email
+      }
     ],
   });
 };
