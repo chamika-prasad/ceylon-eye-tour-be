@@ -56,9 +56,10 @@ const updatePayment = async (id, data) => {
   return await paymentRepository.updatePayment(id, data);
 };
 
-// const deletePayment = async (id) => {
-//   return await paymentRepository.deletePayment(id);
-// };
+const getPaymentById = async (id) => {
+  return await paymentRepository.getPaymentById(id);
+};
+
 const getAccessToken = async () => {
   // If token still valid, reuse it
   if (accessToken && tokenExpiry && Date.now() < tokenExpiry) {
@@ -94,7 +95,7 @@ export default {
   createPayment,
   getPaymentStatusString,
   // getAllPayments,
-  // getPaymentById,
+  getPaymentById,
   updatePayment,
   getAccessToken,
   // deletePayment,

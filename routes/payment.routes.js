@@ -25,8 +25,6 @@ router.post("/update", paymentController.updatePayment);
 
 router.post(
   "/refund",
-//   tokenMiddleware.verifyToken,
-//   tokenMiddleware.authorizeAdmin,
   paymentController.refundPayment
 );
 

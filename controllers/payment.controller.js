@@ -207,11 +207,20 @@ const updatePayment = async (req, res) => {
 // Refund Payment
 const refundPayment = async (req, res) => {
   try {
-    const { payment_id, description } = req.body;
-    if (!payment_id || !description) {
+    const { payment_id, description, pyament_record_id } = req.body;
+    if (!payment_id || !description || !pyament_record_id) {
       return res
         .status(400)
         .json({ success: false, message: "Missing required fields" });
+    }
+
+    const paymentRecord = await paymentService.getPaymentById(
+      pyament_record_id
+    );
+    if (!paymentRecord) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Payment record not found" });
     }
 
     const token = await paymentService.getAccessToken();
@@ -231,10 +240,25 @@ const refundPayment = async (req, res) => {
       }
     );
 
-    return res.json({ success: true, data: response.data });
+    const updated = await paymentService.updatePayment(pyament_record_id, {
+      status: "chargedback",
+    });
+
+    if (!updated) {
+      return res.status(400).json({
+        success: false,
+        message: "Refound success but database update faild updated",
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: response.data,
+      message: "Refund successful",
+    });
   } catch (err) {
     console.error("Refund Error:", err.response?.data || err.message);
-    
+
     return res.status(err.status || 500).json({
       success: false,
       message: "Refund failed",

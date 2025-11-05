@@ -33,19 +33,14 @@ const updatePayment = async (id, data) => {
   }
 };
 
-// const deletePayment = async (id) => {
-//   try {
-//     const deleted = await Payment.destroy({ where: { id } });
-//     return deleted > 0;
-//   } catch (error) {
-//     throw new Error(`Error deleting payment: ${error.message}`);
-//   }
-// };
+const getPaymentById = async (id) => {
+  return await Payment.findByPk(id);
+};
 
 export default {
   createPayment,
-//   getAllPayments,
-//   getPaymentById,
+  //   getAllPayments,
+  //   getPaymentById,
   updatePayment,
-//   deletePayment,
+  getPaymentById,
 };
