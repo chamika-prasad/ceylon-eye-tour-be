@@ -11,15 +11,45 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # This fetches all history for proper change detection
 
     - name: Check for file changes
       id: changes
       run: |
-        # Check package.json
-        git diff --name-only HEAD~1 HEAD | grep -q "package.json" && echo "package_changed=true" >> $GITHUB_OUTPUT || echo "package_changed=false" >> $GITHUB_OUTPUT
+        # Get the previous successful deployment commit
+        if [ -f .github/last-deployed-commit ]; then
+          LAST_DEPLOYED=$(cat .github/last-deployed-commit)
+        else
+          # First deployment - compare with initial commit
+          LAST_DEPLOYED=$(git rev-list --max-parents=0 HEAD)
+        fi
         
-        # Check database/setup.js
-        git diff --name-only HEAD~1 HEAD | grep -q "database/setup.js" && echo "db_changed=true" >> $GITHUB_OUTPUT || echo "db_changed=false" >> $GITHUB_OUTPUT
+        CURRENT_COMMIT=${{ github.sha }}
+        
+        echo "Last deployed: $LAST_DEPLOYED"
+        echo "Current commit: $CURRENT_COMMIT"
+        
+        # Check for package.json changes
+        if git diff --name-only $LAST_DEPLOYED $CURRENT_COMMIT | grep -q "package.json"; then
+          echo "package_changed=true" >> $GITHUB_OUTPUT
+          echo "package.json changed"
+        else
+          echo "package_changed=false" >> $GITHUB_OUTPUT
+          echo "No changes in package.json"
+        fi
+        
+        # Check for database/setup.js changes
+        if git diff --name-only $LAST_DEPLOYED $CURRENT_COMMIT | grep -q "database/setup.js"; then
+          echo "db_changed=true" >> $GITHUB_OUTPUT
+          echo "database/setup.js changed"
+        else
+          echo "db_changed=false" >> $GITHUB_OUTPUT
+          echo "No changes in database/setup.js"
+        fi
+        
+        # Save current commit for next deployment
+        echo $CURRENT_COMMIT > .github/last-deployed-commit
 
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
