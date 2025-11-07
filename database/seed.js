@@ -53,7 +53,7 @@ const HOTEL_TYPES = [
   id: uuidv4(),
   name,
   description: `Description for ${name}`,
-  image_url: `https://picsum.photos/seed/hoteltype${index}/600/400`,
+  image_url: `/uploads/seeds/temp.jpg`,
   url_prefix: `${name.toLowerCase().replace(/\s+/g, "-")}`,
 }));
 
@@ -70,7 +70,7 @@ function generateSampleData(tableName, count) {
           id: uuidv4(),
           name: `Category ${i}`,
           description: `Description for category ${i}`,
-          image_url: `https://picsum.photos/1920/1080?random=${i}`,
+          image_url: `/uploads/seeds/temp.jpg`,
           url_prefix: `category-${i}`,
         });
         break;
@@ -79,7 +79,7 @@ function generateSampleData(tableName, count) {
           id: uuidv4(),
           name: `Activity ${i}`,
           description: `Description for activity ${i}`,
-          image_url: `https://picsum.photos/1920/1080?random=${i}`,
+          image_url: `/uploads/seeds/temp.jpg`,
         });
         break;
       case "places":
@@ -91,7 +91,7 @@ function generateSampleData(tableName, count) {
           name: `Place ${i}`,
           url_prefix: `place-${i}`,
           description: `Description for place ${i}`,
-          image_url: `https://picsum.photos/1920/1080?random=${i}`,
+          image_url: `/uploads/seeds/temp.jpg`,
         });
         break;
       case "vehicles":
@@ -100,9 +100,9 @@ function generateSampleData(tableName, count) {
           name: `Vehicle ${i}`,
           descriptions: `["description 1", "description 2", "description 3"]`,
           images: JSON.stringify([
-            `https://picsum.photos/seed/vehicle${i}a/600/400`,
-            `https://picsum.photos/seed/vehicle${i}b/600/400`,
-            `https://picsum.photos/seed/vehicle${i}c/600/400`,
+            `/uploads/seeds/temp.jpg`,
+            `/uploads/seeds/temp.jpg`,
+            `/uploads/seeds/temp.jpg`,
           ]),
           excludes: JSON.stringify([
             "Fuel not included",
@@ -256,7 +256,7 @@ async function seedDatabase() {
           name: `Hotel ${i + 1}`,
           description: `["description 1", "description 2", "description 3"]`,
           facilities: `["facility 1", "facility 2", "facility 3"]`,
-          images: `["https://picsum.photos/seed/hotel${i}/600/400", "https://picsum.photos/seed/hotel${i}/600/400", "https://picsum.photos/seed/hotel${i}/600/400"]`,
+          images: `["/uploads/seeds/temp.jpg", "/uploads/seeds/temp.jpg", "/uploads/seeds/temp.jpg"]`,
           rooms_details: `["rooms details 1", "rooms details 2", "rooms details 3"]`,
           rating: Math.floor(Math.random() * 5) + 1,
           url_prefix: `hotel-${i + 1}`,
@@ -274,7 +274,7 @@ async function seedDatabase() {
         await connection.query("INSERT INTO gallery SET ?", {
           id: uuidv4(),
           customer_id: customer.id,
-          image_url: `https://picsum.photos/seed/gallery${i}/800/600`,
+          image_url: `/uploads/seeds/temp.jpg`,
           is_approved: Math.random() > 0.5 ? 1 : 0,
         });
       } catch (error) {
@@ -299,7 +299,7 @@ async function seedDatabase() {
           activity_id: activity.id,
           description: `Description for activity ${i}`,
           price: (Math.random() * 100 + 10).toFixed(2),
-          image_url: `https://example.com/place-activity-${i}.jpg`,
+          image_url: `/uploads/seeds/temp.jpg`,
         });
 
         if (i < 8) {
@@ -308,7 +308,7 @@ async function seedDatabase() {
             activity_id: activities[i + 1].id,
             description: `Description for activity ${i}`,
             price: (Math.random() * 100 + 10).toFixed(2),
-            image_url: `https://example.com/place-activity-${i}.jpg`,
+            image_url: `/uploads/seeds/temp.jpg`,
           });
 
           await connection.query("INSERT IGNORE INTO place_activities SET ?", {
@@ -316,7 +316,7 @@ async function seedDatabase() {
             activity_id: activities[i + 2].id,
             description: `Description for activity ${i}`,
             price: (Math.random() * 100 + 10).toFixed(2),
-            image_url: `https://example.com/place-activity-${i}.jpg`,
+            image_url: `/uploads/seeds/temp.jpg`,
           });
         }
 
