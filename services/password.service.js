@@ -22,4 +22,13 @@ const verifyPassword = async (plainPassword, hashedPassword) => {
   }
 };
 
-export default { hashPassword, verifyPassword };
+const generateTempPassword = () => {
+  try {
+    const tempPassword = Math.random().toString(36).slice(-8);
+    return tempPassword;
+  } catch (error) {
+    throw new Error("Error generating temporary password: " + error);
+  }
+};
+
+export default { hashPassword, verifyPassword, generateTempPassword };

@@ -42,6 +42,24 @@ const getUserByEmail = async (email) => {
   }
 };
 
+const updateTempPassword = async (email, tempPassword) => {
+  return await User.update(
+    { temp_pw: tempPassword },
+    {
+      where: { email },
+    }
+  );
+};
+
+const resetPassword = async (email, password) => {
+  return await User.update(
+    { temp_pw: null, pw: password },
+    {
+      where: { email },
+    }
+  );
+};
+
 const updateProfile = async (userId, userData) => {
   return await User.update(userData, {
     where: { id: userId },
@@ -53,4 +71,6 @@ export default {
   getUserById,
   getUserByEmail,
   updateProfile,
+  updateTempPassword,
+  resetPassword,
 };

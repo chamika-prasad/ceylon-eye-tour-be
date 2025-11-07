@@ -8,14 +8,6 @@ const generateInvoiceTemplate = (
   paymentStatus,
   date
 ) => {
-  // Normalize and format inputs
-
-  console.log(packageName);
-  console.log(customerName);
-  console.log(amount);
-  console.log(paymentStatus);
-  console.log(date);
-
   const amt = Number(amount) || 0;
   const formattedAmount = amt.toLocaleString("en-US", {
     minimumFractionDigits: 2,
@@ -189,6 +181,150 @@ const generateInvoiceTemplate = (
 </html>`;
 };
 
+const generateTempPasswordTemplate = (
+  customerName = "Customer",
+  tempCode = "",
+  expiryMinutes = 15
+) => {
+  const companyName = process.env.COMPANY_NAME || "Tech Solutions";
+  const supportEmail =
+    process.env.SUPPORT_EMAIL || "support@techsolutions.site";
+  const year = new Date().getFullYear();
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset</title>
+    <style>
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .mobile-padding {
+                padding: 20px !important;
+            }
+            .mobile-header {
+                padding: 30px 20px !important;
+            }
+            .mobile-title {
+                font-size: 24px !important;
+            }
+            .reset-code {
+                font-size: 32px !important;
+                padding: 20px 15px !important;
+                letter-spacing: 8px !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td style="padding: 40px 20px;">
+                <table role="presentation" class="email-container" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 600px;">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td class="mobile-header" style="background: linear-gradient(135deg, #cd1a40 0%, #ff803c 100%); padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 class="mobile-title" style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">Password Reset Request</h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px;">
+                            
+                            <!-- Greeting -->
+                            <p style="margin: 0 0 20px; color: #000000; font-size: 16px; line-height: 1.6;">Hello <strong>${escapeHtml(
+                              customerName
+                            )}</strong>,</p>
+                            
+                            <p style="margin: 0 0 30px; color: #666666; font-size: 15px; line-height: 1.6;">
+                                We received a request to reset your password. Use the verification code below to complete your password reset:
+                            </p>
+                            
+                            <!-- Reset Code Box -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td style="text-align: center; padding: 30px; background: linear-gradient(135deg, #cd1a40 0%, #ff803c 100%); border-radius: 8px;">
+                                        <p style="margin: 0 0 10px; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">Your Reset Code</p>
+                                        <p class="reset-code" style="margin: 0; color: #ffffff; font-size: 42px; font-weight: bold; letter-spacing: 12px; font-family: 'Courier New', monospace;">${escapeHtml(
+                                          tempCode
+                                        )}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Expiration Notice -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #fff8e6; border-left: 4px solid #ff803c; border-radius: 4px;">
+                                        <p style="margin: 0; color: #000000; font-size: 14px; line-height: 1.6;">
+                                            ⏰ <strong>This code will expire in ${escapeHtml(
+                                              String(expiryMinutes)
+                                            )} minutes</strong> for security reasons.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Instructions -->
+                            <p style="margin: 0 0 20px; color: #666666; font-size: 15px; line-height: 1.6;">
+                                Enter this code on the password reset page to create a new password for your account.
+                            </p>
+                            
+                            <!-- Security Notice -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #f9f9f9; border-radius: 4px;">
+                                        <p style="margin: 0 0 10px; color: #cd1a40; font-size: 14px; font-weight: bold;">🔒 Didn't request this?</p>
+                                        <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.6;">
+                                            If you didn't request a password reset, please ignore this email or contact our support team immediately. Your password will remain unchanged.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Support -->
+                            <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.6; text-align: center;">
+                                Need help? Contact us at <a href="mailto:${escapeHtml(
+                                  supportEmail
+                                )}" style="color: #cd1a40; text-decoration: none; font-weight: 600;">${escapeHtml(
+    supportEmail
+  )}</a>
+                            </p>
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 40px; text-align: center; background-color: #f9f9f9; border-radius: 0 0 8px 8px;">
+                            <p style="margin: 0 0 10px; color: #000000; font-size: 16px; font-weight: bold;">${escapeHtml(
+                              companyName
+                            )}</p>
+                            <p style="margin: 0 0 15px; color: #666666; font-size: 12px;">© ${escapeHtml(
+                              String(year)
+                            )} ${escapeHtml(
+    companyName
+  )}. All rights reserved.</p>
+                            <p style="margin: 0; color: #999999; font-size: 11px;">
+                                This is an automated message, please do not reply to this email.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+};
+
 // minimal HTML escaping to avoid breaking template if inputs contain markup
 const escapeHtml = (str) =>
   String(str)
@@ -200,4 +336,5 @@ const escapeHtml = (str) =>
 
 export default {
   generateInvoiceTemplate,
+  generateTempPasswordTemplate,
 };

@@ -22,4 +22,7 @@ router.put(
   authController.updateProfile
 );
 
+router.put("/get-temp-password", authController.getTempPassword);
+router.put("/reset-password", authController.resetPassword);
+
 export default router;

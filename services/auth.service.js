@@ -1,21 +1,13 @@
 import authRepository from "../repositories/auth.repository.js";
 
 const register = async (userData) => {
-  try {
-    const result = await authRepository.register(userData);
-    return result;
-  } catch (error) {
-    throw new Error(`Error in AuthService register: ${error}`);
-  }
+  const result = await authRepository.register(userData);
+  return result;
 };
 
 const getUserByEmail = async (email) => {
-  try {
-    const user = await authRepository.getUserByEmail(email);
-    return user;
-  } catch (error) {
-    throw new Error(`Error in AuthService getUserByEmail: ${error}`);
-  }
+  const user = await authRepository.getUserByEmail(email);
+  return user;
 };
 
 const getUserById = async (userId) => {
@@ -24,12 +16,16 @@ const getUserById = async (userId) => {
 };
 
 const updateProfile = async (userId, userData) => {
-  try {
-    const result = await authRepository.updateProfile(userId, userData);
-    return result;
-  } catch (error) {
-    throw new Error(`Error in AuthService updateProfileImage: ${error}`);
-  }
+  const result = await authRepository.updateProfile(userId, userData);
+  return result;
+};
+
+const updateTempPassword = async (email, tempPassword) => {
+  return await authRepository.updateTempPassword(email, tempPassword);
+};
+
+const resetPassword = async (email, password) => {
+  return await authRepository.resetPassword(email, password);
 };
 
 export default {
@@ -37,4 +33,6 @@ export default {
   getUserByEmail,
   updateProfile,
   getUserById,
+  updateTempPassword,
+  resetPassword,
 };
