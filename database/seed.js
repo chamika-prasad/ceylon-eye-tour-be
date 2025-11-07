@@ -15,6 +15,7 @@ const DB_CONFIG = {
 // -----------------------------
 // Sample Users
 // -----------------------------
+
 const ADMIN = {
   id: uuidv4(),
   email: "admin@ceyloneye.com",
