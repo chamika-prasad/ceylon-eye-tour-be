@@ -264,7 +264,7 @@ const SQL_STATEMENTS = [
 async function setupDatabase() {
   let connection;
   try {
-    // 1. Connect to MySQL server (without specifying a database)
+    // Connect to MySQL server (without specifying a database)
     connection = await mysql.createConnection(DB_CONFIG);
     console.log("✅ Connected to MySQL server");
 
@@ -282,7 +282,7 @@ async function setupDatabase() {
   } catch (error) {
     console.error("❌ Setup failed:", error.message);
   } finally {
-    // 3. Close the connection
+    // Close the connection
     if (connection) await connection.end();
   }
 }
