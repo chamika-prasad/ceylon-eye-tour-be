@@ -38,4 +38,11 @@ router.put(
   packageController.updatePackage
 );
 
+router.delete(
+  "/delete/:id",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  packageController.deletePackage
+);
+
 export default router;

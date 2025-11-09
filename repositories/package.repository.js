@@ -13,49 +13,44 @@ import {
 import sequelize from "../config/sequelize.js";
 
 const getPackages = async () => {
-  try {
-    const packages = await Package.findAll({
-      attributes: { exclude: ["created_at", "updated_at"] },
-      include: [
-        {
-          model: Place,
-          as: "Places", // Match the alias defined in the Package -> Place association
-          attributes: { exclude: ["created_at", "updated_at"] },
-          through: {
-            attributes: [], // Exclude PackagePlace attributes from the result
-          },
-          include: [
-            {
-              model: Activity,
-              as: "Activities", // Match the alias defined in Place -> Activity association
-              attributes: { exclude: ["created_at", "updated_at"] }, // Exclude timestamps from Activity
-              through: {
-                attributes: [], // Exclude PlaceActivity attributes
-              },
+  const packages = await Package.findAll({
+    where: { is_deleted: false },
+    attributes: { exclude: ["created_at", "updated_at"] },
+    include: [
+      {
+        model: Place,
+        as: "Places", // Match the alias defined in the Package -> Place association
+        attributes: { exclude: ["created_at", "updated_at"] },
+        through: {
+          attributes: [], // Exclude PackagePlace attributes from the result
+        },
+        include: [
+          {
+            model: Activity,
+            as: "Activities", // Match the alias defined in Place -> Activity association
+            attributes: { exclude: ["created_at", "updated_at"] }, // Exclude timestamps from Activity
+            through: {
+              attributes: [], // Exclude PlaceActivity attributes
             },
-          ],
-        },
-        {
-          model: Category,
-          as: "Categories", // Alias defined in association
-          attributes: { exclude: ["created_at", "updated_at"] },
-          through: {
-            attributes: [], // Exclude PackageCategory attributes
           },
+        ],
+      },
+      {
+        model: Category,
+        as: "Categories", // Alias defined in association
+        attributes: { exclude: ["created_at", "updated_at"] },
+        through: {
+          attributes: [], // Exclude PackageCategory attributes
         },
-        {
-          model: PackageImage,
-          as: "Images",
-        },
-      ],
-    });
+      },
+      {
+        model: PackageImage,
+        as: "Images",
+      },
+    ],
+  });
 
-    return packages;
-  } catch (error) {
-    console.log(`Error in Get All Packages: ${error}`);
-
-    throw new Error(`Error in Get All Packages: ${error}`);
-  }
+  return packages;
 };
 
 const getPackageById = async (id) => {
@@ -63,6 +58,10 @@ const getPackageById = async (id) => {
     const packageData = await Package.findByPk(id);
 
     if (!packageData) {
+      return false;
+    }
+
+    if (packageData.is_deleted) {
       return false;
     }
 
@@ -130,6 +129,10 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
     });
 
     if (!packageData) {
+      return false;
+    }
+
+    if (packageData.is_deleted) {
       return false;
     }
 
@@ -343,7 +346,7 @@ const updatePackage = async (data, id) => {
 
       await PackagePlace.bulkCreate(records, { transaction });
     }
-  
+
     if (updateplaceIds.length) {
       const records = updateplaceIds.map((p) => ({
         id: p.id,
@@ -402,6 +405,39 @@ const updatePackage = async (data, id) => {
   }
 };
 
+const deletePackage = async (id) => {
+  let transaction;
+  try {
+    // Start a transaction
+    transaction = await sequelize.transaction();
+    await PackagePlace.destroy({ where: { package_id: id } }, { transaction });
+    await PackageCategory.destroy(
+      { where: { package_id: id } },
+      { transaction }
+    );
+    await PackageImage.destroy({ where: { package_id: id } }, { transaction });
+    await Package.update(
+      { is_deleted: true },
+      {
+        where: { id },
+      },
+      { transaction }
+    );
+    await transaction.commit();
+    return true;
+  } catch (error) {
+    console.log(`Error in Delete Package: ${error}`);
+    if (transaction) await transaction.rollback();
+    throw new Error(`Error in Delete Package: ${error}`);
+  }
+};
+
+const getImagesByPackageId = async (packageId) => {
+  return await PackageImage.findAll({
+    where: { package_id: packageId },
+  });
+};
+
 export default {
   getPackages,
   addPackage,
@@ -409,4 +445,6 @@ export default {
   getPackageByUrlPrefix,
   updatePackageRating,
   updatePackage,
+  deletePackage,
+  getImagesByPackageId,
 };

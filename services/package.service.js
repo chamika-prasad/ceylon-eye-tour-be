@@ -2,12 +2,8 @@ import packageRepository from "../repositories/package.repository.js";
 import fileUploadService from "./fileUpload.service.js";
 
 const getPackages = async () => {
-  try {
-    const result = await packageRepository.getPackages();
-    return result;
-  } catch (error) {
-    throw new Error(`Error in PackageService getPackages: ${error}`);
-  }
+  const result = await packageRepository.getPackages();
+  return result;
 };
 
 const addPackage = async (data) => {
@@ -17,11 +13,10 @@ const addPackage = async (data) => {
 const updatePackage = async (data, id) => {
   const updatedPackage = await packageRepository.updatePackage(data, id);
   if (!updatedPackage) return false;
-  
-  if(updatePackage.imagesToDelete > 0){
-        for (const img of imagesToDelete) {
+
+  if (updatePackage.imagesToDelete > 0) {
+    for (const img of imagesToDelete) {
       await fileUploadService.removeFile(img.image_url);
-      
     }
   }
 };
@@ -43,11 +38,21 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
 };
 
 const updatePackageRating = async (id, data) => {
-  try {
-    return await packageRepository.updatePackageRating(id, data);
-  } catch (error) {
-    throw new Error(`Error in updatePackageRating service: ${error.message}`);
+  return await packageRepository.updatePackageRating(id, data);
+};
+
+const deletePackage = async (id) => {
+  console.log(id);
+
+  const imagesToDelete = await packageRepository.getImagesByPackageId(id);
+  const deleted = await packageRepository.deletePackage(id);
+
+  if (imagesToDelete.length > 0) {
+    for (const img of imagesToDelete) {
+      await fileUploadService.removeFile(img.image_url);
+    }
   }
+  return deleted;
 };
 
 export default {
@@ -56,5 +61,6 @@ export default {
   getPackageById,
   getPackageByUrlPrefix,
   updatePackageRating,
-  updatePackage
+  updatePackage,
+  deletePackage,
 };

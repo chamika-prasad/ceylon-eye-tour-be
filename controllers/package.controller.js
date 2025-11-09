@@ -15,7 +15,7 @@ const getPackages = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error retrieving Packages",
-      error: error,
+      error: error.message,
     });
   }
 };
@@ -43,6 +43,17 @@ const addPackage = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Title,description,package highlights and price are required",
+      });
+    }
+
+    const urlPrefix = title.toLowerCase().replace(/\s+/g, "-");
+
+    const result = await packageService.getPackageByUrlPrefix(urlPrefix);
+
+    if (result) {
+      return res.status(400).json({
+        success: false,
+        message: "Package with the same title already exists",
       });
     }
 
@@ -84,7 +95,7 @@ const addPackage = async (req, res) => {
       duration,
       excludes: excludes,
       includes: includes,
-      url_prefix: title.toLowerCase().replace(/\s+/g, "-"),
+      url_prefix: urlPrefix,
     });
 
     return res.status(201).json({
@@ -133,7 +144,7 @@ const updatePackage = async (req, res) => {
       removedImages,
       updateplaceIds,
     } = req.body;
-    
+
     // Handle uploaded images if any
     let images = [];
     if (req.files && req.files.length > 0) {
@@ -259,10 +270,47 @@ const getPackageByUrlPrefix = async (req, res) => {
   }
 };
 
+const deletePackage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Package ID is required",
+      });
+    }
+    const result = await packageService.getPackageById(id);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "Package not found",
+      });
+    }
+    const deleted = await packageService.deletePackage(id);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Package could not be deleted",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Package deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting package",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   getPackages,
   addPackage,
   getPackageById,
   getPackageByUrlPrefix,
   updatePackage,
+  deletePackage,
 };
