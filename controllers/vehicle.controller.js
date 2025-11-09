@@ -188,7 +188,7 @@ const updateVehicle = async (req, res) => {
       ...(passengerCapacity && { passenger_capacity: passengerCapacity }),
       ...(location && { location }),
       ...(price && { price }),
-      ...(updatedImages && { images: JSON.stringify(updatedImages) }),
+      ...(Array.isArray(updatedImages) && updatedImages.length > 0 && { images: JSON.stringify(updatedImages) }),
       ...(name && { url_prefix: urlPrifix }),
     };
 
