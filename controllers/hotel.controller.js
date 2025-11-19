@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import hotelService from "../services/hotel.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import { log } from "console";
 
 const createHotel = async (req, res) => {
   try {
@@ -239,10 +240,17 @@ const deleteHotel = async (req, res) => {
 const getAllHotels = async (req, res) => {
   try {
     const hotels = await hotelService.getAllHotels();
+
+    const newHotels = hotels.map((hotel) => {
+      const hotelData = hotel.get({ plain: true });
+    const room = Array(hotelData.rooms_details).map((room) => JSON.parse(room))[0];
+    
+      return { ...hotelData , rooms_details: room };
+    });
     return res.status(200).json({
       success: true,
       message: "Hotels retrieved successfully",
-      data: hotels,
+      data: newHotels,
     });
   } catch (error) {
     return res.status(500).json({
