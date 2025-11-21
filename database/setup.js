@@ -80,7 +80,7 @@ const SQL_STATEMENTS = [
     duration VARCHAR(255) NOT NULL,
     excludes TEXT,
     includes TEXT,
-    url_prefix VARCHAR(255) UNIQUE NOT NULL,
+    url_prefix VARCHAR(255) NOT NULL,
     rating INT NOT NULL DEFAULT 0,
     user_count INT NOT NULL DEFAULT 0,
     is_deleted BOOL NOT NULL DEFAULT 0,
@@ -261,7 +261,8 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
 `ALTER TABLE vehicles
-ADD COLUMN vehicle_type INT NOT NULL DEFAULT 0;`
+ADD COLUMN vehicle_type INT NOT NULL DEFAULT 0;`,
+`ALTER TABLE packages DROP INDEX url_prefix;`
 ];
 
 async function setupDatabase() {
