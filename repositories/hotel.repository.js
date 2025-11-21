@@ -73,8 +73,6 @@ const getHotelById = async (id) => {
 };
 
 const getHotelByPrefix = async (prefix) => {
-  console.log(prefix,"repo");
-  
   try {
     return await Hotel.findOne({
       where: { url_prefix: prefix },

@@ -309,7 +309,6 @@ const getHotelById = async (req, res) => {
 const getHotelByPrefix = async (req, res) => {
   try {
     const { urlPrifix } = req.params;
-    console.log(urlPrifix);
     const hotel = await hotelService.getHotelByPrefix(urlPrifix);
 
     if (!hotel) {
