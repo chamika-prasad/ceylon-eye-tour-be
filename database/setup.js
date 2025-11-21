@@ -162,6 +162,7 @@ const SQL_STATEMENTS = [
   passenger_capacity INT NOT NULL,
   location VARCHAR(255) NOT NULL,
   price DECIMAL(10, 2) NOT NULL,
+  vehicle_type INT NOT NULL DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )`,
@@ -259,9 +260,7 @@ const SQL_STATEMENTS = [
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
-)`,
-`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS vehicle_type INT NOT NULL DEFAULT 0;`,
-`ALTER TABLE packages DROP INDEX url_prefix;`
+)`
 ];
 
 async function setupDatabase() {
