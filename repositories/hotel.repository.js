@@ -73,6 +73,8 @@ const getHotelById = async (id) => {
 };
 
 const getHotelByPrefix = async (prefix) => {
+  console.log(prefix,"repo");
+  
   try {
     return await Hotel.findOne({
       where: { url_prefix: prefix },
@@ -85,7 +87,7 @@ const getHotelByPrefix = async (prefix) => {
       ],
     });
   } catch (error) {
-    throw new Error(`Error fetching hotel by ID: ${error.message}`);
+    throw new Error(`Error fetching hotel by urlPrifix: ${error.message}`);
   }
 };
 

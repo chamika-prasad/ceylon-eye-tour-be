@@ -19,6 +19,7 @@ router.get("/get-all", hotelController.getAllHotels);
 
 // Get hotel by ID
 router.get("/get-by-id/:id", hotelController.getHotelById);
+router.get("/get-by-urlPrifix/:urlPrifix", hotelController.getHotelByPrefix);
 
 // Get hotels for a specific place
 router.get("/place/:placeId", hotelController.getHotelsByPlaceId);

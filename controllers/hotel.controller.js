@@ -306,6 +306,33 @@ const getHotelById = async (req, res) => {
   }
 };
 
+const getHotelByPrefix = async (req, res) => {
+  try {
+    const { urlPrifix } = req.params;
+    console.log(urlPrifix);
+    const hotel = await hotelService.getHotelByPrefix(urlPrifix);
+
+    if (!hotel) {
+      return res.status(404).json({
+        success: false,
+        message: "Hotel not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Hotel retrieved successfully",
+      data: hotel,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving hotel by urlPrifix",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createHotel,
   updateHotel,
@@ -313,4 +340,5 @@ export default {
   getAllHotels,
   getHotelsByPlaceId,
   getHotelById,
+  getHotelByPrefix,
 };
