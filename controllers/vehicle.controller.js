@@ -16,6 +16,7 @@ const createVehicle = async (req, res) => {
       passengerCapacity,
       location,
       price,
+      vehicleType,
     } = req.body;
 
     if (
@@ -43,6 +44,17 @@ const createVehicle = async (req, res) => {
       });
     }
 
+    const urlPrifix = name.toLowerCase().replace(/\s+/g, "-");
+    const existingVehicle = await vehicleService.getVehicleByUrlPrefix(
+      urlPrifix
+    );
+    if (existingVehicle) {
+      return res.status(409).json({
+        success: false,
+        message: "Vehicle with the same name already exists",
+      });
+    }
+
     const vehicleId = uuidv4();
 
     // Prepare upload directory: uploads/vehicles/{vehicleId}
@@ -64,10 +76,11 @@ const createVehicle = async (req, res) => {
       terms,
       owner,
       owner_contact: ownerContact,
-      url_prefix: name.toLowerCase().replace(/\s+/g, "-"),
+      url_prefix: urlPrifix,
       passenger_capacity: passengerCapacity,
       location,
       price,
+      vehicle_type: Number(vehicleType),
     });
 
     return res.status(201).json({
@@ -76,6 +89,7 @@ const createVehicle = async (req, res) => {
       message: "Vehicle created successfully",
     });
   } catch (error) {
+    console.error("Error creating vehicle:", error);
     return res.status(500).json({
       success: false,
       message: "Error creating vehicle",
@@ -99,6 +113,7 @@ const updateVehicle = async (req, res) => {
       location,
       price,
       removeImages,
+      vehicleType,
     } = req.body;
 
     if (
@@ -118,6 +133,19 @@ const updateVehicle = async (req, res) => {
         success: false,
         message: "At least one field is required to update",
       });
+    }
+
+    if(name) {
+      var urlPrifix = name.toLowerCase().replace(/\s+/g, "-");
+      const vehicleWithSameName = await vehicleService.getVehicleByUrlPrefix(
+        urlPrifix
+      );
+      if (vehicleWithSameName) {
+        return res.status(409).json({
+          success: false,
+          message: "Another vehicle with the same name already exists",
+        });
+      }
     }
 
     const existingVehicle = await vehicleService.getVehicleById(id);
@@ -188,8 +216,10 @@ const updateVehicle = async (req, res) => {
       ...(passengerCapacity && { passenger_capacity: passengerCapacity }),
       ...(location && { location }),
       ...(price && { price }),
-      ...(Array.isArray(updatedImages) && updatedImages.length > 0 && { images: JSON.stringify(updatedImages) }),
+      ...(Array.isArray(updatedImages) &&
+        updatedImages.length > 0 && { images: JSON.stringify(updatedImages) }),
       ...(name && { url_prefix: urlPrifix }),
+      ...(vehicleType && { vehicle_type: Number(vehicleType) })
     };
 
     const updatedVehicle = await vehicleService.updateVehicle(id, updateData);

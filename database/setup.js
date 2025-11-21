@@ -10,8 +10,8 @@ const DB_CONFIG = {
 };
 
 const SQL_STATEMENTS = [
-  `DROP DATABASE IF EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
-  `CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
+  // `DROP DATABASE IF EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
+  // `CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `USE ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -260,6 +260,8 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
+`ALTER TABLE vehicles
+ADD COLUMN vehicle_type INT NOT NULL DEFAULT 0;`
 ];
 
 async function setupDatabase() {
