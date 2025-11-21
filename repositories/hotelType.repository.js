@@ -6,7 +6,25 @@ const createHotelType = async (data) => {
 };
 
 const getAllHotelTypes = async () => {
-  return await HotelType.findAll();
+  // return await HotelType.findAll();
+  return await HotelType.findAll({
+    attributes: {
+      exclude: ["created_at", "updated_at"],
+      include: [
+        [Sequelize.fn("COUNT", Sequelize.col("Hotels.id")), "hotelCount"],
+      ],
+    },
+    include: [
+      {
+        model: Hotel,
+        as: "Hotels",
+        attributes: [], // No hotel fields, only counting
+        required: false,
+      },
+    ],
+    group: ["HotelType.id"],
+    raw: true, // optional, gives plain objects
+  });
 };
 
 const getHotelTypeById = async (id) => {
