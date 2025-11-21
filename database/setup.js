@@ -260,8 +260,7 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
-`ALTER TABLE vehicles
-ADD COLUMN vehicle_type INT NOT NULL DEFAULT 0;`,
+`ALTER TABLE vehicles ADD COLUMN vehicle_type INT NOT NULL DEFAULT 0;`,
 `ALTER TABLE packages DROP INDEX url_prefix;`
 ];
 
