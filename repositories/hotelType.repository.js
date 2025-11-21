@@ -83,6 +83,7 @@ const getHotelTypeByUrlPrefix = async (urlPrefix) => {
           "images",
           "rating",
           "rooms_details",
+          "url_prefix",
         ],
       },
     ],
