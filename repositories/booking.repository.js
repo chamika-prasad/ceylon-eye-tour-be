@@ -63,7 +63,7 @@ const getBookingById = async (id) => {
 
 const getBookingsByCustomerId = async (customerId) => {
   return await Booking.findAll({
-    where: { customer_id: customerId },
+    where: { customer_id: customerId, is_deleted: false },
     include: [
       {
         model: Package,
@@ -109,10 +109,18 @@ const updateBooking = async (id, data) => {
 };
 
 const deleteBooking = async (bookingId) => {
-  const booking = await Booking.findByPk(bookingId);
-  if (!booking) return null;
+  // const booking = await Booking.findByPk(bookingId);
+  // if (!booking) return null;
 
-  await booking.destroy();
+  // await booking.is_deleted = 1;
+  // await booking.save();
+  // return true;
+  return await Booking.update(
+    { is_deleted: true, status: "cancelled" },
+    {
+      where: { id: bookingId },
+    }
+  );
   return true;
 };
 

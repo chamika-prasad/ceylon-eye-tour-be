@@ -41,6 +41,11 @@ const Booking = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     tableName: "bookings",

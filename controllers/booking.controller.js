@@ -40,6 +40,14 @@ const updateBookingStatus = async (req, res) => {
     const { bookingId } = req.params;
     const { status } = req.body;
 
+    const existingBooking = await bookingService.getBookingById(bookingId);
+    if (!existingBooking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
     const updatedBooking = await bookingService.updateBookingStatus(
       bookingId,
       status
