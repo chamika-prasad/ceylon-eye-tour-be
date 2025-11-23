@@ -13,12 +13,12 @@ const getAllBookings = async () => {
       {
         model: Package,
         as: "Package",
-        attributes: ["title","price","duration"], // Include package title only
+        attributes: ["title", "price", "duration"], // Include package title only
       },
       {
         model: CustomizePackage,
         as: "CustomPackage",
-        attributes: ["message","price","required_day_count"], // Include package title only
+        attributes: ["message", "price", "required_day_count"], // Include package title only
       },
       {
         model: User,
@@ -45,18 +45,18 @@ const getBookingById = async (id) => {
       {
         model: Package,
         as: "Package",
-        attributes: ["title", "price","duration"], // Include package title only
+        attributes: ["title", "price", "duration"], // Include package title only
       },
       {
         model: CustomizePackage,
         as: "CustomPackage",
-        attributes: ["message", "price","required_day_count"], // Include package title only
+        attributes: ["message", "price", "required_day_count"], // Include package title only
       },
       {
         model: User,
         as: "User",
         attributes: ["name", "email"], // Include customer name and email
-      }
+      },
     ],
   });
 };
@@ -68,7 +68,7 @@ const getBookingsByCustomerId = async (customerId) => {
       {
         model: Package,
         as: "Package",
-        attributes: ["title","price","duration"], // Include package title only
+        attributes: ["title", "price", "duration"], // Include package title only
       },
       {
         model: Review,
@@ -78,7 +78,12 @@ const getBookingsByCustomerId = async (customerId) => {
       {
         model: CustomizePackage,
         as: "CustomPackage",
-        attributes: ["message", "price","required_day_count"], // Include custom package title and price only
+        attributes: ["message", "price", "required_day_count"], // Include custom package title and price only
+      },
+      {
+        model: Payment,
+        as: "Payment",
+        attributes: ["id", "payment_id", "amount", "status"], // Include payment details
       },
     ],
   });
