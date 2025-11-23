@@ -4,17 +4,16 @@ import transporter from "../config/email.js";
 dotenv.config();
 
 const sendEmail = async ({ to, subject, text = "", html = "" }) => {
-
   const mailFrom = process.env.FROM_EMAIL;
 
   const mailOptions = {
     from: mailFrom,
-    to:"chamikap40@gmail.com",
+    to: to,
     subject,
     text,
     html,
   };
-  
+
   try {
     const info = await transporter.sendMail(mailOptions);
     return true;
