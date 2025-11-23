@@ -50,7 +50,7 @@ jobs:
           if [ "${{ steps.changes.outputs.db_changed }}" == "true" ]; then
             echo "database/setup.js changed. Running database setup..."
             npm run setup-db
-            npm run seed-db
+            # npm run seed-db  # Uncomment if seeding is needed
           else
             echo "No changes in database/setup.js. Skipping database setup."
           fi
