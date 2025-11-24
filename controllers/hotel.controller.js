@@ -50,12 +50,38 @@ const createHotel = async (req, res) => {
     const hotelId = uuidv4();
 
     const uploadDir = path.join("uploads", "hotels", hotelId.toString());
+    const roomUploadDir = path.join(
+      "uploads",
+      "hotels",
+      hotelId.toString(),
+      "rooms"
+    );
     const images = [];
 
-    for (const file of req.files) {
+    const hotelImages = req.files.filter(f => f.fieldname === "images");
+
+    for (const file of hotelImages) {
       const filename = await fileUploadService.uploadFile(uploadDir, file);
       images.push(`/uploads/hotels/${hotelId}/${filename}`);
     }
+
+    var roomsDetailsRow = JSON.parse(roomsDetails);
+
+    const roomsDetailsWithImages = await Promise.all(
+      roomsDetailsRow.map(async (room) => {
+        const file = req.files.find((f) => f.fieldname === `image_${room.id}`);
+
+        let filename = null;
+        if (file) {
+          filename = await fileUploadService.uploadFile(roomUploadDir, file);
+        }
+
+        return {
+          ...room,
+          image: file ? `/uploads/hotels/${hotelId}/rooms/${filename}` : null,
+        };
+      })
+    );
 
     const newHotel = await hotelService.createHotel({
       id: hotelId,
@@ -65,7 +91,8 @@ const createHotel = async (req, res) => {
       description,
       facilities,
       images: JSON.stringify(images) || "[]", // Ensure images is a JSON string
-      rooms_details: JSON.stringify(roomsDetails) || "[]", // Ensure rooms_details is a JSON string
+      // rooms_details: JSON.stringify(roomsDetails) || "[]", // Ensure rooms_details is a JSON string
+      rooms_details: JSON.stringify(roomsDetailsWithImages) || "[]",
       rating: Number(rating) || 0,
       url_prefix: urlPrifix,
     });

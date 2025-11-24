@@ -10,7 +10,7 @@ router.post(
   "/add",
   tokenMiddleware.verifyToken,
   tokenMiddleware.authorizeAdmin,
-  upload.array("images", 8),
+  upload.any(),
   hotelController.createHotel
 );
 
