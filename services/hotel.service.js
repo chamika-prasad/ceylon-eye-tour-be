@@ -18,7 +18,10 @@ const getAllHotels = async () => {
   const formattedHotels = hotels.map((hotel) => {
     return {
       ...hotel.dataValues,
-      rooms_details: JSON.parse(hotel.rooms_details || "[]"),
+      description: hotel.description,
+      facilities: hotel.facilities,
+      images: hotel.images,
+      rooms_details: safeParse(hotel.rooms_details),
     };
   });
 
@@ -36,6 +39,14 @@ const getHotelById = async (id) => {
 const getHotelByPrefix = async (prefix) => {
   return await hotelRepository.getHotelByPrefix(prefix);
 };
+
+const safeParse = (value) => {
+  try {
+    return JSON.parse(value);
+  } catch (err) {
+     return [val];
+  }
+}
 
 export default {
   createHotel,
