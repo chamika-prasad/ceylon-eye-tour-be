@@ -13,7 +13,16 @@ const deleteHotel = async (id) => {
 };
 
 const getAllHotels = async () => {
-  return await hotelRepository.getAllHotels();
+  const hotels = await hotelRepository.getAllHotels();
+  // Convert rooms_details into array
+  const formattedHotels = hotels.map((hotel) => {
+    return {
+      ...hotel.dataValues,
+      rooms_details: JSON.parse(hotel.rooms_details || "[]"),
+    };
+  });
+
+  return formattedHotels;
 };
 
 const getHotelsByPlaceId = async (placeId) => {
