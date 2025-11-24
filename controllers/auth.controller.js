@@ -9,7 +9,7 @@ import emailTemplateService from "../services/emailTemplate.service.js";
 // Register method
 const register = async (req, res) => {
   try {
-    const { name, email, country, phoneNo, password } = req.body;
+    const { name, email, passport, country, phoneNo, password } = req.body;
 
     // Check if user already exists
     const existingUser = await authService.getUserByEmail(email);
@@ -36,6 +36,7 @@ const register = async (req, res) => {
     const createdUser = await authService.register({
       name,
       email,
+      passport,
       country,
       phoneNo,
       hashedPassword,
@@ -109,9 +110,17 @@ const login = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { userId } = req.user;
-    const { name, email, country, phoneNo, password } = req.body;
+    const { name, passport, email, country, phoneNo, password } = req.body;
 
-    if (!name && !email && !country && !phoneNo && !password && !req.file) {
+    if (
+      !name &&
+      !email &&
+      !passport &&
+      !country &&
+      !phoneNo &&
+      !password &&
+      !req.file
+    ) {
       return res.status(400).json({
         success: false,
         message: "Nothing to update",
@@ -142,6 +151,7 @@ const updateProfile = async (req, res) => {
     const userData = {
       ...(name && { name }),
       ...(email && { email }),
+      ...(passport && { passport }),
       ...(country && { country }),
       ...(phoneNo && { phoneno: phoneNo }),
       ...(password && { pw: hashedPassword }),

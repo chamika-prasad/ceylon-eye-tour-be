@@ -16,6 +16,7 @@ const SQL_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     email VARCHAR(255) NOT NULL UNIQUE,
+    passport VARCHAR(255) NOT NULL,
     pw VARCHAR(255) NOT NULL,
     phoneno VARCHAR(20),
     country VARCHAR(100),
@@ -215,7 +216,6 @@ const SQL_STATEMENTS = [
   FOREIGN KEY (customize_package_place_id) REFERENCES customize_package_places(id) ON DELETE CASCADE,
   FOREIGN KEY (activity_id) REFERENCES activities(id) ON DELETE CASCADE
 );`,
-
   `CREATE TABLE IF NOT EXISTS bookings (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   adult_count INT NOT NULL,
@@ -262,7 +262,7 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
-`ALTER TABLE bookings ADD COLUMN is_deleted BOOL NOT NULL DEFAULT 0;`
+`ALTER TABLE users ADD COLUMN passport VARCHAR(255) NOT NULL DEFAULT 'testpasport';`
 ];
 
 async function setupDatabase() {
