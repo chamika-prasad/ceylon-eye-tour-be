@@ -44,7 +44,7 @@ const safeParse = (value) => {
   try {
     return JSON.parse(value);
   } catch (err) {
-     return [value];
+     return value;
   }
 }
 
