@@ -23,7 +23,7 @@ const getAllBookings = async () => {
       {
         model: User,
         as: "User",
-        attributes: ["name", "email"], // Include customer name and email
+        attributes: ["name", "email","passport","country"], // Include customer name and email
       },
       {
         model: Review,
@@ -55,7 +55,7 @@ const getBookingById = async (id) => {
       {
         model: User,
         as: "User",
-        attributes: ["name", "email"], // Include customer name and email
+        attributes: ["name", "email",,"passport","country"], // Include customer name and email
       },
     ],
   });
@@ -121,7 +121,6 @@ const deleteBooking = async (bookingId) => {
       where: { id: bookingId },
     }
   );
-  return true;
 };
 
 export default {
