@@ -3,10 +3,12 @@ import messageService from "./../services/message.service.js";
 
 const users = {};
 
-export const initializeSocket = (server) => {
+export const initializeSocket = (server, frontEndUrl) => {
+  console.log(frontEndUrl);
+
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: frontEndUrl,
       methods: ["GET", "POST"],
     },
   });
@@ -37,12 +39,14 @@ export const initializeSocket = (server) => {
     socket.on("sendMessage", async (data) => {
       try {
         // data: { senderId, receiverId, message }
-        const { senderId, receiverId, message } = data;
+        const { senderId, receiverId, userId, message } = data;
 
         // Save message in DB
+
         const newMessage = await messageService.createMessage({
           senderId,
           receiverId,
+          userId,
           message,
         });
 
@@ -67,5 +71,6 @@ export const initializeSocket = (server) => {
     });
   });
 
+  console.log("socket.io server created");
   return io;
 };

@@ -4,6 +4,7 @@ const addMessage = async (messageData) => {
   return await Message.create({
     sender_id: messageData.senderId,
     receiver_id: messageData.receiverId,
+    user_id: messageData.userId,
     message: messageData.message,
   });
 };

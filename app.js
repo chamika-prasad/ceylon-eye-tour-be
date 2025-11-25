@@ -31,7 +31,7 @@ const app = express();
 const server = http.createServer(app); // Create HTTP server
 
 // Initialize Socket.IO with the HTTP server
-initializeSocket(server);
+initializeSocket(server,process.env.FRONTEND_URL);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,6 +78,10 @@ try {
   console.error("❌ Sequelize failed to connect:", error.message);
 }
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server running on port ${PORT}`);
+// });
+
+server.listen(PORT, () => {
+  console.log(`🚀 Server + Socket.IO running on port ${PORT}`);
 });
