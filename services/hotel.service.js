@@ -29,24 +29,51 @@ const getAllHotels = async () => {
 };
 
 const getHotelsByPlaceId = async (placeId) => {
-  return await hotelRepository.getHotelsByPlaceId(placeId);
+  const hotels = await hotelRepository.getHotelsByPlaceId(placeId);
+   const formattedHotels = hotels.map((hotel) => {
+    return {
+      ...hotel.dataValues,
+      description: hotel.description,
+      facilities: hotel.facilities,
+      images: hotel.images,
+      rooms_details: safeParse(hotel.rooms_details),
+    };
+  });
+
+  return formattedHotels;
 };
 
 const getHotelById = async (id) => {
-  return await hotelRepository.getHotelById(id);
+  const hotel = await hotelRepository.getHotelById(id);
+  const formattedHotel = {
+    ...hotel.dataValues,
+    description: hotel.description,
+    facilities: hotel.facilities,
+    images: hotel.images,
+    rooms_details: safeParse(hotel.rooms_details),
+  };
+  return formattedHotel;
 };
 
 const getHotelByPrefix = async (prefix) => {
-  return await hotelRepository.getHotelByPrefix(prefix);
+  const hotel = await hotelRepository.getHotelByPrefix(prefix);
+  const formattedHotel = {
+    ...hotel.dataValues,
+    description: hotel.description,
+    facilities: hotel.facilities,
+    images: hotel.images,
+    rooms_details: safeParse(hotel.rooms_details),
+  };
+  return formattedHotel;
 };
 
 const safeParse = (value) => {
   try {
     return JSON.parse(value);
   } catch (err) {
-     return value;
+    return value;
   }
-}
+};
 
 export default {
   createHotel,
