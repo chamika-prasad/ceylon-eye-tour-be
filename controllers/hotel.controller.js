@@ -58,7 +58,7 @@ const createHotel = async (req, res) => {
     );
     const images = [];
 
-    const hotelImages = req.files.filter(f => f.fieldname === "images");
+    const hotelImages = req.files.filter((f) => f.fieldname === "images");
 
     for (const file of hotelImages) {
       const filename = await fileUploadService.uploadFile(uploadDir, file);
@@ -123,6 +123,7 @@ const updateHotel = async (req, res) => {
       roomsDetails,
       rating,
       removeImages,
+      removeRoomImages,
     } = req.body;
 
     if (
@@ -175,12 +176,13 @@ const updateHotel = async (req, res) => {
       );
     }
 
+    const hotelImages = req.files.filter((f) => f.fieldname === "images");
     var images = [];
 
-    if (req.files && req.files.length > 0) {
+    if (req.files && hotelImages.length > 0) {
       const uploadDir = path.join("uploads", "hotels", id);
 
-      for (const file of req.files) {
+      for (const file of hotelImages) {
         const filename = await fileUploadService.uploadFile(uploadDir, file);
         images.push(`/uploads/hotels/${id}/${filename}`);
       }
@@ -192,13 +194,38 @@ const updateHotel = async (req, res) => {
       updatedImages = images;
     }
 
+    const roomUploadDir = path.join("uploads", "hotels", id, "rooms");
+
+    var roomsDetailsRow = JSON.parse(roomsDetails);
+
+    const roomsDetailsWithImages = await Promise.all(
+      roomsDetailsRow.map(async (room) => {
+        if (room.image) {
+          return room;
+        }
+        const file = req.files.find((f) => f.fieldname === `image_${room.id}`);
+
+        let filename = null;
+        if (file) {
+          filename = await fileUploadService.uploadFile(roomUploadDir, file);
+        }
+
+        return {
+          ...room,
+          image: file ? `/uploads/hotels/${id}/rooms/${filename}` : null,
+        };
+      })
+    );
+
     const updateData = {
       ...(name && { name }),
       ...(placeId && { place_id: placeId }),
       ...(typeId && { type_id: typeId }),
       ...(description && { description }),
       ...(facilities && { facilities }),
-      ...(roomsDetails && { roomsDetails }),
+      ...(roomsDetails && {
+        rooms_details: JSON.stringify(roomsDetailsWithImages) || "[]",
+      }),
       ...(name && { url_prefix: name.toLowerCase().replace(/\s+/g, "-") }),
       ...(rating && { rating: Number(rating) }),
       ...(updatedImages && { images: JSON.stringify(updatedImages) }),
@@ -220,6 +247,16 @@ const updateHotel = async (req, res) => {
       JSON.parse(removeImages).length > 0
     ) {
       for (const removeImage of JSON.parse(removeImages)) {
+        await fileUploadService.removeFile(removeImage);
+      }
+    }
+
+    if (
+      removeRoomImages &&
+      Array.isArray(JSON.parse(removeRoomImages)) &&
+      JSON.parse(removeRoomImages).length > 0
+    ) {
+      for (const removeImage of JSON.parse(removeRoomImages)) {
         await fileUploadService.removeFile(removeImage);
       }
     }

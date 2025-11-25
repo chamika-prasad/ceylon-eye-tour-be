@@ -29,7 +29,8 @@ router.put(
   "/:id",
   tokenMiddleware.verifyToken,
   tokenMiddleware.authorizeAdmin,
-  upload.array("images", 8),
+  // upload.array("images", 8),
+  upload.any(),
   hotelController.updateHotel
 );
 

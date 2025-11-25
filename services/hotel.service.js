@@ -30,7 +30,10 @@ const getAllHotels = async () => {
 
 const getHotelsByPlaceId = async (placeId) => {
   const hotels = await hotelRepository.getHotelsByPlaceId(placeId);
-   const formattedHotels = hotels.map((hotel) => {
+  if (!hotels || hotels.length === 0) {
+    return [];
+  }
+  const formattedHotels = hotels.map((hotel) => {
     return {
       ...hotel.dataValues,
       description: hotel.description,
@@ -45,6 +48,9 @@ const getHotelsByPlaceId = async (placeId) => {
 
 const getHotelById = async (id) => {
   const hotel = await hotelRepository.getHotelById(id);
+  if (!hotel) {
+    return null;
+  }
   const formattedHotel = {
     ...hotel.dataValues,
     description: hotel.description,
@@ -57,6 +63,9 @@ const getHotelById = async (id) => {
 
 const getHotelByPrefix = async (prefix) => {
   const hotel = await hotelRepository.getHotelByPrefix(prefix);
+  if (!hotel) {
+    return null;
+  }
   const formattedHotel = {
     ...hotel.dataValues,
     description: hotel.description,
