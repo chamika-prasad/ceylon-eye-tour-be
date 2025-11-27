@@ -162,16 +162,16 @@ const updateHotel = async (req, res) => {
       }
     }
 
-    var updatedImages;
+    var updatedImages = Array.isArray(existingHotel.images)
+      ? existingHotel.images
+      : JSON.parse(existingHotel.images || "[]");
+      
     if (
       removeImages &&
       Array.isArray(JSON.parse(removeImages)) &&
       JSON.parse(removeImages).length > 0
     ) {
-      const currentImages = Array.isArray(existingHotel.images)
-        ? existingHotel.images
-        : JSON.parse(existingHotel.images || "[]");
-      updatedImages = currentImages.filter(
+      updatedImages = updatedImages.filter(
         (img) => !JSON.parse(removeImages).includes(img)
       );
     }
@@ -188,17 +188,18 @@ const updateHotel = async (req, res) => {
       }
     }
 
-    if (updatedImages && images) {
+    if (images.length > 0) {
       updatedImages = [...updatedImages, ...images];
-    } else if (images) {
-      updatedImages = images;
     }
 
     const roomUploadDir = path.join("uploads", "hotels", id, "rooms");
 
+    if(roomsDetails){
+
+    
     var roomsDetailsRow = JSON.parse(roomsDetails);
 
-    const roomsDetailsWithImages = await Promise.all(
+    var roomsDetailsWithImages = await Promise.all(
       roomsDetailsRow.map(async (room) => {
         if (room.image) {
           return room;
@@ -217,6 +218,8 @@ const updateHotel = async (req, res) => {
       })
     );
 
+  }
+
     const updateData = {
       ...(name && { name }),
       ...(placeId && { place_id: placeId }),
@@ -228,7 +231,7 @@ const updateHotel = async (req, res) => {
       }),
       ...(name && { url_prefix: name.toLowerCase().replace(/\s+/g, "-") }),
       ...(rating && { rating: Number(rating) }),
-      ...(updatedImages && { images: JSON.stringify(updatedImages) }),
+      ...(updatedImages.length && { images: JSON.stringify(updatedImages) }),
       ...(name && { url_prefix: urlPrifix }),
     };
 
