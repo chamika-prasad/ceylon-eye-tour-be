@@ -25,4 +25,10 @@ router.put(
 router.put("/get-temp-password", authController.getTempPassword);
 router.put("/reset-password", authController.resetPassword);
 
+router.get(
+  "/user",
+  tokenMiddleware.verifyToken,
+  authController.getUserById
+);
+
 export default router;
