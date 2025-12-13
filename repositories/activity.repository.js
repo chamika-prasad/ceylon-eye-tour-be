@@ -1,5 +1,11 @@
+import dotenv from "dotenv";
 import { Activity } from "./../models/index.js";
-import { where, fn, col } from "sequelize";
+import { where, fn, col,Op } from "sequelize";
+
+dotenv.config();
+
+const limit = process.env.PAGINATION_LIMIT || 10;
+
 
 const createActivity = async (data) => {
   return await Activity.create(data);
@@ -31,11 +37,33 @@ const getActivityByName = async (name) => {
   });
 };
 
+const getAllActivitiesWithSearchAndPagination = async (page = 1, searchName = '') => {
+    const offset = (page - 1) * limit;
+  
+  const whereClause = searchName 
+    ? { name: { [Op.like]: `%${searchName}%` } }
+    : {};
+
+  const { count, rows } = await Activity.findAndCountAll({
+    where: whereClause,
+    limit: parseInt(limit),
+    offset: parseInt(offset)
+  });
+
+  return {
+    activities: rows,
+    totalItems: count,
+    totalPages: Math.ceil(count / limit),
+    currentPage: parseInt(page)
+  };
+};
+
 export default {
   createActivity,
   updateActivity,
   deleteActivity,
   getAllActivities,
   getActivityById,
-  getActivityByName
+  getActivityByName,
+  getAllActivitiesWithSearchAndPagination
 };

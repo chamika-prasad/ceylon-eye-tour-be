@@ -54,11 +54,12 @@ const createActivity = async (req, res) => {
 const updateActivity = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name,description } = req.body;
+    const { name, description } = req.body;
     if (!name && !req.file && !description) {
       return res.status(400).json({
         success: false,
-        message: "At least one field (name,description or logo) is required to update",
+        message:
+          "At least one field (name,description or logo) is required to update",
       });
     }
     const existActivity = await activityService.getActivityById(id);
@@ -135,10 +136,48 @@ const getActivityById = async (req, res) => {
   }
 };
 
+const getAllActivitiesWithSearchAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const searchName = req.query.name || "";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    const result =
+      await activityService.getAllActivitiesWithSearchAndPagination(
+        page,
+        searchName
+      );
+
+    return res.status(200).json({
+      success: true,
+      data: result.activities,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export default {
   createActivity,
   updateActivity,
   deleteActivity,
   getAllActivities,
   getActivityById,
+  getAllActivitiesWithSearchAndPagination,
 };

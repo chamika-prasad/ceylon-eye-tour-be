@@ -25,7 +25,9 @@ router.delete(
   tokenMiddleware.authorizeAdmin,
   activityController.deleteActivity
 );
+router.get('/paginate-activities', activityController.getAllActivitiesWithSearchAndPagination);
 router.get("/get-all", activityController.getAllActivities);
 router.get("/:id", activityController.getActivityById);
+
 
 export default router;

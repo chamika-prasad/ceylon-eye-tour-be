@@ -24,11 +24,23 @@ const getActivityByName = async (name) => {
   return await activityRepository.getActivityByName(name);
 };
 
+const getAllActivitiesWithSearchAndPagination = async (
+  page,
+  limit,
+  searchName
+) => {
+  return await activityRepository.getAllActivitiesWithSearchAndPagination(
+    page,
+    searchName
+  );
+};
+
 export default {
   createActivity,
   updateActivity,
   deleteActivity,
   getAllActivities,
   getActivityById,
-  getActivityByName
+  getActivityByName,
+  getAllActivitiesWithSearchAndPagination,
 };
