@@ -69,6 +69,31 @@ export const initializeSocket = (server, frontEndUrl) => {
         socket.emit("error", { message: "Failed to send message" });
       }
     });
+
+    // ✅ Send message updated version
+    socket.on("sendNewMessage", async (data) => {
+      try {
+        const { senderId, receiverId } = data;
+
+        // Find recipient user
+        const recipient = users[receiverId];
+
+        if (recipient) {
+          io.to(recipient.socketId).emit("messageReceived", {
+            from: senderId,
+            message,
+          });
+        }
+
+        // ✅ Send confirmation back to sender
+        socket.emit("messageSent", newMessage);
+
+        console.log(`Message sent from ${senderId} to ${receiverId}`);
+      } catch (error) {
+        console.error("Error sending message:", error.message);
+        socket.emit("error", { message: "Failed to send message" });
+      }
+    });
   });
 
   console.log("socket.io server created");
