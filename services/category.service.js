@@ -48,6 +48,20 @@ const getCategoryByUrlPrefix = async (urlPrefix, tourType) => {
   return await categoryRepository.getCategoryByUrlPrefix(urlPrefix, tourType);
 };
 
+const getCategoriesWithSearchAndPagination = async (
+  page,
+  searchTerm,
+  tourType,
+  isAdmin
+) => {
+  return await categoryRepository.getCategoriesWithSearchAndPagination(
+    page,
+    searchTerm,
+    tourType,
+    isAdmin
+  );
+};
+
 export default {
   createCategory,
   updateCategory,
@@ -55,4 +69,5 @@ export default {
   getCategories,
   getCategoryById,
   getCategoryByUrlPrefix,
+  getCategoriesWithSearchAndPagination,
 };

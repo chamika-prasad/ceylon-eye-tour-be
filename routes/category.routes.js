@@ -19,6 +19,12 @@ router.get(
   categoryController.getCategoryByUrlPrefix
 );
 
+router.get(
+  "/get-all-with-pagination",
+  tokenMiddleware.verifyUser,
+  categoryController.getCategoriesWithSearchAndPagination
+);
+
 router.post(
   "/create",
   // tokenMiddleware.verifyToken,

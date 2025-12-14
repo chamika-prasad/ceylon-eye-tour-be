@@ -10,7 +10,10 @@ const getCategories = async (req, res) => {
 
   try {
     // const categories = await categoryService.getCategories();
-    const categories = await categoryService.getCategories(Number(tourType), req.user?.role === 'admin');
+    const categories = await categoryService.getCategories(
+      Number(tourType),
+      req.user?.role === "admin"
+    );
     return res.status(200).json({
       success: true,
       message: "Categories retrived successfully",
@@ -99,7 +102,8 @@ const updateCategory = async (req, res) => {
     if (!name && !description && !req.file) {
       return res.status(400).json({
         success: false,
-        message: "Nothing to update. Provide at least name or description or image.",
+        message:
+          "Nothing to update. Provide at least name or description or image.",
       });
     }
 
@@ -117,7 +121,6 @@ const updateCategory = async (req, res) => {
         });
       }
     }
-
 
     if (req.file) {
       const uploadDir = path.join("uploads", "categories");
@@ -241,6 +244,54 @@ const getCategoryByUrlPrefix = async (req, res) => {
   }
 };
 
+const getCategoriesWithSearchAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const searchTerm = req.query.search || "";
+    const tourType = req.query.tourType ? Number(req.query.tourType) : null;
+    const isAdmin = req.user?.role === "admin";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (tourType !== null && tourType !== 0 && tourType !== 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Tour type must be 0 or 1",
+      });
+    }
+
+    const result = await categoryService.getCategoriesWithSearchAndPagination(
+      page,
+      searchTerm,
+      tourType,
+      isAdmin
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Categories retrieved successfully",
+      data: result.categories,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Error retrieving categories",
+    });
+  }
+};
+
 export default {
   getCategories,
   createCategory,
@@ -248,4 +299,5 @@ export default {
   deleteCategory,
   getCategoryById,
   getCategoryByUrlPrefix,
+  getCategoriesWithSearchAndPagination,
 };

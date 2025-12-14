@@ -1,10 +1,10 @@
-import {
-  Category,
-  Package,
-  PackageCategory,
-  PackageImage,
-} from "../models/index.js";
-import { Sequelize } from "sequelize";
+import { Category, Package, PackageImage } from "../models/index.js";
+import { Sequelize, Op } from "sequelize";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const limit = process.env.PAGINATION_LIMIT || 10;
 
 const createCategory = async (data) => {
   const category = await Category.create(data);
@@ -12,7 +12,6 @@ const createCategory = async (data) => {
 };
 
 const updateCategory = async (id, data) => {
-
   const category = await Category.findByPk(id);
   if (!category) return false;
 
@@ -21,7 +20,6 @@ const updateCategory = async (id, data) => {
 };
 
 const deleteCategory = async (id) => {
-
   const deleted = await Category.destroy({ where: { id } });
   if (!deleted) return false;
   return deleted;
@@ -43,8 +41,8 @@ const getCategories = async (tourType, isAdmin) => {
           through: { attributes: [] }, // Don't include join table fields
           where: isTourTypeValid
             ? {
-              tour_type: tourType, // Filter by passed tourType
-            }
+                tour_type: tourType, // Filter by passed tourType
+              }
             : undefined,
           required: false,
         },
@@ -119,6 +117,74 @@ const getCategoryByUrlPrefix = async (urlPrefix, tourType) => {
   }
 };
 
+const getCategoriesWithSearchAndPagination = async (
+  page = 1,
+  searchTerm = "",
+  tourType = null,
+  isAdmin = false
+) => {
+  const offset = (page - 1) * limit;
+  const isTourTypeValid = tourType === 0 || tourType === 1;
+
+  try {
+    // Build where clause for category name search
+    const whereClause = searchTerm
+      ? {
+          name: { [Op.like]: `%${searchTerm}%` },
+        }
+      : {};
+
+    const { count, rows } = await Category.findAndCountAll({
+      where: whereClause,
+      attributes: {
+        include: [
+          [Sequelize.fn("COUNT", Sequelize.col("Packages.id")), "packageCount"],
+        ],
+      },
+      include: [
+        {
+          association: "Packages",
+          attributes: [],
+          through: { attributes: [] },
+          where: isTourTypeValid
+            ? {
+                tour_type: tourType,
+              }
+            : undefined,
+          required: false,
+        },
+      ],
+      group: ["Category.id"],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [["name", "ASC"]], // Order by category name
+      subQuery: false,
+    });
+
+    // Filter categories with packageCount > 0 for non-admin users
+    let filteredRows = rows;
+    if (!isAdmin) {
+      filteredRows = rows.filter(
+        (category) => Number(category.get("packageCount")) > 0
+      );
+    }
+
+    // Calculate filtered count for non-admin
+    const finalCount = isAdmin ? count.length : filteredRows.length;
+
+    return {
+      categories: filteredRows,
+      totalItems: finalCount,
+      totalPages: Math.ceil(finalCount / limit),
+      currentPage: parseInt(page),
+    };
+  } catch (error) {
+    throw new Error(
+      "Error fetching categories with pagination: " + error.message
+    );
+  }
+};
+
 export default {
   getCategories,
   createCategory,
@@ -126,4 +192,5 @@ export default {
   deleteCategory,
   getCategoryById,
   getCategoryByUrlPrefix,
+  getCategoriesWithSearchAndPagination,
 };
