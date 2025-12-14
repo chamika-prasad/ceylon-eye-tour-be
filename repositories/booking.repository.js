@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import {
   Booking,
   User,
@@ -6,6 +7,11 @@ import {
   Review,
   CustomizePackage,
 } from "../models/index.js";
+import { Op } from "sequelize";
+
+dotenv.config();
+
+const limit = process.env.PAGINATION_LIMIT || 10;
 
 const getAllBookings = async () => {
   return await Booking.findAll({
@@ -23,7 +29,7 @@ const getAllBookings = async () => {
       {
         model: User,
         as: "User",
-        attributes: ["name", "email","passport","country"], // Include customer name and email
+        attributes: ["name", "email", "passport", "country"], // Include customer name and email
       },
       {
         model: Review,
@@ -55,7 +61,7 @@ const getBookingById = async (id) => {
       {
         model: User,
         as: "User",
-        attributes: ["name", "email",,"passport","country"], // Include customer name and email
+        attributes: ["name", "email", , "passport", "country"], // Include customer name and email
       },
     ],
   });
@@ -123,9 +129,133 @@ const deleteBooking = async (bookingId) => {
   );
 };
 
+const getAllBookingsWithSearchAndPagination = async (
+  page = 1,
+  searchTerm = ""
+) => {
+  const offset = (page - 1) * limit;
+
+  // Build where clause for searching across related tables
+  const whereClause = searchTerm
+    ? {
+        [Op.or]: [
+          // Search in User name
+          { "$User.name$": { [Op.like]: `%${searchTerm}%` } },
+          // Search in Package title
+          { "$Package.title$": { [Op.like]: `%${searchTerm}%` } },
+          // Search in CustomPackage message
+          { "$CustomPackage.message$": { [Op.like]: `%${searchTerm}%` } },
+        ],
+      }
+    : {};
+
+  const { count, rows } = await Booking.findAndCountAll({
+    where: whereClause,
+    include: [
+      {
+        model: Package,
+        as: "Package",
+        attributes: ["title", "price", "duration"],
+      },
+      {
+        model: CustomizePackage,
+        as: "CustomPackage",
+        attributes: ["message", "price", "required_day_count"],
+      },
+      {
+        model: User,
+        as: "User",
+        attributes: ["name", "email", "passport", "country"],
+      },
+      {
+        model: Review,
+        as: "Review",
+        attributes: ["rating", "review"],
+      },
+      {
+        model: Payment,
+        as: "Payment",
+        attributes: ["id", "payment_id", "amount", "status"],
+      },
+    ],
+    limit: parseInt(limit),
+    offset: parseInt(offset),
+    distinct: true, // Important: prevents count from being affected by joins
+    order: [["created_at", "DESC"]],
+  });
+
+  return {
+    bookings: rows,
+    totalItems: count,
+    totalPages: Math.ceil(count / limit),
+    currentPage: parseInt(page),
+  };
+};
+
+const getBookingsByCustomerIdWithSearchAndPagination = async (
+  customerId,
+  page = 1,
+  searchTerm = ""
+) => {
+  const offset = (page - 1) * limit;
+
+  // Build where clause combining customer filter with search
+  const whereClause = {
+    customer_id: customerId,
+    is_deleted: false,
+    ...(searchTerm && {
+      [Op.or]: [
+        // Search in Package title
+        { "$Package.title$": { [Op.like]: `%${searchTerm}%` } },
+        // Search in CustomPackage message
+        { "$CustomPackage.message$": { [Op.like]: `%${searchTerm}%` } },
+      ],
+    }),
+  };
+
+  const { count, rows } = await Booking.findAndCountAll({
+    where: whereClause,
+    include: [
+      {
+        model: Package,
+        as: "Package",
+        attributes: ["title", "price", "duration"],
+      },
+      {
+        model: Review,
+        as: "Review",
+        attributes: ["rating", "review"],
+      },
+      {
+        model: CustomizePackage,
+        as: "CustomPackage",
+        attributes: ["message", "price", "required_day_count"],
+      },
+      {
+        model: Payment,
+        as: "Payment",
+        attributes: ["id", "payment_id", "amount", "status"],
+      },
+    ],
+    limit: parseInt(limit),
+    offset: parseInt(offset),
+    distinct: true, // Prevents count from being affected by joins
+    order: [["created_at", "DESC"]],
+  });
+
+  return {
+    bookings: rows,
+    totalItems: count,
+    totalPages: Math.ceil(count / limit),
+    currentPage: parseInt(page),
+  };
+};
+
 export default {
   getAllBookings,
   getBookingsByCustomerId,
+  getAllBookingsWithSearchAndPagination,
+  getBookingsByCustomerIdWithSearchAndPagination,
   updateBookingStatus,
   createBooking,
   deleteBooking,

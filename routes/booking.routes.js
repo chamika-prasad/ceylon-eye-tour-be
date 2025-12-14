@@ -10,7 +10,17 @@ router.get(
   tokenMiddleware.authorizeAdmin,
   bookingController.getAllBookings
 );
+router.get(
+  "/paginate-bookings",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  bookingController.getAllBookingsWithSearchAndPagination
+);
 router.get("/customer/:customerId", bookingController.getBookingsByCustomerId);
+router.get(
+  "/paginate-customer/:customerId",
+  bookingController.getBookingsByCustomerIdWithSearchAndPagination
+);
 router.put(
   "/:bookingId/status",
   tokenMiddleware.verifyToken,

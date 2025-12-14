@@ -46,6 +46,14 @@ const getBookingById = async (bookingId) => {
   return booking;
 };
 
+const getAllBookingsWithSearchAndPagination = async (page,searchTerm) => {
+  return await bookingRepository.getAllBookingsWithSearchAndPagination(page,searchTerm);
+};
+
+const getBookingsByCustomerIdWithSearchAndPagination = async (customerId,page,searchTerm) => {
+  return await bookingRepository.getBookingsByCustomerIdWithSearchAndPagination(customerId,page,searchTerm);
+};
+
 export default {
   getAllBookings,
   getBookingsByCustomerId,
@@ -54,4 +62,6 @@ export default {
   deleteBooking,
   getBookingById,
   updateBooking,
+  getAllBookingsWithSearchAndPagination,
+  getBookingsByCustomerIdWithSearchAndPagination,
 };

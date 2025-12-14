@@ -205,6 +205,88 @@ const deleteBooking = async (req, res) => {
   }
 };
 
+const getAllBookingsWithSearchAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const searchTerm = req.query.search || "";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    const result = await bookingService.getAllBookingsWithSearchAndPagination(
+      page,
+      searchTerm
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: result.bookings,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
+  try {
+    const customerId = req.params.customerId || req.user.id; // Adjust based on your auth setup
+    const page = parseInt(req.query.page) || 1;
+    const searchTerm = req.query.search || "";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (!customerId) {
+      return res.status(400).json({
+        success: false,
+        message: "Customer ID is required",
+      });
+    }
+
+    const result =
+      await bookingService.getBookingsByCustomerIdWithSearchAndPagination(
+        customerId,
+        page,
+        searchTerm
+      );
+
+    return res.status(200).json({
+      success: true,
+      data: result.bookings,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching customer bookings:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export default {
   getAllBookings,
   getBookingsByCustomerId,
@@ -212,4 +294,6 @@ export default {
   createBooking,
   deleteBooking,
   updateBooking,
+  getBookingsByCustomerIdWithSearchAndPagination,
+  getAllBookingsWithSearchAndPagination,
 };
