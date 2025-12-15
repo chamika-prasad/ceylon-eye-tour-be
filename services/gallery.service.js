@@ -20,10 +20,20 @@ const deleteGalleryItemById = async (id) => {
   return await galleryRepository.deleteGalleryItemById(id);
 };
 
+const getAllGalleryWithPagination = async (page, pageSize) => {
+  return await galleryRepository.getAllGalleryWithPagination(page, pageSize);
+};
+
+const getAllApprovedGalleryWithPagination = async (page, pageSize) => {
+  return await galleryRepository.getAllApprovedGalleryWithPagination(page, pageSize);
+};
+
 export default {
   getAllGallery,
   updateGalleryApproval,
   getAllApprovedGallery,
   addGalleryItem,
   deleteGalleryItemById,
+  getAllGalleryWithPagination,
+  getAllApprovedGalleryWithPagination,
 };

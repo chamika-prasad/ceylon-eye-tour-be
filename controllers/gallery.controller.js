@@ -1,6 +1,9 @@
 import path from "path";
 import galleryService from "../services/gallery.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Get all gallery items
 const getAllGallery = async (req, res) => {
@@ -143,10 +146,98 @@ const deleteGalleryItem = async (req, res) => {
   }
 };
 
+const getAllGalleryWithPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result = await galleryService.getAllGalleryWithPagination(page, pageSize);
+
+    return res.status(200).json({
+      success: true,
+      message: "Gallery items retrieved successfully",
+      data: result.galleries,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving gallery items:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving gallery items",
+      error: error.message,
+    });
+  }
+};
+
+const getAllApprovedGalleryWithPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result = await galleryService.getAllApprovedGalleryWithPagination(page, pageSize);
+
+    return res.status(200).json({
+      success: true,
+      message: "Approved gallery items retrieved successfully",
+      data: result.galleries,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving approved gallery items:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving approved gallery items",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   getAllGallery,
   updateGalleryApproval,
   getAllApprovedGallery,
   addGalleryItem,
-  deleteGalleryItem
+  deleteGalleryItem,
+  getAllGalleryWithPagination,
+  getAllApprovedGalleryWithPagination,
 };

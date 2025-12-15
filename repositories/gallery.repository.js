@@ -76,6 +76,65 @@ const getGalleryItemById = async (id) => {
   }
 };
 
+const getAllGalleryWithPagination = async (page = 1, pageSize = 10) => {
+  const offset = (page - 1) * pageSize;
+
+  try {
+    const { count, rows } = await Gallery.findAndCountAll({
+      include: [
+        {
+          model: User,
+          as: "User",
+          attributes: ["name"],
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset: parseInt(offset),
+      order: [["created_at", "DESC"]],
+    });
+
+    return {
+      galleries: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching gallery items: ${error.message}`);
+  }
+};
+
+const getAllApprovedGalleryWithPagination = async (page = 1, pageSize = 10) => {
+  const offset = (page - 1) * pageSize;
+
+  try {
+    const { count, rows } = await Gallery.findAndCountAll({
+      where: { is_approved: true },
+      include: [
+        {
+          model: User,
+          as: "User",
+          attributes: ["name"],
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset: parseInt(offset),
+      order: [["created_at", "DESC"]],
+    });
+
+    return {
+      galleries: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching approved gallery items: ${error.message}`);
+  }
+};
+
 export default {
   getAllGallery,
   updateGalleryApproval,
@@ -83,4 +142,6 @@ export default {
   addGalleryItem,
   deleteGalleryItemById,
   getGalleryItemById,
+  getAllGalleryWithPagination,
+  getAllApprovedGalleryWithPagination,
 };
