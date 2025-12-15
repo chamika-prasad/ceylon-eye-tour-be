@@ -76,6 +76,60 @@ const getHotelByPrefix = async (prefix) => {
   return formattedHotel;
 };
 
+const getAllHotelsWithPagination = async (page, pageSize) => {
+  const result = await hotelRepository.getAllHotelsWithPagination(
+    page,
+    pageSize
+  );
+
+  // Convert rooms_details into array
+  const formattedHotels = result.hotels.map((hotel) => {
+    return {
+      ...hotel.dataValues,
+      description: hotel.description,
+      facilities: hotel.facilities,
+      images: hotel.images,
+      rooms_details: safeParse(hotel.rooms_details),
+    };
+  });
+
+  return {
+    ...result,
+    hotels: formattedHotels,
+  };
+};
+
+const getHotelsByPlaceIdWithPagination = async (placeId, page, pageSize) => {
+  const result = await hotelRepository.getHotelsByPlaceIdWithPagination(
+    placeId,
+    page,
+    pageSize
+  );
+
+  if (!result.hotels || result.hotels.length === 0) {
+    return {
+      ...result,
+      hotels: [],
+    };
+  }
+
+  // Convert rooms_details into array
+  const formattedHotels = result.hotels.map((hotel) => {
+    return {
+      ...hotel.dataValues,
+      description: hotel.description,
+      facilities: hotel.facilities,
+      images: hotel.images,
+      rooms_details: safeParse(hotel.rooms_details),
+    };
+  });
+
+  return {
+    ...result,
+    hotels: formattedHotels,
+  };
+};
+
 const safeParse = (value) => {
   try {
     return JSON.parse(value);
@@ -92,4 +146,6 @@ export default {
   getHotelsByPlaceId,
   getHotelById,
   getHotelByPrefix,
+  getAllHotelsWithPagination,
+  getHotelsByPlaceIdWithPagination,
 };

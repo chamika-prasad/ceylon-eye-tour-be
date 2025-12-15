@@ -24,6 +24,9 @@ router.get("/get-by-urlPrifix/:urlPrifix", hotelController.getHotelByPrefix);
 // Get hotels for a specific place
 router.get("/place/:placeId", hotelController.getHotelsByPlaceId);
 
+router.get("/get-all-paginated", hotelController.getAllHotelsWithPagination);
+router.get("/place/:placeId/paginated", hotelController.getHotelsByPlaceIdWithPagination);
+
 // Update hotel details
 router.put(
   "/:id",

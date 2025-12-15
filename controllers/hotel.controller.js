@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import hotelService from "../services/hotel.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const createHotel = async (req, res) => {
   try {
@@ -165,7 +168,7 @@ const updateHotel = async (req, res) => {
     var updatedImages = Array.isArray(existingHotel.images)
       ? existingHotel.images
       : JSON.parse(existingHotel.images || "[]");
-      
+
     if (
       removeImages &&
       Array.isArray(JSON.parse(removeImages)) &&
@@ -194,31 +197,30 @@ const updateHotel = async (req, res) => {
 
     const roomUploadDir = path.join("uploads", "hotels", id, "rooms");
 
-    if(roomsDetails){
+    if (roomsDetails) {
+      var roomsDetailsRow = JSON.parse(roomsDetails);
 
-    
-    var roomsDetailsRow = JSON.parse(roomsDetails);
+      var roomsDetailsWithImages = await Promise.all(
+        roomsDetailsRow.map(async (room) => {
+          if (room.image) {
+            return room;
+          }
+          const file = req.files.find(
+            (f) => f.fieldname === `image_${room.id}`
+          );
 
-    var roomsDetailsWithImages = await Promise.all(
-      roomsDetailsRow.map(async (room) => {
-        if (room.image) {
-          return room;
-        }
-        const file = req.files.find((f) => f.fieldname === `image_${room.id}`);
+          let filename = null;
+          if (file) {
+            filename = await fileUploadService.uploadFile(roomUploadDir, file);
+          }
 
-        let filename = null;
-        if (file) {
-          filename = await fileUploadService.uploadFile(roomUploadDir, file);
-        }
-
-        return {
-          ...room,
-          image: file ? `/uploads/hotels/${id}/rooms/${filename}` : null,
-        };
-      })
-    );
-
-  }
+          return {
+            ...room,
+            image: file ? `/uploads/hotels/${id}/rooms/${filename}` : null,
+          };
+        })
+      );
+    }
 
     const updateData = {
       ...(name && { name }),
@@ -399,6 +401,120 @@ const getHotelByPrefix = async (req, res) => {
   }
 };
 
+const getAllHotelsWithPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize =
+      parseInt(req.query.size) ||
+      parseInt(process.env.PAGINATION_LIMIT) ||
+      10;
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result = await hotelService.getAllHotelsWithPagination(
+      page,
+      pageSize
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Hotels retrieved successfully",
+      data: result.hotels,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving hotels:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving hotels",
+      error: error.message,
+    });
+  }
+};
+
+const getHotelsByPlaceIdWithPagination = async (req, res) => {
+  try {
+    const { placeId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize =
+      parseInt(req.query.size) ||
+      parseInt(process.env.PAGINATION_LIMIT) ||
+      10;
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    if (!placeId) {
+      return res.status(400).json({
+        success: false,
+        message: "Place ID is required",
+      });
+    }
+
+    const result = await hotelService.getHotelsByPlaceIdWithPagination(
+      placeId,
+      page,
+      pageSize
+    );
+
+    if (result.totalItems === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No hotels found for this place",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Hotels retrieved successfully",
+      data: result.hotels,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving hotels by place ID:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving hotels by place ID",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createHotel,
   updateHotel,
@@ -407,4 +523,6 @@ export default {
   getHotelsByPlaceId,
   getHotelById,
   getHotelByPrefix,
+  getAllHotelsWithPagination,
+  getHotelsByPlaceIdWithPagination,
 };

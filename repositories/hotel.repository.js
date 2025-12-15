@@ -89,6 +89,69 @@ const getHotelByPrefix = async (prefix) => {
   }
 };
 
+const getAllHotelsWithPagination = async (page = 1, pageSize = 10) => {
+  const offset = (page - 1) * pageSize;
+
+  try {
+    const { count, rows } = await Hotel.findAndCountAll({
+      include: [
+        {
+          model: Place,
+          as: "Place",
+          attributes: ["id", "name", "url_prefix"],
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset: parseInt(offset),
+      order: [["name", "ASC"]],
+    });
+
+    return {
+      hotels: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching hotels: ${error.message}`);
+  }
+};
+
+const getHotelsByPlaceIdWithPagination = async (
+  placeId,
+  page = 1,
+  pageSize = 10
+) => {
+  const offset = (page - 1) * pageSize;
+
+  try {
+    const { count, rows } = await Hotel.findAndCountAll({
+      where: { place_id: placeId },
+      include: [
+        {
+          model: Place,
+          as: "Place",
+          attributes: ["id", "name"],
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset: parseInt(offset),
+      order: [["name", "ASC"]],
+    });
+
+    return {
+      hotels: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching hotels by place ID: ${error.message}`);
+  }
+};
+
 export default {
   createHotel,
   updateHotel,
@@ -97,4 +160,6 @@ export default {
   getHotelsByPlaceId,
   getHotelById,
   getHotelByPrefix,
+  getAllHotelsWithPagination,
+  getHotelsByPlaceIdWithPagination,
 };
