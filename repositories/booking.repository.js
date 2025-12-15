@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import {
   Booking,
   User,
@@ -9,9 +8,6 @@ import {
 } from "../models/index.js";
 import { Op } from "sequelize";
 
-dotenv.config();
-
-const limit = process.env.PAGINATION_LIMIT || 10;
 
 const getAllBookings = async () => {
   return await Booking.findAll({
@@ -131,7 +127,8 @@ const deleteBooking = async (bookingId) => {
 
 const getAllBookingsWithSearchAndPagination = async (
   page = 1,
-  searchTerm = ""
+  searchTerm = "",
+  limit = 10
 ) => {
   const offset = (page - 1) * limit;
 
@@ -195,7 +192,8 @@ const getAllBookingsWithSearchAndPagination = async (
 const getBookingsByCustomerIdWithSearchAndPagination = async (
   customerId,
   page = 1,
-  searchTerm = ""
+  searchTerm = "",
+  limit = 10
 ) => {
   const offset = (page - 1) * limit;
 

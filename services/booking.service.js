@@ -46,12 +46,30 @@ const getBookingById = async (bookingId) => {
   return booking;
 };
 
-const getAllBookingsWithSearchAndPagination = async (page,searchTerm) => {
-  return await bookingRepository.getAllBookingsWithSearchAndPagination(page,searchTerm);
+const getAllBookingsWithSearchAndPagination = async (
+  page,
+  searchTerm,
+  limit
+) => {
+  return await bookingRepository.getAllBookingsWithSearchAndPagination(
+    page,
+    searchTerm,
+    limit
+  );
 };
 
-const getBookingsByCustomerIdWithSearchAndPagination = async (customerId,page,searchTerm) => {
-  return await bookingRepository.getBookingsByCustomerIdWithSearchAndPagination(customerId,page,searchTerm);
+const getBookingsByCustomerIdWithSearchAndPagination = async (
+  customerId,
+  page,
+  searchTerm,
+  limit
+) => {
+  return await bookingRepository.getBookingsByCustomerIdWithSearchAndPagination(
+    customerId,
+    page,
+    searchTerm,
+    limit
+  );
 };
 
 export default {

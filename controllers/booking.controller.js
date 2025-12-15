@@ -1,4 +1,9 @@
 import bookingService from "../services/booking.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const limit = process.env.PAGINATION_LIMIT || 10;
 
 const getAllBookings = async (req, res) => {
   try {
@@ -209,6 +214,7 @@ const getAllBookingsWithSearchAndPagination = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const searchTerm = req.query.search || "";
+    const pageLimit = parseInt(req.query.size) || limit;
 
     // Validation
     if (page < 1) {
@@ -220,7 +226,8 @@ const getAllBookingsWithSearchAndPagination = async (req, res) => {
 
     const result = await bookingService.getAllBookingsWithSearchAndPagination(
       page,
-      searchTerm
+      searchTerm,
+      pageLimit
     );
 
     return res.status(200).json({
@@ -246,6 +253,7 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
     const customerId = req.params.customerId || req.user.id; // Adjust based on your auth setup
     const page = parseInt(req.query.page) || 1;
     const searchTerm = req.query.search || "";
+    const pageLimit = parseInt(req.query.size) || limit;
 
     // Validation
     if (page < 1) {
@@ -266,7 +274,8 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
       await bookingService.getBookingsByCustomerIdWithSearchAndPagination(
         customerId,
         page,
-        searchTerm
+        searchTerm,
+        pageLimit
       );
 
     return res.status(200).json({
