@@ -1,4 +1,5 @@
 import placeRepository from "../repositories/place.repository.js";
+import hotelRepository from "../repositories/hotel.repository.js";
 
 const createPlace = async (data) => {
   return await placeRepository.createPlace(data);
@@ -48,6 +49,51 @@ const getAllPlacesWithHotelCountAndPagination = async (
   );
 };
 
+const getPlaceByUrlPrefixWithHotelCountAndPagination = async (
+  urlPrefix,
+  page,
+  pageSize,
+  searchTerm
+) => {
+  const place = await placeRepository.getPlaceByUrlPrefix(urlPrefix);
+  const result = await hotelRepository.getHotelsByPlaceIdWithPagination(
+    place.id,
+    page,
+    pageSize,
+    searchTerm
+  );
+
+  const formattedHotels = result.hotels.map((hotel) => {
+    return {
+      ...hotel.dataValues,
+      description: hotel.description,
+      facilities: hotel.facilities,
+      images: hotel.images,
+      rooms_details: safeParse(hotel.rooms_details),
+    };
+  });
+
+  const finalResult = {
+    result: {
+      ...place.toJSON(),
+      Hotels:
+        !result.hotels || result.hotels.length === 0 ? [] : formattedHotels,
+    },
+    currentPage: result.currentPage,
+    totalPages: result.totalPages,
+    totalItems: result.totalItems,
+  };
+  return finalResult;
+};
+
+const safeParse = (value) => {
+  try {
+    return JSON.parse(value);
+  } catch (err) {
+    return value;
+  }
+};
+
 export default {
   createPlace,
   updatePlace,
@@ -58,4 +104,5 @@ export default {
   getPlaceByUrlPrefix,
   getAllPlacesWithPagination,
   getAllPlacesWithHotelCountAndPagination,
+  getPlaceByUrlPrefixWithHotelCountAndPagination,
 };

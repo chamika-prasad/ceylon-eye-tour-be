@@ -256,9 +256,7 @@ const getAllPlacesWithPagination = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize =
-      parseInt(req.query.size) ||
-      parseInt(process.env.PAGINATION_LIMIT) ||
-      10;
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
     const searchTerm = req.query.search || "";
 
     // Validation
@@ -352,6 +350,48 @@ const getAllPlacesWithHotelCountAndPagination = async (req, res) => {
   }
 };
 
+const getPlaceByUrlPrefixWithHotelCountAndPagination = async (req, res) => {
+  try {
+    const { urlPrefix } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const searchTerm = req.query.search || "";
+    const pageLimit =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+
+    const place =
+      await placeService.getPlaceByUrlPrefixWithHotelCountAndPagination(
+        urlPrefix,
+        page,
+        pageLimit,
+        searchTerm
+      );
+
+    if (!place) {
+      return res.status(404).json({
+        success: false,
+        message: "Place not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Place retrieved successfully",
+      data: place.result,
+      pagination: {
+        currentPage: place.currentPage,
+        totalPages: place.totalPages,
+        totalItems: place.totalItems,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving place",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createPlace,
   updatePlace,
@@ -362,4 +402,5 @@ export default {
   getPlaceByUrlPrefix,
   getAllPlacesWithPagination,
   getAllPlacesWithHotelCountAndPagination,
+  getPlaceByUrlPrefixWithHotelCountAndPagination,
 };

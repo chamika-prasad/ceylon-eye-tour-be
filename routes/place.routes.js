@@ -32,6 +32,7 @@ router.get("/get-by-urlprefix/:urlPrefix", placeController.getPlaceByUrlPrefix);
 
 router.get("/get-all-paginated", placeController.getAllPlacesWithPagination);
 router.get("/get-all-with-hotels-paginated", placeController.getAllPlacesWithHotelCountAndPagination);
+router.get("/get-by-urlprefix/:urlPrefix/paginated", placeController.getPlaceByUrlPrefixWithHotelCountAndPagination);
 
 
 export default router;
