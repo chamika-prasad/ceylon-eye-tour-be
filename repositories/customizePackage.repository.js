@@ -7,6 +7,7 @@ import {
   Activity,
   User,
 } from "../models/index.js";
+import { Op } from "sequelize";
 
 const createCustomizePackage = async (userId, places = []) => {
   let transaction;
@@ -259,6 +260,109 @@ const getCustomizePackageById = async (id) => {
   return customizePackage;
 };
 
+const getAllCustomizePackagesWithSearchAndPagination = async (
+  page = 1,
+  searchTerm = "",
+  limit = 10
+) => {
+  const offset = (page - 1) * limit;
+
+  // Build where clause for searching user name
+  const whereClause = searchTerm
+    ? {
+        [Op.or]: [
+          { "$User.name$": { [Op.like]: `%${searchTerm}%` } },
+          { "$User.country$": { [Op.like]: `%${searchTerm}%` } },
+          { message: { [Op.like]: `%${searchTerm}%` } },
+        ],
+      }
+    : {};
+
+  const { count, rows } = await CustomizePackage.findAndCountAll({
+    where: whereClause,
+    include: [
+      {
+        model: User,
+        as: "User",
+        attributes: ["id", "name", "country"],
+      },
+      {
+        model: CustomizePackagePlace,
+        as: "CustomizePackagePlaces",
+        attributes: ["id", "place_id", "sort_order", "day_no", "description"],
+        include: [
+          {
+            model: Place,
+            as: "Place",
+            attributes: ["id", "name"],
+          },
+          {
+            model: Activity,
+            as: "Activities",
+            attributes: ["id", "name"],
+            through: { attributes: ["id"] },
+            
+          },
+        ],
+      },
+    ],
+    limit: parseInt(limit),
+    offset: parseInt(offset),
+    distinct: true, // Prevents count from being affected by joins
+    order: [["created_at", "DESC"]],
+  });
+
+  return {
+    customizePackages: rows,
+    totalItems: count,
+    totalPages: Math.ceil(count / limit),
+    currentPage: parseInt(page),
+  };
+};
+
+const getAllCustomizePackagesByUserIdWithPagination = async (
+  userId,
+  page = 1,
+  limit = 10
+) => {
+  const offset = (page - 1) * limit;
+
+  const { count, rows } = await CustomizePackage.findAndCountAll({
+    where: { user_id: userId },
+    include: [
+      {
+        model: CustomizePackagePlace,
+        as: "CustomizePackagePlaces",
+        attributes: ["id", "place_id", "sort_order", "day_no", "description"],
+        include: [
+          {
+            model: Place,
+            as: "Place",
+            attributes: ["id", "name", "image_url"],
+          },
+          {
+            model: Activity,
+            as: "Activities",
+            attributes: ["id", "name"],
+            through: { attributes: ["id"] },
+          },
+        ],
+      },
+    ],
+    limit: parseInt(limit),
+    offset: parseInt(offset),
+    distinct: true,
+    order: [["created_at", "DESC"]],
+  });
+
+  return {
+    customizePackages: rows,
+    totalItems: count,
+    totalPages: Math.ceil(count / limit),
+    currentPage: parseInt(page),
+  };
+};
+
 export default {
   createCustomizePackage,
   updateCustomizePackage,
@@ -269,4 +373,6 @@ export default {
   getCustomizePackageById,
   updateMessage,
   updatePrice,
+  getAllCustomizePackagesWithSearchAndPagination,
+  getAllCustomizePackagesByUserIdWithPagination,
 };

@@ -14,6 +14,15 @@ router.get(
   "/get-all/:userId",
   customizePackageController.getAllCustomizePackagesByUserId
 );
+
+router.get(
+  "/get-all-with-pagination",
+  customizePackageController.getAllCustomizePackagesWithSearchAndPagination
+);
+router.get(
+  "/get-all-with-pagination/:userId",
+  customizePackageController.getAllCustomizePackagesByUserIdWithPagination
+);
 router.get("/:id", customizePackageController.getCustomizePackageById);
 router.put("/:id/is-approved", customizePackageController.updateIsApproved);
 router.put("/:id/message", customizePackageController.updateMessage);

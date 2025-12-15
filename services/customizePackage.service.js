@@ -71,6 +71,26 @@ const getCustomizePackageById = async (id) => {
   return customizePackage;
 };
 
+const getAllCustomizePackagesWithSearchAndPagination = async (
+  page,
+  searchTerm,
+  limit
+) => {
+  return await customizePackageRepository.getAllCustomizePackagesWithSearchAndPagination(
+    page,
+    searchTerm,
+    limit
+  );
+};
+
+const getAllCustomizePackagesByUserIdWithPagination = async (userId, page,limit) => {
+  return await customizePackageRepository.getAllCustomizePackagesByUserIdWithPagination(
+    userId,
+    page,
+    limit
+  );
+};
+
 export default {
   createCustomizePackage,
   updateCustomizePackage,
@@ -81,4 +101,6 @@ export default {
   getCustomizePackageById,
   updateMessage,
   updatePrice,
+  getAllCustomizePackagesWithSearchAndPagination,
+  getAllCustomizePackagesByUserIdWithPagination,
 };

@@ -1,4 +1,9 @@
+import dotenv from "dotenv";
 import customizePackageService from "../services/customizePackage.service.js";
+
+dotenv.config();
+
+const limit = process.env.PAGINATION_LIMIT || 10;
 
 const createCustomizePackage = async (req, res) => {
   // const { userId, places } = req.body;
@@ -286,6 +291,95 @@ const getCustomizePackageById = async (req, res) => {
   }
 };
 
+const getAllCustomizePackagesWithSearchAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const searchTerm = req.query.search || "";
+    const pageLimit = parseInt(req.query.size) || limit;
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    const result =
+      await customizePackageService.getAllCustomizePackagesWithSearchAndPagination(
+        page,
+        searchTerm,
+        pageLimit
+      );
+
+    res.status(200).json({
+      success: true,
+      message: "Customize packages retrieved successfully",
+      data: result.customizePackages,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving customize packages:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve customize packages",
+      error: error.message,
+    });
+  }
+};
+
+const getAllCustomizePackagesByUserIdWithPagination = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const pageLimit = parseInt(req.query.size) || limit;
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    const result =
+      await customizePackageService.getAllCustomizePackagesByUserIdWithPagination(
+        userId,
+        page,
+        pageLimit
+      );
+
+    res.status(200).json({
+      success: true,
+      message: "Customize packages for user retrieved successfully",
+      data: result.customizePackages,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving customize packages for user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve customize packages for user",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createCustomizePackage,
   updateCustomizePackage,
@@ -296,4 +390,6 @@ export default {
   getCustomizePackageById,
   updateMessage,
   updatePrice,
+  getAllCustomizePackagesWithSearchAndPagination,
+  getAllCustomizePackagesByUserIdWithPagination,
 };
