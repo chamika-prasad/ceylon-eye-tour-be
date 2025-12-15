@@ -24,6 +24,20 @@ const getVehicleById = async (id) => {
   return await vehicleRepository.getVehicleById(id);
 };
 
+const getAllVehiclesWithPagination = async (
+  page,
+  pageSize,
+  searchTerm,
+  vehicleType
+) => {
+  return await vehicleRepository.getAllVehiclesWithPagination(
+    page,
+    pageSize,
+    searchTerm,
+    vehicleType
+  );
+};
+
 export default {
   createVehicle,
   updateVehicle,
@@ -31,4 +45,5 @@ export default {
   getAllVehicles,
   getVehicleByUrlPrefix,
   getVehicleById,
+  getAllVehiclesWithPagination,
 };

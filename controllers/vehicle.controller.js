@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import vehicleService from "../services/vehicle.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const createVehicle = async (req, res) => {
   try {
@@ -135,7 +138,7 @@ const updateVehicle = async (req, res) => {
       });
     }
 
-    if(name) {
+    if (name) {
       var urlPrifix = name.toLowerCase().replace(/\s+/g, "-");
       const vehicleWithSameName = await vehicleService.getVehicleByUrlPrefix(
         urlPrifix
@@ -219,7 +222,7 @@ const updateVehicle = async (req, res) => {
       ...(Array.isArray(updatedImages) &&
         updatedImages.length > 0 && { images: JSON.stringify(updatedImages) }),
       ...(name && { url_prefix: urlPrifix }),
-      ...(vehicleType && { vehicle_type: Number(vehicleType) })
+      ...(vehicleType && { vehicle_type: Number(vehicleType) }),
     };
 
     const updatedVehicle = await vehicleService.updateVehicle(id, updateData);
@@ -308,10 +311,62 @@ const getVehicleByUrlPrefix = async (req, res) => {
   }
 };
 
+const getAllVehiclesWithPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const searchTerm = req.query.search || "";
+    const vehicleType = req.query.type ? parseInt(req.query.type) : null;
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result = await vehicleService.getAllVehiclesWithPagination(
+      page,
+      pageSize,
+      searchTerm,
+      vehicleType
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Vehicles retrieved successfully",
+      data: result.vehicles,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving vehicles:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving vehicles",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createVehicle,
   updateVehicle,
   deleteVehicle,
   getAllVehicles,
   getVehicleByUrlPrefix,
+  getAllVehiclesWithPagination,
 };

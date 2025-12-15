@@ -18,6 +18,10 @@ router.delete(
   tokenMiddleware.authorizeAdmin,
   vehicleController.deleteVehicle
 );
+router.get(
+  "/get-all-paginated",
+  vehicleController.getAllVehiclesWithPagination
+);
 router.get("/get-all", vehicleController.getAllVehicles);
 router.get("/:urlPrefix", vehicleController.getVehicleByUrlPrefix);
 // Update vehicle details
