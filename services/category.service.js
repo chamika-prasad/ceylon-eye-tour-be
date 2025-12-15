@@ -52,13 +52,15 @@ const getCategoriesWithSearchAndPagination = async (
   page,
   searchTerm,
   tourType,
-  isAdmin
+  isAdmin,
+  limit
 ) => {
   return await categoryRepository.getCategoriesWithSearchAndPagination(
     page,
     searchTerm,
     tourType,
-    isAdmin
+    isAdmin,
+    limit
   );
 };
 

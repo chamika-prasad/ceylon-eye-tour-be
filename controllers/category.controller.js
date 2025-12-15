@@ -4,6 +4,11 @@ import path from "path";
 import categoryService from "../services/category.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
 import tokenService from "../services/token.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const limit = process.env.PAGINATION_LIMIT || 10;
 
 const getCategories = async (req, res) => {
   const { tourType } = req.query;
@@ -250,6 +255,7 @@ const getCategoriesWithSearchAndPagination = async (req, res) => {
     const searchTerm = req.query.search || "";
     const tourType = req.query.tourType ? Number(req.query.tourType) : null;
     const isAdmin = req.user?.role === "admin";
+    const pageLimit = parseInt(req.query.size) || limit;
 
     // Validation
     if (page < 1) {
@@ -270,7 +276,8 @@ const getCategoriesWithSearchAndPagination = async (req, res) => {
       page,
       searchTerm,
       tourType,
-      isAdmin
+      isAdmin,
+      pageLimit
     );
 
     return res.status(200).json({

@@ -1,10 +1,5 @@
 import { Category, Package, PackageImage } from "../models/index.js";
 import { Sequelize, Op } from "sequelize";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const limit = process.env.PAGINATION_LIMIT || 10;
 
 const createCategory = async (data) => {
   const category = await Category.create(data);
@@ -121,7 +116,8 @@ const getCategoriesWithSearchAndPagination = async (
   page = 1,
   searchTerm = "",
   tourType = null,
-  isAdmin = false
+  isAdmin = false,
+  limit = 10
 ) => {
   const offset = (page - 1) * limit;
   const isTourTypeValid = tourType === 0 || tourType === 1;
