@@ -261,6 +261,148 @@ const getHotelTypeByUrlPrefix = async (req, res) => {
   }
 };
 
+const getAllHotelTypesWithHotelCountAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize =
+      parseInt(req.query.pageSize) ||
+      parseInt(process.env.PAGINATION_LIMIT) ||
+      10;
+    const searchTerm = req.query.search || "";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result =
+      await hotelTypeService.getAllHotelTypesWithHotelCountAndPagination(
+        page,
+        pageSize,
+        searchTerm
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Hotel types retrieved with hotel count successfully",
+      data: result.hotelTypes,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving hotel types with hotel count:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving hotel types with hotel count",
+      error: error.message,
+    });
+  }
+};
+
+const getAllHotelTypesWithPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const searchTerm = req.query.search || "";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result = await hotelTypeService.getAllHotelTypesWithPagination(
+      page,
+      pageSize,
+      searchTerm
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Hotel types retrieved successfully",
+      data: result.hotelTypes,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving hotel types:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving hotel types",
+      error: error.message,
+    });
+  }
+};
+
+const getHotelTypeByUrlPrefixWithPaginationAndSearch = async (req, res) => {
+  const { urlPrefix } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const searchTerm = req.query.search || "";
+  const pageLimit =  parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+
+  try {
+    const hotelType =
+      await hotelTypeService.getHotelTypeByUrlPrefixWithPaginationAndSearch(
+        urlPrefix,
+        searchTerm,
+        page,
+        pageLimit
+      );
+
+    if (!hotelType) {
+      return res.status(404).json({
+        success: false,
+        message: "Hotel type not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Hotel type retrieved successfully",
+      data: hotelType.type,
+      pagination: {
+        currentPage: hotelType.currentPage,
+        totalPages: hotelType.totalPages,
+        totalItems: hotelType.totalItems,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving Category by urlprefix",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createHotelType,
   getAllHotelTypes,
@@ -269,4 +411,7 @@ export default {
   deleteHotelType,
   getAllHotelTypesWithHotelCount,
   getHotelTypeByUrlPrefix,
+  getAllHotelTypesWithHotelCountAndPagination,
+  getAllHotelTypesWithPagination,
+  getHotelTypeByUrlPrefixWithPaginationAndSearch
 };

@@ -174,6 +174,50 @@ const getHotelsByPlaceIdWithPagination = async (
   }
 };
 
+const getHotelsByTypeIdWithPagination = async (
+  typeId,
+  page = 1,
+  pageSize = 10,
+  searchTerm = ""
+) => {
+  const offset = (page - 1) * pageSize;
+
+  // Build where clause combining place_id filter with search
+  const whereClause = {
+    type_id: typeId,
+    ...(searchTerm && {
+      name: { [Op.like]: `%${searchTerm}%` },
+    }),
+  };
+
+  try {
+    const { count, rows } = await Hotel.findAndCountAll({
+      where: whereClause,
+      attributes:{ exclude: ["created_at", "updated_at","type_id","place_id"] },
+      include: [
+        {
+          model: Place,
+          as: "Place",
+          attributes: ["id", "name"],
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset: parseInt(offset),
+      order: [["name", "ASC"]],
+    });
+
+    return {
+      hotels: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching hotels by place ID: ${error.message}`);
+  }
+};
+
 export default {
   createHotel,
   updateHotel,
@@ -184,4 +228,5 @@ export default {
   getHotelByPrefix,
   getAllHotelsWithPagination,
   getHotelsByPlaceIdWithPagination,
+  getHotelsByTypeIdWithPagination,
 };

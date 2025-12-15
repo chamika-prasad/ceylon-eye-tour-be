@@ -15,7 +15,19 @@ router.post(
 );
 
 // Get all hotel types
-router.get("/get-all", hotelTypeController.getAllHotelTypes);
+router.get(
+  "/get-all",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  hotelTypeController.getAllHotelTypes
+);
+
+router.get(
+  "/get-all-paginated",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  hotelTypeController.getAllHotelTypesWithPagination
+);
 
 // Get single hotel type by ID
 router.get("/get-by-id/:id", hotelTypeController.getHotelTypeById);
@@ -43,8 +55,18 @@ router.get(
 );
 
 router.get(
+  "/get-all-with-hotels-paginated",
+  hotelTypeController.getAllHotelTypesWithHotelCountAndPagination
+);
+
+router.get(
   "/get-by-urlprefix/:urlPrefix",
   hotelTypeController.getHotelTypeByUrlPrefix
+);
+
+router.get(
+  "/get-by-urlprefix-paginated/:urlPrefix",
+  hotelTypeController.getHotelTypeByUrlPrefixWithPaginationAndSearch
 );
 
 export default router;
