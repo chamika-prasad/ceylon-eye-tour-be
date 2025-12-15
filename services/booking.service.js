@@ -46,15 +46,48 @@ const getBookingById = async (bookingId) => {
   return booking;
 };
 
+// const getAllBookingsWithSearchAndPagination = async (
+//   page,
+//   searchTerm,
+//   limit
+// ) => {
+//   return await bookingRepository.getAllBookingsWithSearchAndPagination(
+//     page,
+//     searchTerm,
+//     limit
+//   );
+// };
+
+// const getBookingsByCustomerIdWithSearchAndPagination = async (
+//   customerId,
+//   page,
+//   searchTerm,
+//   limit
+// ) => {
+//   return await bookingRepository.getBookingsByCustomerIdWithSearchAndPagination(
+//     customerId,
+//     page,
+//     searchTerm,
+//     limit
+//   );
+// };
+
+// Service
 const getAllBookingsWithSearchAndPagination = async (
   page,
   searchTerm,
-  limit
+  limit,
+  year,
+  month,
+  date
 ) => {
   return await bookingRepository.getAllBookingsWithSearchAndPagination(
     page,
     searchTerm,
-    limit
+    limit,
+    year,
+    month,
+    date
   );
 };
 
@@ -62,13 +95,19 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
   customerId,
   page,
   searchTerm,
-  limit
+  limit,
+  year,
+  month,
+  date
 ) => {
   return await bookingRepository.getBookingsByCustomerIdWithSearchAndPagination(
     customerId,
     page,
     searchTerm,
-    limit
+    limit,
+    year,
+    month,
+    date
   );
 };
 

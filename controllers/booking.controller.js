@@ -210,11 +210,101 @@ const deleteBooking = async (req, res) => {
   }
 };
 
+// const getAllBookingsWithSearchAndPagination = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const searchTerm = req.query.search || "";
+//     const pageLimit = parseInt(req.query.size) || limit;
+
+//     // Validation
+//     if (page < 1) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Page must be greater than 0",
+//       });
+//     }
+
+//     const result = await bookingService.getAllBookingsWithSearchAndPagination(
+//       page,
+//       searchTerm,
+//       pageLimit
+//     );
+
+//     return res.status(200).json({
+//       success: true,
+//       data: result.bookings,
+//       pagination: {
+//         currentPage: result.currentPage,
+//         totalPages: result.totalPages,
+//         totalItems: result.totalItems,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error fetching bookings:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//     });
+//   }
+// };
+
+// const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
+//   try {
+//     const customerId = req.params.customerId || req.user.id; // Adjust based on your auth setup
+//     const page = parseInt(req.query.page) || 1;
+//     const searchTerm = req.query.search || "";
+//     const pageLimit = parseInt(req.query.size) || limit;
+
+//     // Validation
+//     if (page < 1) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Page must be greater than 0",
+//       });
+//     }
+
+//     if (!customerId) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Customer ID is required",
+//       });
+//     }
+
+//     const result =
+//       await bookingService.getBookingsByCustomerIdWithSearchAndPagination(
+//         customerId,
+//         page,
+//         searchTerm,
+//         pageLimit
+//       );
+
+//     return res.status(200).json({
+//       success: true,
+//       data: result.bookings,
+//       pagination: {
+//         currentPage: result.currentPage,
+//         totalPages: result.totalPages,
+//         totalItems: result.totalItems,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error fetching customer bookings:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//     });
+//   }
+// };
+
 const getAllBookingsWithSearchAndPagination = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const searchTerm = req.query.search || "";
-    const pageLimit = parseInt(req.query.size) || limit;
+    const pageSize =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const year = req.query.year ? parseInt(req.query.year) : null;
+    const month = req.query.month ? parseInt(req.query.month) : null;
+    const date = req.query.date ? parseInt(req.query.date) : null;
 
     // Validation
     if (page < 1) {
@@ -224,10 +314,52 @@ const getAllBookingsWithSearchAndPagination = async (req, res) => {
       });
     }
 
+    // Validate year
+    if (year && (year < 1900 || year > 2100)) {
+      return res.status(400).json({
+        success: false,
+        message: "Year must be between 1900 and 2100",
+      });
+    }
+
+    // Validate month
+    if (month && (month < 1 || month > 12)) {
+      return res.status(400).json({
+        success: false,
+        message: "Month must be between 1 and 12",
+      });
+    }
+
+    // Validate date
+    if (date && (date < 1 || date > 31)) {
+      return res.status(400).json({
+        success: false,
+        message: "Date must be between 1 and 31",
+      });
+    }
+
+    // Validate date dependencies
+    if (month && !year) {
+      return res.status(400).json({
+        success: false,
+        message: "Year is required when filtering by month",
+      });
+    }
+
+    if (date && (!year || !month)) {
+      return res.status(400).json({
+        success: false,
+        message: "Year and month are required when filtering by date",
+      });
+    }
+
     const result = await bookingService.getAllBookingsWithSearchAndPagination(
       page,
       searchTerm,
-      pageLimit
+      pageSize,
+      year,
+      month,
+      date
     );
 
     return res.status(200).json({
@@ -237,6 +369,7 @@ const getAllBookingsWithSearchAndPagination = async (req, res) => {
         currentPage: result.currentPage,
         totalPages: result.totalPages,
         totalItems: result.totalItems,
+        pageSize: result.pageSize,
       },
     });
   } catch (error) {
@@ -250,10 +383,14 @@ const getAllBookingsWithSearchAndPagination = async (req, res) => {
 
 const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
   try {
-    const customerId = req.params.customerId || req.user.id; // Adjust based on your auth setup
+    const customerId = req.params.customerId || req.user.id;
     const page = parseInt(req.query.page) || 1;
     const searchTerm = req.query.search || "";
-    const pageLimit = parseInt(req.query.size) || limit;
+    const pageSize =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const year = req.query.year ? parseInt(req.query.year) : null;
+    const month = req.query.month ? parseInt(req.query.month) : null;
+    const date = req.query.date ? parseInt(req.query.date) : null;
 
     // Validation
     if (page < 1) {
@@ -270,12 +407,54 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
       });
     }
 
+    // Validate year
+    if (year && (year < 1900 || year > 2100)) {
+      return res.status(400).json({
+        success: false,
+        message: "Year must be between 1900 and 2100",
+      });
+    }
+
+    // Validate month
+    if (month && (month < 1 || month > 12)) {
+      return res.status(400).json({
+        success: false,
+        message: "Month must be between 1 and 12",
+      });
+    }
+
+    // Validate date
+    if (date && (date < 1 || date > 31)) {
+      return res.status(400).json({
+        success: false,
+        message: "Date must be between 1 and 31",
+      });
+    }
+
+    // Validate date dependencies
+    if (month && !year) {
+      return res.status(400).json({
+        success: false,
+        message: "Year is required when filtering by month",
+      });
+    }
+
+    if (date && (!year || !month)) {
+      return res.status(400).json({
+        success: false,
+        message: "Year and month are required when filtering by date",
+      });
+    }
+
     const result =
       await bookingService.getBookingsByCustomerIdWithSearchAndPagination(
         customerId,
         page,
         searchTerm,
-        pageLimit
+        pageSize,
+        year,
+        month,
+        date
       );
 
     return res.status(200).json({
@@ -285,6 +464,7 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
         currentPage: result.currentPage,
         totalPages: result.totalPages,
         totalItems: result.totalItems,
+        pageSize: result.pageSize,
       },
     });
   } catch (error) {
