@@ -30,4 +30,8 @@ router.delete(
 router.get("/get-all-with-hotels", placeController.getAllPlacesWithHotelCount);
 router.get("/get-by-urlprefix/:urlPrefix", placeController.getPlaceByUrlPrefix);
 
+router.get("/get-all-paginated", placeController.getAllPlacesWithPagination);
+router.get("/get-all-with-hotels-paginated", placeController.getAllPlacesWithHotelCountAndPagination);
+
+
 export default router;

@@ -28,6 +28,26 @@ const getPlaceByUrlPrefix = async (urlPrefix) => {
   return await placeRepository.getPlaceByUrlPrefix(urlPrefix);
 };
 
+const getAllPlacesWithPagination = async (page, pageSize, searchTerm) => {
+  return await placeRepository.getAllPlacesWithPagination(
+    page,
+    pageSize,
+    searchTerm
+  );
+};
+
+const getAllPlacesWithHotelCountAndPagination = async (
+  page,
+  pageSize,
+  searchTerm
+) => {
+  return await placeRepository.getAllPlacesWithHotelCountAndPagination(
+    page,
+    pageSize,
+    searchTerm
+  );
+};
+
 export default {
   createPlace,
   updatePlace,
@@ -36,4 +56,6 @@ export default {
   deletePlace,
   getAllPlacesWithHotelCount,
   getPlaceByUrlPrefix,
+  getAllPlacesWithPagination,
+  getAllPlacesWithHotelCountAndPagination,
 };

@@ -1,6 +1,9 @@
 import path from "path";
 import placeService from "../services/place.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // ✅ Create a new place
 const createPlace = async (req, res) => {
@@ -249,6 +252,106 @@ const getPlaceByUrlPrefix = async (req, res) => {
   }
 };
 
+const getAllPlacesWithPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize =
+      parseInt(req.query.size) ||
+      parseInt(process.env.PAGINATION_LIMIT) ||
+      10;
+    const searchTerm = req.query.search || "";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result = await placeService.getAllPlacesWithPagination(
+      page,
+      pageSize,
+      searchTerm
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Places retrieved successfully",
+      data: result.places,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving places:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving places",
+      error: error.message,
+    });
+  }
+};
+
+const getAllPlacesWithHotelCountAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const searchTerm = req.query.search || "";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result = await placeService.getAllPlacesWithHotelCountAndPagination(
+      page,
+      pageSize,
+      searchTerm
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Places retrieved with hotel count successfully",
+      data: result.places,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving places with hotel count:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving places with hotel count",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createPlace,
   updatePlace,
@@ -257,4 +360,6 @@ export default {
   deletePlace,
   getAllPlacesWithHotelCount,
   getPlaceByUrlPrefix,
+  getAllPlacesWithPagination,
+  getAllPlacesWithHotelCountAndPagination,
 };

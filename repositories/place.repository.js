@@ -1,5 +1,5 @@
 import { Place, Hotel } from "../models/index.js";
-import { Sequelize } from "sequelize";
+import { Sequelize, Op } from "sequelize";
 
 const createPlace = async (data) => {
   return await Place.create(data);
@@ -60,6 +60,95 @@ const getPlaceByUrlPrefix = async (urlPrefix) => {
   });
 };
 
+const getAllPlacesWithPagination = async (
+  page = 1,
+  pageSize = 10,
+  searchTerm = ""
+) => {
+  const offset = (page - 1) * pageSize;
+
+  // Build where clause for searching place name
+  const whereClause = searchTerm
+    ? {
+        name: { [Op.like]: `%${searchTerm}%` },
+      }
+    : {};
+
+  try {
+    const { count, rows } = await Place.findAndCountAll({
+      where: whereClause,
+      limit: parseInt(pageSize),
+      offset: parseInt(offset),
+      order: [["name", "ASC"]],
+    });
+
+    return {
+      places: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching places: ${error.message}`);
+  }
+};
+
+const getAllPlacesWithHotelCountAndPagination = async (
+  page = 1,
+  pageSize = 10,
+  searchTerm = ""
+) => {
+  const offset = (page - 1) * pageSize;
+
+  // Build where clause for searching place name
+  const whereClause = searchTerm
+    ? {
+        name: { [Op.like]: `%${searchTerm}%` },
+      }
+    : {};
+
+  try {
+    // First, get total count of filtered places with hotels
+    const allPlaces = await Place.findAll({
+      where: whereClause,
+      attributes: {
+        include: [
+          [Sequelize.fn("COUNT", Sequelize.col("Hotels.id")), "hotelCount"],
+        ],
+      },
+      include: [
+        {
+          model: Hotel,
+          as: "Hotels",
+          attributes: [],
+          required: false,
+        },
+      ],
+      group: ["Place.id"],
+      raw: true,
+    });
+
+    // Filter places with hotelCount > 0
+    const filteredPlaces = allPlaces.filter(
+      (place) => Number(place.hotelCount) > 0
+    );
+
+    // Apply pagination to filtered results
+    const paginatedPlaces = filteredPlaces.slice(offset, offset + pageSize);
+
+    return {
+      places: paginatedPlaces,
+      totalItems: filteredPlaces.length,
+      totalPages: Math.ceil(filteredPlaces.length / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching places with hotel count: ${error.message}`);
+  }
+};
+
 export default {
   createPlace,
   updatePlace,
@@ -68,4 +157,6 @@ export default {
   deletePlace,
   getAllPlacesWithHotelCount,
   getPlaceByUrlPrefix,
+  getAllPlacesWithPagination,
+  getAllPlacesWithHotelCountAndPagination,
 };
