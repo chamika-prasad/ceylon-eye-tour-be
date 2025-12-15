@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import packageService from "../services/package.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const getPackages = async (req, res) => {
   try {
@@ -306,6 +309,57 @@ const deletePackage = async (req, res) => {
   }
 };
 
+const getPackagesWithSearchAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize =
+      parseInt(req.query.size) ||
+      parseInt(process.env.PAGINATION_LIMIT) ||
+      10;
+    const searchTerm = req.query.search || "";
+
+    // Validation
+    if (page < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be greater than 0",
+      });
+    }
+
+    if (pageSize < 1 || pageSize > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Page size must be between 1 and 100",
+      });
+    }
+
+    const result = await packageService.getPackagesWithSearchAndPagination(
+      page,
+      pageSize,
+      searchTerm
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Packages retrieved successfully",
+      data: result.packages,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        pageSize: result.pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving packages:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving packages",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   getPackages,
   addPackage,
@@ -313,4 +367,5 @@ export default {
   getPackageByUrlPrefix,
   updatePackage,
   deletePackage,
+  getPackagesWithSearchAndPagination,
 };

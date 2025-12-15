@@ -55,6 +55,18 @@ const deletePackage = async (id) => {
   return deleted;
 };
 
+const getPackagesWithSearchAndPagination = async (
+  page,
+  pageSize,
+  searchTerm
+) => {
+  return await packageRepository.getPackagesWithSearchAndPagination(
+    page,
+    pageSize,
+    searchTerm
+  );
+};
+
 export default {
   getPackages,
   addPackage,
@@ -63,4 +75,5 @@ export default {
   updatePackageRating,
   updatePackage,
   deletePackage,
+  getPackagesWithSearchAndPagination,
 };

@@ -11,6 +11,7 @@ import {
   PackageCategory,
 } from "../models/index.js";
 import sequelize from "../config/sequelize.js";
+import { where, fn, col,Op } from "sequelize";
 
 const getPackages = async () => {
   const packages = await Package.findAll({
@@ -438,6 +439,75 @@ const getImagesByPackageId = async (packageId) => {
   });
 };
 
+const getPackagesWithSearchAndPagination = async (
+  page = 1,
+  pageSize = 10,
+  searchTerm = ""
+) => {
+  const offset = (page - 1) * pageSize;
+
+  // Build where clause for searching package title
+  const whereClause = {
+    is_deleted: false,
+    ...(searchTerm && {
+      title: { [Op.like]: `%${searchTerm}%` },
+    }),
+  };
+
+  try {
+    const { count, rows } = await Package.findAndCountAll({
+      where: whereClause,
+      attributes: { exclude: ["created_at", "updated_at"] },
+      include: [
+        {
+          model: Place,
+          as: "Places",
+          attributes: { exclude: ["created_at", "updated_at"] },
+          through: {
+            attributes: [],
+          },
+          include: [
+            {
+              model: Activity,
+              as: "Activities",
+              attributes: { exclude: ["created_at", "updated_at"] },
+              through: {
+                attributes: [],
+              },
+            },
+          ],
+        },
+        {
+          model: Category,
+          as: "Categories",
+          attributes: { exclude: ["created_at", "updated_at"] },
+          through: {
+            attributes: [],
+          },
+        },
+        {
+          model: PackageImage,
+          as: "Images",
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset: parseInt(offset),
+      distinct: true, // Prevents count from being affected by joins
+      order: [["title", "ASC"]],
+    });
+
+    return {
+      packages: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching packages: ${error.message}`);
+  }
+};
+
 export default {
   getPackages,
   addPackage,
@@ -447,4 +517,5 @@ export default {
   updatePackage,
   deletePackage,
   getImagesByPackageId,
+  getPackagesWithSearchAndPagination,
 };

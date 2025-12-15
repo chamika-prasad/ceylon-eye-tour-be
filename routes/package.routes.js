@@ -5,11 +5,7 @@ import upload from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
-router.get(
-  "/get-all",
-  // tokenMiddleware.verifyToken,
-  packageController.getPackages
-);
+router.get("/get-all", packageController.getPackages);
 
 router.get(
   "/get-by-id/:id",
@@ -22,6 +18,8 @@ router.get(
   // tokenMiddleware.verifyToken,
   packageController.getPackageByUrlPrefix
 );
+
+router.get("/get-all-paginated", packageController.getPackagesWithSearchAndPagination);
 
 router.post(
   "/add",
