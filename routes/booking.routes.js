@@ -21,6 +21,7 @@ router.get(
   "/paginate-customer/:customerId",
   bookingController.getBookingsByCustomerIdWithSearchAndPagination
 );
+router.get("/calendar", bookingController.getAllBookingsForCalendar);
 router.put(
   "/:bookingId/status",
   tokenMiddleware.verifyToken,

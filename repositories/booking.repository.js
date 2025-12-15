@@ -124,130 +124,6 @@ const deleteBooking = async (bookingId) => {
   );
 };
 
-// const getAllBookingsWithSearchAndPagination = async (
-//   page = 1,
-//   searchTerm = "",
-//   limit = 10
-// ) => {
-//   const offset = (page - 1) * limit;
-
-//   // Build where clause for searching across related tables
-//   const whereClause = searchTerm
-//     ? {
-//         [Op.or]: [
-//           // Search in User name
-//           { "$User.name$": { [Op.like]: `%${searchTerm}%` } },
-//           // Search in Package title
-//           { "$Package.title$": { [Op.like]: `%${searchTerm}%` } },
-//           // Search in CustomPackage message
-//           { "$CustomPackage.message$": { [Op.like]: `%${searchTerm}%` } },
-//         ],
-//       }
-//     : {};
-
-//   const { count, rows } = await Booking.findAndCountAll({
-//     where: whereClause,
-//     include: [
-//       {
-//         model: Package,
-//         as: "Package",
-//         attributes: ["title", "price", "duration"],
-//       },
-//       {
-//         model: CustomizePackage,
-//         as: "CustomPackage",
-//         attributes: ["message", "price", "required_day_count"],
-//       },
-//       {
-//         model: User,
-//         as: "User",
-//         attributes: ["name", "email", "passport", "country"],
-//       },
-//       {
-//         model: Review,
-//         as: "Review",
-//         attributes: ["rating", "review"],
-//       },
-//       {
-//         model: Payment,
-//         as: "Payment",
-//         attributes: ["id", "payment_id", "amount", "status"],
-//       },
-//     ],
-//     limit: parseInt(limit),
-//     offset: parseInt(offset),
-//     distinct: true, // Important: prevents count from being affected by joins
-//     order: [["created_at", "DESC"]],
-//   });
-
-//   return {
-//     bookings: rows,
-//     totalItems: count,
-//     totalPages: Math.ceil(count / limit),
-//     currentPage: parseInt(page),
-//   };
-// };
-
-// const getBookingsByCustomerIdWithSearchAndPagination = async (
-//   customerId,
-//   page = 1,
-//   searchTerm = "",
-//   limit = 10
-// ) => {
-//   const offset = (page - 1) * limit;
-
-//   // Build where clause combining customer filter with search
-//   const whereClause = {
-//     customer_id: customerId,
-//     is_deleted: false,
-//     ...(searchTerm && {
-//       [Op.or]: [
-//         // Search in Package title
-//         { "$Package.title$": { [Op.like]: `%${searchTerm}%` } },
-//         // Search in CustomPackage message
-//         { "$CustomPackage.message$": { [Op.like]: `%${searchTerm}%` } },
-//       ],
-//     }),
-//   };
-
-//   const { count, rows } = await Booking.findAndCountAll({
-//     where: whereClause,
-//     include: [
-//       {
-//         model: Package,
-//         as: "Package",
-//         attributes: ["title", "price", "duration"],
-//       },
-//       {
-//         model: Review,
-//         as: "Review",
-//         attributes: ["rating", "review"],
-//       },
-//       {
-//         model: CustomizePackage,
-//         as: "CustomPackage",
-//         attributes: ["message", "price", "required_day_count"],
-//       },
-//       {
-//         model: Payment,
-//         as: "Payment",
-//         attributes: ["id", "payment_id", "amount", "status"],
-//       },
-//     ],
-//     limit: parseInt(limit),
-//     offset: parseInt(offset),
-//     distinct: true, // Prevents count from being affected by joins
-//     order: [["created_at", "DESC"]],
-//   });
-
-//   return {
-//     bookings: rows,
-//     totalItems: count,
-//     totalPages: Math.ceil(count / limit),
-//     currentPage: parseInt(page),
-//   };
-// };
-
 const getAllBookingsWithSearchAndPagination = async (
   page = 1,
   searchTerm = "",
@@ -449,6 +325,63 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
   };
 };
 
+const getAllBookingsForCalender = async (year = null, month = null) => {
+  // Build where clause for searching across related tables
+  const whereClause = {};
+
+  // Add date filters
+  if (year) {
+    if (month) {
+      const startOfMonth = `${year}-${String(month).padStart(2, "0")}-01`;
+      const endOfMonth = new Date(year, month, 0).getDate();
+      const endOfMonthDate = `${year}-${String(month).padStart(
+        2,
+        "0"
+      )}-${String(endOfMonth).padStart(2, "0")}`;
+      whereClause.start_date = {
+        [Op.between]: [startOfMonth, endOfMonthDate],
+      };
+    }
+  }
+
+  return await Booking.findAll({
+    where: whereClause,
+    attributes: {
+      exclude: [
+        "adult_count",
+        "child_count",
+        "message",
+        "is_deleted",
+        "updated_at",
+        "package_id",
+        "custom_package_id",
+        "customer_id",
+        "created_at",
+      ],
+    },
+    include: [
+      {
+        model: Package,
+        as: "Package",
+        attributes: ["title"],
+      },
+      {
+        model: CustomizePackage,
+        as: "CustomPackage",
+        attributes: ["message"],
+      },
+      {
+        model: User,
+        as: "User",
+        attributes: ["name", "country"],
+      },
+    ],
+    distinct: true,
+    subQuery: false, // Important for $ notation in where clause
+    order: [["created_at", "DESC"]],
+  });
+};
+
 export default {
   getAllBookings,
   getBookingsByCustomerId,
@@ -459,4 +392,5 @@ export default {
   deleteBooking,
   getBookingById,
   updateBooking,
+  getAllBookingsForCalender,
 };

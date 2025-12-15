@@ -476,6 +476,55 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
   }
 };
 
+const getAllBookingsForCalendar = async (req, res) => {
+  try {
+    const year = req.query.year ? parseInt(req.query.year) : null;
+    const month = req.query.month ? parseInt(req.query.month) : null;
+
+    // Validate month and year
+    if (!month || !year) {
+      return res.status(400).json({
+        success: false,
+        message: "Year and month are required",
+      });
+    }
+
+    // Validate year
+    if (year && (year < 1900 || year > 2100)) {
+      return res.status(400).json({
+        success: false,
+        message: "Year must be between 1900 and 2100",
+      });
+    }
+
+    // Validate month
+    if (month && (month < 1 || month > 12)) {
+      return res.status(400).json({
+        success: false,
+        message: "Month must be between 1 and 12",
+      });
+    }
+
+    const bookings = await bookingService.getAllBookingsForCalendar(
+      year,
+      month
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Bookings for calendar retrieved successfully",
+      data: bookings,
+    });
+  } catch (error) {
+    console.error("Error fetching bookings for calendar:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   getAllBookings,
   getBookingsByCustomerId,
@@ -485,4 +534,5 @@ export default {
   updateBooking,
   getBookingsByCustomerIdWithSearchAndPagination,
   getAllBookingsWithSearchAndPagination,
+  getAllBookingsForCalendar,
 };

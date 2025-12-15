@@ -111,6 +111,10 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
   );
 };
 
+const getAllBookingsForCalendar = async (year, month) => {
+  return await bookingRepository.getAllBookingsForCalender(year, month);
+};
+
 export default {
   getAllBookings,
   getBookingsByCustomerId,
@@ -121,4 +125,5 @@ export default {
   updateBooking,
   getAllBookingsWithSearchAndPagination,
   getBookingsByCustomerIdWithSearchAndPagination,
+  getAllBookingsForCalendar,
 };
