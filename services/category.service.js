@@ -1,5 +1,6 @@
 import categoryRepository from "../repositories/category.repository.js";
 import fileUploadService from "./fileUpload.service.js";
+import packageRepository from "../repositories/package.repository.js";
 
 const createCategory = async (data) => {
   const newCategory = await categoryRepository.createCategory(data);
@@ -64,6 +65,54 @@ const getCategoriesWithSearchAndPagination = async (
   );
 };
 
+const getCategoryByUrlPrefixWithSearchAndPagination = async (
+  urlPrefix,
+  tourType,
+  searchTerm = "",
+  page = 1,
+  limit = 10
+) => {
+  const result = await categoryRepository.getCategoryByUrlPrefix(
+    urlPrefix,
+    tourType
+  );
+  // var packages = result ? [...result.Packages] : [];
+  // const filteredPackages = searchTerm
+  //   ? packages.filter((pkg) =>
+  //       pkg.title.toLowerCase().includes(searchTerm.toLowerCase())
+  //     )
+  //   : packages;
+  // const count = filteredPackages.length;
+  // const totalPages = Math.ceil(count / limit);
+  // const offset = (page - 1) * limit;
+  // const paginatedPackages = filteredPackages.slice(offset, offset + limit);
+  // return {
+  //   category: { ...result, Packages: paginatedPackages },
+  //   currentPage: page,
+  //   totalPages: totalPages,
+  //   totalItems: count,
+  // };
+
+  const packages =
+    await packageRepository.getPackagesByCategoryIdWithSearchAndPagination(
+      result.id,
+      page,
+      limit,
+      searchTerm
+    );
+
+  const finalResult = {
+    category: {
+      ...result.toJSON(),
+      Packages: packages.packages,
+    },
+    currentPage: packages.currentPage,
+    totalPages: packages.totalPages,
+    totalItems: packages.totalItems,
+  };
+  return finalResult;
+};
+
 export default {
   createCategory,
   updateCategory,
@@ -72,4 +121,5 @@ export default {
   getCategoryById,
   getCategoryByUrlPrefix,
   getCategoriesWithSearchAndPagination,
+  getCategoryByUrlPrefixWithSearchAndPagination,
 };

@@ -299,6 +299,49 @@ const getCategoriesWithSearchAndPagination = async (req, res) => {
   }
 };
 
+const getCategoryByUrlPrefixWithSearchAndPagination = async (req, res) => {
+  const { urlPrefix } = req.params;
+  const { tourType } = req.query;
+  const page = parseInt(req.query.page) || 1;
+  const searchTerm = req.query.search || "";
+  const pageLimit = parseInt(req.query.size) || limit;
+
+  try {
+    const category =
+      await categoryService.getCategoryByUrlPrefixWithSearchAndPagination(
+        urlPrefix,
+        Number(tourType),
+        searchTerm,
+        page,
+        pageLimit
+      );
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Category retrieved successfully",
+      data: category.category,
+      pagination: {
+        currentPage: category.currentPage,
+        totalPages: category.totalPages,
+        totalItems: category.totalItems,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving Category by urlprefix",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   getCategories,
   createCategory,
@@ -307,4 +350,5 @@ export default {
   getCategoryById,
   getCategoryByUrlPrefix,
   getCategoriesWithSearchAndPagination,
+  getCategoryByUrlPrefixWithSearchAndPagination,
 };

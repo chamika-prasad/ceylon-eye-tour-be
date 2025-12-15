@@ -112,6 +112,40 @@ const getCategoryByUrlPrefix = async (urlPrefix, tourType) => {
   }
 };
 
+const getCategoryByUrlPrefixWithSearchAndPagination = async (
+  urlPrefix,
+  tourType,
+  page = 1,
+  searchTerm = "",
+  limit = 10
+) => {
+  const isTourTypeValid = tourType === 0 || tourType === 1;
+  try {
+    const category = await Category.findOne({
+      where: { url_prefix: urlPrefix },
+      include: {
+        model: Package,
+        as: "Packages",
+        where: isTourTypeValid ? { tour_type: tourType } : undefined,
+        through: { attributes: [] },
+        include: {
+          model: PackageImage,
+          as: "Images",
+        },
+        required: false,
+      },
+    });
+
+    if (!category) return null;
+
+    return category;
+  } catch (error) {
+    throw new Error(
+      "Failed to fetch packages by category ID: " + error.message
+    );
+  }
+};
+
 const getCategoriesWithSearchAndPagination = async (
   page = 1,
   searchTerm = "",

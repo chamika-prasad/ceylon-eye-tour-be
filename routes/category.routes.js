@@ -20,6 +20,12 @@ router.get(
 );
 
 router.get(
+  "/get-by-urlprefix-paginated/:urlPrefix",
+  // tokenMiddleware.verifyToken,
+  categoryController.getCategoryByUrlPrefixWithSearchAndPagination
+);
+
+router.get(
   "/get-all-with-pagination",
   tokenMiddleware.verifyUser,
   categoryController.getCategoriesWithSearchAndPagination

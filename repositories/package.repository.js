@@ -11,7 +11,7 @@ import {
   PackageCategory,
 } from "../models/index.js";
 import sequelize from "../config/sequelize.js";
-import { where, fn, col,Op } from "sequelize";
+import { where, fn, col, Op } from "sequelize";
 
 const getPackages = async () => {
   const packages = await Package.findAll({
@@ -508,6 +508,70 @@ const getPackagesWithSearchAndPagination = async (
   }
 };
 
+const getPackagesByCategoryIdWithSearchAndPagination = async (
+  id,
+  page = 1,
+  pageSize = 10,
+  searchTerm = ""
+) => {
+  const offset = (page - 1) * pageSize;
+
+  // Build where clause for searching package title
+  const whereClause = {
+    is_deleted: false,
+    ...(searchTerm && {
+      title: { [Op.like]: `%${searchTerm}%` },
+    }),
+  };
+  const { count, rows: packages } = await Package.findAndCountAll({
+    where: whereClause,
+    attributes: {
+      exclude: [
+        "created_at",
+        "updated_at",
+        "description",
+        "package_highlights",
+        "excludes",
+        "includes",
+        "departure_location",
+        "departure_description",
+        "arrival_location",
+        "arrival_description",
+        "user_count",
+        "is_deleted",
+        "tour_type"
+      ],
+    },
+    include: [
+      {
+        model: PackageImage,
+        as: "Images",
+        // attributes: ["id", "image_url", "alt_text"],
+      },
+      {
+        model: Category,
+        as: "Categories",
+        where: { id },
+        through: { attributes: [] },
+        required: true, // This ensures INNER JOIN - only packages with this category
+        attributes: [],
+      },
+    ],
+    limit: parseInt(pageSize),
+    offset: parseInt(offset),
+    order: [["title", "ASC"]],
+    distinct: true,
+  });
+
+  return {
+    packages: packages,
+    totalItems: count,
+    totalPages: Math.ceil(count / pageSize),
+    currentPage: parseInt(page),
+    pageSize: parseInt(pageSize),
+  };
+};
+
 export default {
   getPackages,
   addPackage,
@@ -518,4 +582,5 @@ export default {
   deletePackage,
   getImagesByPackageId,
   getPackagesWithSearchAndPagination,
+  getPackagesByCategoryIdWithSearchAndPagination,
 };
