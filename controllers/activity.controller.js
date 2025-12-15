@@ -1,6 +1,11 @@
 import path from "path";
 import activityService from "../services/activity.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const limit = process.env.PAGINATION_LIMIT || 10;
 
 const createActivity = async (req, res) => {
   try {
@@ -140,6 +145,7 @@ const getAllActivitiesWithSearchAndPagination = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const searchName = req.query.name || "";
+    const pageLimit = parseInt(req.query.size) || limit;
 
     // Validation
     if (page < 1) {
@@ -152,7 +158,8 @@ const getAllActivitiesWithSearchAndPagination = async (req, res) => {
     const result =
       await activityService.getAllActivitiesWithSearchAndPagination(
         page,
-        searchName
+        searchName,
+        pageLimit
       );
 
     return res.status(200).json({

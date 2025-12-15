@@ -26,12 +26,13 @@ const getActivityByName = async (name) => {
 
 const getAllActivitiesWithSearchAndPagination = async (
   page,
-  limit,
-  searchName
+  searchName,
+  limit
 ) => {
   return await activityRepository.getAllActivitiesWithSearchAndPagination(
     page,
-    searchName
+    searchName,
+    limit
   );
 };
 

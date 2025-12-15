@@ -1,10 +1,5 @@
-import dotenv from "dotenv";
 import { Activity } from "./../models/index.js";
 import { where, fn, col,Op } from "sequelize";
-
-dotenv.config();
-
-const limit = process.env.PAGINATION_LIMIT || 10;
 
 
 const createActivity = async (data) => {
@@ -37,7 +32,7 @@ const getActivityByName = async (name) => {
   });
 };
 
-const getAllActivitiesWithSearchAndPagination = async (page = 1, searchName = '') => {
+const getAllActivitiesWithSearchAndPagination = async (page = 1, searchName = '',limit=10) => {
     const offset = (page - 1) * limit;
   
   const whereClause = searchName 
