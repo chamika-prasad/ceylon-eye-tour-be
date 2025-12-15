@@ -405,9 +405,8 @@ const getAllHotelsWithPagination = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize =
-      parseInt(req.query.size) ||
-      parseInt(process.env.PAGINATION_LIMIT) ||
-      10;
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const searchTerm = req.query.search || "";
 
     // Validation
     if (page < 1) {
@@ -426,7 +425,8 @@ const getAllHotelsWithPagination = async (req, res) => {
 
     const result = await hotelService.getAllHotelsWithPagination(
       page,
-      pageSize
+      pageSize,
+      searchTerm
     );
 
     return res.status(200).json({
@@ -455,9 +455,8 @@ const getHotelsByPlaceIdWithPagination = async (req, res) => {
     const { placeId } = req.params;
     const page = parseInt(req.query.page) || 1;
     const pageSize =
-      parseInt(req.query.size) ||
-      parseInt(process.env.PAGINATION_LIMIT) ||
-      10;
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const searchTerm = req.query.search || "";
 
     // Validation
     if (page < 1) {
@@ -484,7 +483,8 @@ const getHotelsByPlaceIdWithPagination = async (req, res) => {
     const result = await hotelService.getHotelsByPlaceIdWithPagination(
       placeId,
       page,
-      pageSize
+      pageSize,
+      searchTerm
     );
 
     if (result.totalItems === 0) {

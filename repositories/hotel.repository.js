@@ -1,4 +1,5 @@
 import { Hotel, Place } from "../models/index.js";
+import { Op } from "sequelize";
 
 const createHotel = async (data) => {
   try {
@@ -89,11 +90,23 @@ const getHotelByPrefix = async (prefix) => {
   }
 };
 
-const getAllHotelsWithPagination = async (page = 1, pageSize = 10) => {
+const getAllHotelsWithPagination = async (
+  page = 1,
+  pageSize = 10,
+  searchTerm = ""
+) => {
   const offset = (page - 1) * pageSize;
+
+  // Build where clause for searching hotel name
+  const whereClause = searchTerm
+    ? {
+        name: { [Op.like]: `%${searchTerm}%` },
+      }
+    : {};
 
   try {
     const { count, rows } = await Hotel.findAndCountAll({
+      where: whereClause,
       include: [
         {
           model: Place,
@@ -121,13 +134,22 @@ const getAllHotelsWithPagination = async (page = 1, pageSize = 10) => {
 const getHotelsByPlaceIdWithPagination = async (
   placeId,
   page = 1,
-  pageSize = 10
+  pageSize = 10,
+  searchTerm = ""
 ) => {
   const offset = (page - 1) * pageSize;
 
+  // Build where clause combining place_id filter with search
+  const whereClause = {
+    place_id: placeId,
+    ...(searchTerm && {
+      name: { [Op.like]: `%${searchTerm}%` },
+    }),
+  };
+
   try {
     const { count, rows } = await Hotel.findAndCountAll({
-      where: { place_id: placeId },
+      where: whereClause,
       include: [
         {
           model: Place,

@@ -76,10 +76,11 @@ const getHotelByPrefix = async (prefix) => {
   return formattedHotel;
 };
 
-const getAllHotelsWithPagination = async (page, pageSize) => {
+const getAllHotelsWithPagination = async (page, pageSize, searchTerm) => {
   const result = await hotelRepository.getAllHotelsWithPagination(
     page,
-    pageSize
+    pageSize,
+    searchTerm
   );
 
   // Convert rooms_details into array
@@ -99,11 +100,17 @@ const getAllHotelsWithPagination = async (page, pageSize) => {
   };
 };
 
-const getHotelsByPlaceIdWithPagination = async (placeId, page, pageSize) => {
+const getHotelsByPlaceIdWithPagination = async (
+  placeId,
+  page,
+  pageSize,
+  searchTerm
+) => {
   const result = await hotelRepository.getHotelsByPlaceIdWithPagination(
     placeId,
     page,
-    pageSize
+    pageSize,
+    searchTerm
   );
 
   if (!result.hotels || result.hotels.length === 0) {
