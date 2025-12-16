@@ -76,26 +76,10 @@ const getCategoryByUrlPrefixWithSearchAndPagination = async (
     urlPrefix,
     tourType
   );
-  // var packages = result ? [...result.Packages] : [];
-  // const filteredPackages = searchTerm
-  //   ? packages.filter((pkg) =>
-  //       pkg.title.toLowerCase().includes(searchTerm.toLowerCase())
-  //     )
-  //   : packages;
-  // const count = filteredPackages.length;
-  // const totalPages = Math.ceil(count / limit);
-  // const offset = (page - 1) * limit;
-  // const paginatedPackages = filteredPackages.slice(offset, offset + limit);
-  // return {
-  //   category: { ...result, Packages: paginatedPackages },
-  //   currentPage: page,
-  //   totalPages: totalPages,
-  //   totalItems: count,
-  // };
-
   const packages =
     await packageRepository.getPackagesByCategoryIdWithSearchAndPagination(
       result.id,
+      tourType,
       page,
       limit,
       searchTerm

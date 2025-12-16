@@ -510,11 +510,13 @@ const getPackagesWithSearchAndPagination = async (
 
 const getPackagesByCategoryIdWithSearchAndPagination = async (
   id,
+  tourType,
   page = 1,
   pageSize = 10,
   searchTerm = ""
 ) => {
   const offset = (page - 1) * pageSize;
+  const isTourTypeValid = tourType === 0 || tourType === 1;
 
   // Build where clause for searching package title
   const whereClause = {
@@ -522,6 +524,7 @@ const getPackagesByCategoryIdWithSearchAndPagination = async (
     ...(searchTerm && {
       title: { [Op.like]: `%${searchTerm}%` },
     }),
+    ...(isTourTypeValid && { tour_type: tourType })
   };
   const { count, rows: packages } = await Package.findAndCountAll({
     where: whereClause,
@@ -539,7 +542,7 @@ const getPackagesByCategoryIdWithSearchAndPagination = async (
         "arrival_description",
         "user_count",
         "is_deleted",
-        "tour_type"
+        "tour_type",
       ],
     },
     include: [
