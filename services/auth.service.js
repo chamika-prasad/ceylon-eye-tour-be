@@ -39,4 +39,5 @@ export default {
   getUserById,
   updateTempPassword,
   resetPassword,
+  getAdminId,
 };
