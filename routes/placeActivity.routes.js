@@ -14,6 +14,10 @@ router.post(
 );
 
 router.get("/grouped", placeActivityController.getGroupedByPlace);
+router.get(
+  "/grouped-paginated",
+  placeActivityController.getAllGroupedByPlaceWithSearchAndPagination
+);
 
 router.put(
   "/:place_id/:activity_id",

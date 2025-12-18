@@ -2,6 +2,9 @@ import fs from "fs";
 import path from "path";
 import placeActivityService from "../services/placeActivity.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const createPlaceActivitiy = async (req, res) => {
   try {
@@ -173,9 +176,42 @@ const deletePlaceActivity = async (req, res) => {
   }
 };
 
+const getAllGroupedByPlaceWithSearchAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const searchTerm = req.query.search || "";
+    const pageSize =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+
+    const result =
+      await placeActivityService.getAllGroupedByPlaceWithSearchAndPagination(
+        searchTerm,
+        page,
+        pageSize
+      );
+    return res.status(200).json({
+      success: true,
+      message: "Place activities retrieved successfully",
+      data:result.places,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving place activities",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   getGroupedByPlace,
   updatePlaceActivity,
   deletePlaceActivity,
   createPlaceActivitiy,
+  getAllGroupedByPlaceWithSearchAndPagination,
 };

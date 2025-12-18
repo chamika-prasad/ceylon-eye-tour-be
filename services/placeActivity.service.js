@@ -12,6 +12,36 @@ const getAllGroupedByPlace = async () => {
   return await placeActivityRepository.fetchGroupedByPlace();
 };
 
+const getAllGroupedByPlaceWithSearchAndPagination = async (
+  search,
+  page,
+  limit
+) => {
+  const places = await placeActivityRepository.fetchGroupedByPlace();
+  // Filter based on search term
+  let filteredPlaces = places;
+  if (search) {
+    const lowerSearch = search.toLowerCase();
+    filteredPlaces = places.filter((place) =>
+      place.placeDetails.name.toLowerCase().includes(lowerSearch)
+    );
+  }
+  // Pagination
+  const totalItems = filteredPlaces.length;
+  const totalPages = Math.ceil(totalItems / limit);
+  const offset = (page - 1) * limit;
+  const paginatedCategories = filteredPlaces.slice(
+    offset,
+    offset + parseInt(limit)
+  );
+  return {
+    places: paginatedCategories,
+    totalItems: totalItems,
+    totalPages: totalPages,
+    currentPage: parseInt(page),
+  };
+};
+
 const updatePlaceActivity = async (place_id, activity_id, updatedData) => {
   return await placeActivityRepository.update(
     place_id,
@@ -30,4 +60,5 @@ export default {
   deletePlaceActivity,
   create,
   getByPlaceIdAndActivityId,
+  getAllGroupedByPlaceWithSearchAndPagination,
 };
