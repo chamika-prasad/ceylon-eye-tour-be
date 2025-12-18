@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import messageService from "./../services/message.service.js";
+import authService from "./../services/auth.service.js";
 
 const users = {};
 
@@ -75,6 +76,10 @@ export const initializeSocket = (server, frontEndUrl) => {
       try {
         const { senderId, receiverId } = data;
 
+        if(!receiverId){
+          const adminId = await authService.getAdminId();
+          receiverId = adminId;
+        }
         // Find recipient user
         const recipient = users[receiverId];
 
