@@ -86,7 +86,6 @@ export const initializeSocket = (server, frontEndUrl) => {
         if (recipient) {
           io.to(recipient.socketId).emit("messageReceived", {
             from: senderId,
-            message,
           });
         }
 
