@@ -5,9 +5,11 @@ import authService from "../services/auth.service.js";
 const addMessage = async (req, res) => {
   try {
     const { receiverId, message } = req.body;
+    console.log(req.user);
+    
     const { userId, role } = req.user;
 
-    if ((!receiverId && roll === "admin") || !message) {
+    if ((!receiverId && role === "admin") || !message) {
       return res.status(400).json({
         success: false,
         message: "Receiver, and message are required",
