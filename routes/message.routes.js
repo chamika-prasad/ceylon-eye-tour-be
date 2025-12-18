@@ -10,10 +10,22 @@ router.post("/add", tokenMiddleware.verifyToken, messageController.addMessage);
 // Get all messages where user_id = userId (order by created_at)
 router.get("/", tokenMiddleware.verifyToken, messageController.getMessages);
 
-router.put("/:id", tokenMiddleware.verifyToken, messageController.updateMessage);
+//Get unread count
+router.get(
+  "/unread-count",
+  tokenMiddleware.verifyToken,
+  messageController.getUserUnredMessageCount
+);
+
+router.put(
+  "/:id",
+  tokenMiddleware.verifyToken,
+  messageController.updateMessage
+);
 
 // Get all messages for a specific user by userId (admin only)
-router.get("/get-by-id/:userId",
+router.get(
+  "/get-by-id/:userId",
   tokenMiddleware.verifyToken,
   tokenMiddleware.authorizeAdmin,
   messageController.getMessagesByUserId
@@ -26,6 +38,13 @@ router.get(
   tokenMiddleware.verifyToken,
   tokenMiddleware.authorizeAdmin,
   messageController.getGroupedMessages
+);
+
+// Mark messages as read for the authenticated user
+router.patch(
+  "/mark-as-read",
+  tokenMiddleware.verifyToken,
+  messageController.markMessagesAsRead
 );
 
 export default router;

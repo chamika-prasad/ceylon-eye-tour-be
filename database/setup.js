@@ -263,7 +263,7 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
-`ALTER TABLE users ADD COLUMN passport VARCHAR(255) NOT NULL DEFAULT 'testpasport';`
+`ALTER TABLE messages ADD COLUMN is_read BOOL NOT NULL DEFAULT 0;`
 ];
 
 async function setupDatabase() {

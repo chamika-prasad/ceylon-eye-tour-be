@@ -14,10 +14,10 @@ const addMessage = async (req, res) => {
       });
     }
 
-    if(role !== "admin") {
+    if (role !== "admin") {
       const adminId = await authService.getAdminId();
       console.log("admin id : ", adminId);
-      
+
       if (!adminId) {
         return res.status(500).json({
           success: false,
@@ -123,7 +123,8 @@ const getMessagesByUserId = async (req, res) => {
 // ✅ Get grouped messages (latest message per user)
 const getGroupedMessages = async (req, res) => {
   try {
-    const groupedMessages = await messageService.getGroupedMessages();
+    const { userId } = req.user;
+    const groupedMessages = await messageService.getGroupedMessages(userId);
 
     return res.status(200).json({
       success: true,
@@ -139,10 +140,48 @@ const getGroupedMessages = async (req, res) => {
   }
 };
 
+const markMessagesAsRead = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    await messageService.markMessagesAsRead(userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Messages marked as read successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error marking messages as read",
+      error: error.message,
+    });
+  }
+};
+
+const getUserUnredMessageCount = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const unreadCount = await messageService.getUserUnredMessageCount(userId);
+    return res.status(200).json({
+      success: true,
+      message: "Unread message count retrieved successfully",
+      data: { unreadCount },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving unread message count",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   addMessage,
   getMessages,
   getGroupedMessages,
   getMessagesByUserId,
   updateMessage,
+  markMessagesAsRead,
+  getUserUnredMessageCount,
 };

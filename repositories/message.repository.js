@@ -9,7 +9,7 @@ const addMessage = async (messageData) => {
   });
 };
 
-const updateMessage = async (id,data) => {
+const updateMessage = async (id, data) => {
   return await Message.update(data, {
     where: { id },
   });
@@ -36,20 +36,39 @@ const getMessagesGroupedByUser = async () => {
         attributes: ["id", "name"], // Include customer name and id
       },
     ],
-    order: [['created_at', 'DESC']]
+    order: [["created_at", "DESC"]],
   });
 
-  const uniqueSenders = [];
-  const userIds = new Set();
+  return latestMessages;
+};
 
-  for (const msg of latestMessages) {
-    if (!userIds.has(msg.user.id)) {
-      userIds.add(msg.user.id);
-      uniqueSenders.push(msg);
-    }
-  }
+const markMessagesAsRead = async (receiverId) => {
+  return await Message.update(
+    { is_read: true },
+    { where: { receiver_id: receiverId, is_read: false } }
+  );
+};
 
-  return uniqueSenders;
+const countUnreadMessagesFromSenderToReceiver = async (
+  senderId,
+  receiverId
+) => {
+  return await Message.count({
+    where: {
+      sender_id: senderId,
+      receiver_id: receiverId,
+      is_read: false,
+    },
+  });
+};
+
+const getUserUnredMessageCount = async (userId) => {
+  return await Message.count({
+    where: {
+      receiver_id: userId,
+      is_read: false,
+    },
+  });
 };
 
 export default {
@@ -58,4 +77,7 @@ export default {
   getMessageById,
   getMessagesByUser,
   getMessagesGroupedByUser,
+  markMessagesAsRead,
+  countUnreadMessagesFromSenderToReceiver,
+  getUserUnredMessageCount,
 };
