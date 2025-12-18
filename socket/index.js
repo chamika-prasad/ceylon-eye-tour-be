@@ -90,7 +90,7 @@ export const initializeSocket = (server, frontEndUrl) => {
         }
 
         // ✅ Send confirmation back to sender
-        socket.emit("messageSent", newMessage);
+        socket.emit("messageSent"," Message delivered");
 
         console.log(`Message sent from ${senderId} to ${receiverId}`);
       } catch (error) {
