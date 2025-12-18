@@ -5,11 +5,10 @@ import authService from "../services/auth.service.js";
 const addMessage = async (req, res) => {
   try {
     const { receiverId, message } = req.body;
-    console.log(req.user);
-    
     const { userId, role } = req.user;
+    var updatedReceiverId = receiverId;
 
-    if ((!receiverId && role === "admin") || !message) {
+    if ((!updatedReceiverId && role === "admin") || !message) {
       return res.status(400).json({
         success: false,
         message: "Receiver, and message are required",
@@ -18,7 +17,6 @@ const addMessage = async (req, res) => {
 
     if (role !== "admin") {
       const adminId = await authService.getAdminId();
-      console.log("admin id : ", adminId);
 
       if (!adminId) {
         return res.status(500).json({
@@ -26,14 +24,14 @@ const addMessage = async (req, res) => {
           message: "Admin user not found",
         });
       }
-      receiverId = adminId;
+      updatedReceiverId = adminId;
     }
 
     const newMessage = await messageService.createMessage({
       senderId: userId,
-      receiverId,
+      receiverId: updatedReceiverId,
       message,
-      userId: role === "admin" ? receiverId : userId,
+      userId: role === "admin" ? updatedReceiverId : userId,
     });
 
     return res.status(201).json({

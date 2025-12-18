@@ -75,13 +75,14 @@ export const initializeSocket = (server, frontEndUrl) => {
     socket.on("sendNewMessage", async (data) => {
       try {
         const { senderId, receiverId } = data;
+        var updatedReceiverId = receiverId;
 
-        if(!receiverId){
+        if (!updatedReceiverId) {
           const adminId = await authService.getAdminId();
-          receiverId = adminId;
+          updatedReceiverId = adminId;
         }
         // Find recipient user
-        const recipient = users[receiverId];
+        const recipient = users[updatedReceiverId];
 
         if (recipient) {
           io.to(recipient.socketId).emit("messageReceived", {
@@ -90,9 +91,7 @@ export const initializeSocket = (server, frontEndUrl) => {
         }
 
         // ✅ Send confirmation back to sender
-        socket.emit("messageSent"," Message delivered");
-
-        console.log(`Message sent from ${senderId} to ${receiverId}`);
+        socket.emit("messageSent", " Message delivered");
       } catch (error) {
         console.error("Error sending message:", error.message);
         socket.emit("error", { message: "Failed to send message" });
