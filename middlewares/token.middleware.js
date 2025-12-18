@@ -25,9 +25,7 @@ const verifyToken = (req, res, next) => {
     const decoded = decodeToken(splitToken[1]);
 
     if (!decoded.success) {
-      return res
-        .status(401)
-        .json({ success: false, message: decoded.message });
+      return res.status(401).json({ success: false, message: decoded.message });
     }
 
     req.user = decoded.data;
@@ -49,27 +47,21 @@ const authorizeAdmin = (req, res, next) => {
 
 const verifyUser = (req, res, next) => {
   const token = req.headers["authorization"];
-
   if (!token) {
     req.user = null;
-  }
-  else {
+  } else {
     const splitToken = token.split(" ");
     // Check if the token is in the correct format (Bearer <token>)
     if (splitToken.length !== 2 || splitToken[0] !== "Bearer") {
       req.user = null;
     }
     try {
-      // const decoded = jwt.verify(splitToken[1], process.env.JWT_SECRET_KEY);
       const decoded = decodeToken(splitToken[1]);
-
       if (!decoded.success) {
         req.user = null;
-        next();
+      } else {
+        req.user = decoded.data;
       }
-
-      req.user = decoded.data;
-
     } catch (error) {
       req.user = null;
     }

@@ -25,6 +25,11 @@ const Message = sequelize.define(
       type: DataTypes.STRING(36),
       allowNull: false,
     },
+    is_read: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     tableName: "messages",

@@ -74,6 +74,11 @@ const updateProfile = async (userId, userData) => {
   });
 };
 
+const getAdminId = async () => {
+  const admin = await User.findOne({ where: { role: "admin" } });
+  return admin ? admin.id : null;
+};
+
 export default {
   register,
   getUserById,
@@ -81,4 +86,5 @@ export default {
   updateProfile,
   updateTempPassword,
   resetPassword,
+  getAdminId,
 };

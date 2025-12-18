@@ -56,13 +56,36 @@ const getCategoriesWithSearchAndPagination = async (
   isAdmin,
   limit
 ) => {
-  return await categoryRepository.getCategoriesWithSearchAndPagination(
-    page,
-    searchTerm,
-    tourType,
-    isAdmin,
-    limit
+  // return await categoryRepository.getCategoriesWithSearchAndPagination(
+  //   page,
+  //   searchTerm,
+  //   tourType,
+  //   isAdmin,
+  //   limit
+  // );
+
+  const categories = await categoryRepository.getCategories(tourType, isAdmin);
+
+  let filteredCategories = categories;
+  if (searchTerm) {
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    filteredCategories = categories.filter((category) =>
+      category.name.toLowerCase().includes(lowerSearchTerm)
+    );
+  }
+  const totalItems = filteredCategories.length;
+  const totalPages = Math.ceil(totalItems / limit);
+  const offset = (page - 1) * limit;
+  const paginatedCategories = filteredCategories.slice(
+    offset,
+    offset + parseInt(limit)
   );
+  return {
+    categories: paginatedCategories,
+    totalItems: totalItems,
+    totalPages: totalPages,
+    currentPage: parseInt(page),
+  };
 };
 
 const getCategoryByUrlPrefixWithSearchAndPagination = async (

@@ -28,6 +28,10 @@ const resetPassword = async (email, password) => {
   return await authRepository.resetPassword(email, password);
 };
 
+const getAdminId = async () => {
+  return await authRepository.getAdminId();
+};
+
 export default {
   register,
   getUserByEmail,

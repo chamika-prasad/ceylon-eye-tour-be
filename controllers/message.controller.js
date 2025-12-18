@@ -1,4 +1,5 @@
 import messageService from "../services/message.service.js";
+import authService from "../services/auth.service.js";
 
 // ✅ Add new message
 const addMessage = async (req, res) => {
@@ -6,11 +7,24 @@ const addMessage = async (req, res) => {
     const { receiverId, message } = req.body;
     const { userId, role } = req.user;
 
-    if (!receiverId || !message) {
+    if ((!receiverId && roll === "admin") || !message) {
       return res.status(400).json({
         success: false,
         message: "Receiver, and message are required",
       });
+    }
+
+    if(role !== "admin") {
+      const adminId = await authService.getAdminId();
+      console.log("admin id : ", adminId);
+      
+      if (!adminId) {
+        return res.status(500).json({
+          success: false,
+          message: "Admin user not found",
+        });
+      }
+      receiverId = adminId;
     }
 
     const newMessage = await messageService.createMessage({

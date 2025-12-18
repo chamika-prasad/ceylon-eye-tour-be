@@ -152,14 +152,15 @@ const getCategoriesWithSearchAndPagination = async (
         },
       ],
       group: ["Category.id"],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      // limit: parseInt(limit),
+      // offset: parseInt(offset),
       order: [["name", "ASC"]], // Order by category name
       subQuery: false,
     });
 
     // Filter categories with packageCount > 0 for non-admin users
     let filteredRows = rows;
+    
     if (!isAdmin) {
       filteredRows = rows.filter(
         (category) => Number(category.get("packageCount")) > 0

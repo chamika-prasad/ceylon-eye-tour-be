@@ -12,7 +12,6 @@ const limit = process.env.PAGINATION_LIMIT || 10;
 
 const getCategories = async (req, res) => {
   const { tourType } = req.query;
-
   try {
     // const categories = await categoryService.getCategories();
     const categories = await categoryService.getCategories(
@@ -25,7 +24,7 @@ const getCategories = async (req, res) => {
       data: categories,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message || "Error retrieving categories",
       error: error,

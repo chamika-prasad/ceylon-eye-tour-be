@@ -11,7 +11,7 @@ const DB_CONFIG = {
 
 const SQL_STATEMENTS = [
   // `DROP DATABASE IF EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
-  // `CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
+  `CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `USE ${process.env.DB_NAME || "ceylon_eye_tour"}`,
   `CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -175,6 +175,7 @@ const SQL_STATEMENTS = [
   user_id VARCHAR(36) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  is_read BOOL NOT NULL DEFAULT 0,
   INDEX idx_sender_id (sender_id),
   INDEX idx_receiver_id (receiver_id),
   INDEX idx_user_id (user_id),
