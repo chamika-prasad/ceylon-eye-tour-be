@@ -47,4 +47,11 @@ router.patch(
   messageController.markMessagesAsRead
 );
 
+router.patch(
+  "/mark-admin-message-as-read",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  messageController.markAdminMessagesAsReadForUser
+);
+
 export default router;

@@ -158,6 +158,25 @@ const markMessagesAsRead = async (req, res) => {
   }
 };
 
+const markAdminMessagesAsReadForUser = async (req, res) => {
+  try {
+    const { userId: adminId } = req.user;
+    const { userId } = req.body;
+    await messageService.markAdminMessagesAsReadForUser(userId, adminId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Messages marked as read successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error marking messages as read",
+      error: error.message,
+    });
+  }
+};
+
 const getUserUnredMessageCount = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -184,4 +203,5 @@ export default {
   updateMessage,
   markMessagesAsRead,
   getUserUnredMessageCount,
+  markAdminMessagesAsReadForUser,
 };

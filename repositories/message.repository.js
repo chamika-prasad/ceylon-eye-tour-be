@@ -49,6 +49,13 @@ const markMessagesAsRead = async (receiverId) => {
   );
 };
 
+const markAdminMessagesAsReadForUser = async (userId, adminId) => {
+  return await Message.update(
+    { is_read: true },
+    { where: { receiver_id: adminId, sender_id: userId, is_read: false } }
+  );
+};
+
 const countUnreadMessagesFromSenderToReceiver = async (
   senderId,
   receiverId
@@ -80,4 +87,5 @@ export default {
   markMessagesAsRead,
   countUnreadMessagesFromSenderToReceiver,
   getUserUnredMessageCount,
+  markAdminMessagesAsReadForUser,
 };

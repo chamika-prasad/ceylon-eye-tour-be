@@ -41,6 +41,10 @@ const markMessagesAsRead = async (receiverId) => {
   return await messageRepository.markMessagesAsRead(receiverId);
 };
 
+const markAdminMessagesAsReadForUser = async (userId, adminId) => {
+  return await messageRepository.markAdminMessagesAsReadForUser(userId, adminId);
+};
+
 const getUserUnredMessageCount = async (userId) => {
   return await messageRepository.getUserUnredMessageCount(userId);
 };
@@ -53,4 +57,5 @@ export default {
   updateMessage,
   markMessagesAsRead,
   getUserUnredMessageCount,
+  markAdminMessagesAsReadForUser,
 };
