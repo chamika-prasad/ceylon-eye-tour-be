@@ -8,7 +8,7 @@ const getAllGallery = async () => {
         {
           model: User,
           as: "User",
-          attributes: ["name"],
+          attributes: ["name","profile_image"],
         },
       ],
     });
@@ -26,7 +26,7 @@ const getAllApprovedGallery = async () => {
         {
           model: User,
           as: "User",
-          attributes: ["name"],
+          attributes: ["name","profile_image"],
         },
       ],
     });
@@ -90,7 +90,7 @@ const getAllGalleryWithPagination = async (
         {
           model: User,
           as: "User",
-          attributes: ["name"],
+          attributes: ["name","profile_image"],
         },
       ],
       limit: parseInt(pageSize),
@@ -120,7 +120,7 @@ const getAllApprovedGalleryWithPagination = async (page = 1, pageSize = 10) => {
         {
           model: User,
           as: "User",
-          attributes: ["name"],
+          attributes: ["name","profile_image"],
         },
       ],
       limit: parseInt(pageSize),
