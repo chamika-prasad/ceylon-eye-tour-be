@@ -56,7 +56,7 @@ const getBookingById = async (id) => {
       {
         model: User,
         as: "User",
-        attributes: ["name", "email", , "passport", "country"], // Include customer name and email
+        attributes: ["name", "email", "passport", "country"], // Include customer name and email
       },
     ],
   });

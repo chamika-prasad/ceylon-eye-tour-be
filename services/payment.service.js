@@ -67,7 +67,6 @@ const getAccessToken = async () => {
   }
 
   const AUTH_CODE = btoa(process.env.PAYHERE_APP_ID+":"+process.env.PAYHERE_APP_SECRET);
-  console.log(AUTH_CODE);
   
   const PAYHERE_TOKEN_URL =
     process.env.PAYHERE_MODE === "live"

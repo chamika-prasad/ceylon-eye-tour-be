@@ -1,4 +1,8 @@
 import bookingService from "../services/booking.service.js";
+import emailTemplateService from "../services/emailTemplate.service.js";
+import authService from "../services/auth.service.js";
+import packageService from "../services/package.service.js";
+import emailService from "../services/email.service.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -41,10 +45,9 @@ const getBookingsByCustomerId = async (req, res) => {
 };
 
 const updateBookingStatus = async (req, res) => {
+  const { bookingId } = req.params;
   try {
-    const { bookingId } = req.params;
     const { status } = req.body;
-
     const existingBooking = await bookingService.getBookingById(bookingId);
     if (!existingBooking) {
       return res.status(404).json({
@@ -57,6 +60,29 @@ const updateBookingStatus = async (req, res) => {
       bookingId,
       status
     );
+    const customer = await authService.getUserById(
+      existingBooking?.customer_id
+    );
+
+    let packageName =
+      existingBooking?.Package?.dataValues?.title || "Custom Package";
+    let customerName = customer?.name || "Customer";
+    let date = existingBooking?.start_date
+      ? new Date(existingBooking?.start_date)
+      : new Date();
+    const template = emailTemplateService.generateInformBookingStatusTemplate(
+      customerName,
+      packageName,
+      status,
+      date
+    );
+
+    await emailService.sendEmail({
+      to: process.env.EMAIL_USER,
+      subject: "Booking Updated - Jwing Tours",
+      html: template,
+    });
+
     return res.json({
       success: true,
       message: `Booking status updated successfully for booking ID ${bookingId}.`,
@@ -120,6 +146,26 @@ const createBooking = async (req, res) => {
     }
 
     const newBooking = await bookingService.createBooking(bookingData);
+    // Send booking inform email
+    const customer = await authService.getUserById(userId);
+    let packageName = "Custom Package";
+
+    if (packageId) {
+      const pkg = await packageService.getPackageById(packageId);
+      packageName = pkg?.package?.title || "Unknown Package";
+    }
+
+    const template = emailTemplateService.generateBookingInformTemplate(
+      customer.name,
+      packageName,
+      new Date(newBooking.start_date)
+    );
+
+    await emailService.sendEmail({
+      to: process.env.EMAIL_USER,
+      subject: "New Booking Created - Jwing Tours",
+      html: template,
+    });
 
     return res.status(201).json({
       success: true,

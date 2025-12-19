@@ -41,9 +41,8 @@ const generateInvoiceTemplate = (
     badgeText = badgeText.charAt(0).toUpperCase() + badgeText.slice(1);
   }
 
-  const companyName = process.env.COMPANY_NAME || "Tech Solutions";
-  const supportEmail =
-    process.env.SUPPORT_EMAIL || "support@techsolutions.site";
+  const companyName = process.env.COMPANY_NAME || "Jawing Tours";
+  const supportEmail = process.env.SUPPORT_EMAIL || "support@jwintours.com";
   const copyrightYear = new Date().getFullYear();
 
   return `<!DOCTYPE html>
@@ -325,6 +324,458 @@ const generateTempPasswordTemplate = (
 </html>`;
 };
 
+const generateBookingInformTemplate = (
+  customerName = "Customer",
+  packageName = "Package",
+  date
+) => {
+  const companyName = process.env.COMPANY_NAME || "Jwin Tours";
+  const supportEmail = process.env.SUPPORT_EMAIL || "support@jwintours.com";
+  const year = new Date().getFullYear();
+
+  const dt = date && date instanceof Date ? date : new Date(date || Date.now());
+  const displayDate = dt.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  });
+
+  const displayTime = dt.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Booking Notification</title>
+    <style>
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .mobile-padding {
+                padding: 20px !important;
+            }
+            .mobile-header {
+                padding: 30px 20px !important;
+            }
+            .mobile-title {
+                font-size: 24px !important;
+            }
+            .mobile-text {
+                font-size: 14px !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td style="padding: 40px 20px;">
+                <table role="presentation" class="email-container" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 600px;">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td class="mobile-header" style="background: linear-gradient(135deg, #cd1a40 0%, #ff803c 100%); padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 class="mobile-title" style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">🎉 New Booking Received!</h1>
+                            <p style="margin: 10px 0 0; color: #ffffff; font-size: 14px; opacity: 0.9;">A customer has just made a booking</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px;">
+                            
+                            <!-- Alert Box -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #e8f5e9; border-left: 4px solid #28a745; border-radius: 4px;">
+                                        <p style="margin: 0; color: #000000; font-size: 15px; font-weight: bold;">
+                                            ✅ Action Required: Please review and confirm this booking
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Booking Details -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse: collapse; margin-bottom: 30px;">
+                                <tr>
+                                    <td colspan="2" style="padding: 15px; background-color: #cd1a40; border-radius: 4px 4px 0 0;">
+                                        <p style="margin: 0; color: #ffffff; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Booking Details</p>
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="padding: 15px; border-bottom: 1px solid #eeeeee; width: 40%;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Customer Name</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-bottom: 1px solid #eeeeee; width: 60%;">
+                                        <p class="mobile-text" style="margin: 0; color: #000000; font-size: 15px; font-weight: bold;">${escapeHtml(
+                                          customerName
+                                        )}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 15px; border-bottom: 1px solid #eeeeee;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Package</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-bottom: 1px solid #eeeeee;">
+                                        <p class="mobile-text" style="margin: 0; color: #000000; font-size: 15px; font-weight: bold;">${escapeHtml(
+                                          packageName
+                                        )}</p>
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="padding: 15px; border-bottom: 1px solid #eeeeee;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Booking Date</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-bottom: 1px solid #eeeeee;">
+                                        <p class="mobile-text" style="margin: 0; color: #000000; font-size: 15px; font-weight: bold;">${escapeHtml(
+                                          displayDate
+                                        )}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 15px; border-radius: 0 0 0 4px;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Booking Time</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-radius: 0 0 4px 0;">
+                                        <p class="mobile-text" style="margin: 0; color: #000000; font-size: 15px; font-weight: bold;">${escapeHtml(
+                                          displayTime
+                                        )}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Timestamp Box -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td style="padding: 20px; background: linear-gradient(135deg, #cd1a40 0%, #ff803c 100%); border-radius: 4px; text-align: center;">
+                                        <p style="margin: 0 0 5px; color: #ffffff; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">Booking Received On</p>
+                                        <p style="margin: 0; color: #ffffff; font-size: 18px; font-weight: bold;">${escapeHtml(
+                                          displayDate
+                                        )} at ${escapeHtml(displayTime)}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Action Instructions -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #f9f9f9; border-radius: 4px;">
+                                        <p style="margin: 0 0 10px; color: #cd1a40; font-size: 14px; font-weight: bold;">📋 Next Steps:</p>
+                                        <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.6;">
+                                            Please log in to your admin dashboard to review the booking details and confirm availability. Contact the customer if you need any additional information.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Support -->
+                            <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.6; text-align: center;">
+                                Questions or issues? Contact support at <a href="mailto:${escapeHtml(
+                                  supportEmail
+                                )}" style="color: #cd1a40; text-decoration: none; font-weight: 600;">${escapeHtml(
+    supportEmail
+  )}</a>
+                            </p>
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 40px; text-align: center; background-color: #f9f9f9; border-radius: 0 0 8px 8px;">
+                            <p style="margin: 0 0 10px; color: #000000; font-size: 16px; font-weight: bold;">${escapeHtml(
+                              companyName
+                            )}</p>
+                            <p style="margin: 0 0 15px; color: #666666; font-size: 12px;">© ${escapeHtml(
+                              String(year)
+                            )} ${escapeHtml(
+    companyName
+  )}. All rights reserved.</p>
+                            <p style="margin: 0; color: #999999; font-size: 11px;">
+                                This is an automated notification from your booking system.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+};
+
+const generateInformBookingStatusTemplate = (
+  customerName = "Customer",
+  packageName = "Package",
+  status = "confirmed",
+  date
+) => {
+  const companyName = process.env.COMPANY_NAME || "Jawing Tours";
+  const supportEmail = process.env.SUPPORT_EMAIL || "support@jwintours.com";
+  const year = new Date().getFullYear();
+
+  const dt = date && date instanceof Date ? date : new Date(date || Date.now());
+  const displayDate = dt.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  });
+
+  const displayTime = dt.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  // Determine status styling and messaging
+  const statusKey = String(status).toLowerCase();
+  let statusColor = "#6c757d";
+  let statusBgColor = "#f8f9fa";
+  let statusIcon = "ℹ️";
+  let statusTitle = "Booking Status Update";
+  let statusMessage = "Your booking status has been updated.";
+  let actionMessage = "";
+
+  if (["confirmed", "approved", "accepted"].includes(statusKey)) {
+    statusColor = "#28a745";
+    statusBgColor = "#e8f5e9";
+    statusIcon = "✅";
+    statusTitle = "Booking Confirmed!";
+    statusMessage = "Great news! Your booking has been confirmed.";
+    actionMessage =
+      "We're excited to serve you. Please make sure to arrive on time for your scheduled appointment.";
+  } else if (["pending", "processing", "under review"].includes(statusKey)) {
+    statusColor = "#ffc107";
+    statusBgColor = "#fff8e6";
+    statusIcon = "⏳";
+    statusTitle = "Booking Under Review";
+    statusMessage = "Your booking is currently being reviewed.";
+    actionMessage =
+      "We'll notify you as soon as your booking is confirmed. This usually takes 24-48 hours.";
+  } else if (
+    ["cancelled", "canceled", "rejected", "declined"].includes(statusKey)
+  ) {
+    statusColor = "#dc3545";
+    statusBgColor = "#ffe6e6";
+    statusIcon = "❌";
+    statusTitle = "Booking Cancelled";
+    statusMessage = "Your booking has been cancelled.";
+    actionMessage =
+      "If you didn't request this cancellation or have any questions, please contact our support team immediately.";
+  } else if (["completed", "finished", "done"].includes(statusKey)) {
+    statusColor = "#17a2b8";
+    statusBgColor = "#e6f7ff";
+    statusIcon = "🎉";
+    statusTitle = "Booking Completed";
+    statusMessage = "Your booking has been successfully completed.";
+    actionMessage =
+      "Thank you for choosing us! We hope you had a great experience. We'd love to hear your feedback.";
+  } else if (["rescheduled", "modified", "changed"].includes(statusKey)) {
+    statusColor = "#ff803c";
+    statusBgColor = "#fff0e6";
+    statusIcon = "🔄";
+    statusTitle = "Booking Rescheduled";
+    statusMessage = "Your booking has been rescheduled.";
+    actionMessage =
+      "Please check the new booking details below and make note of the updated date and time.";
+  }
+
+  // Format status badge text
+  let badgeText = statusKey.charAt(0).toUpperCase() + statusKey.slice(1);
+  if (["confirmed", "approved", "accepted"].includes(statusKey)) {
+    badgeText = "Confirmed";
+  } else if (["cancelled", "canceled"].includes(statusKey)) {
+    badgeText = "Cancelled";
+  } else if (["pending", "processing", "under review"].includes(statusKey)) {
+    badgeText = "Pending";
+  } else if (["rejected", "declined"].includes(statusKey)) {
+    badgeText = "Declined";
+  } else if (["completed", "finished", "done"].includes(statusKey)) {
+    badgeText = "Completed";
+  } else if (["rescheduled", "modified", "changed"].includes(statusKey)) {
+    badgeText = "Rescheduled";
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Status Update</title>
+    <style>
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .mobile-padding {
+                padding: 20px !important;
+            }
+            .mobile-header {
+                padding: 30px 20px !important;
+            }
+            .mobile-title {
+                font-size: 24px !important;
+            }
+            .mobile-text {
+                font-size: 14px !important;
+            }
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td style="padding: 40px 20px;">
+                <table role="presentation" class="email-container" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 600px;">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td class="mobile-header" style="background: linear-gradient(135deg, #cd1a40 0%, #ff803c 100%); padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 class="mobile-title" style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">${statusIcon} ${escapeHtml(
+    statusTitle
+  )}</h1>
+                            <p style="margin: 10px 0 0; color: #ffffff; font-size: 14px; opacity: 0.9;">${escapeHtml(
+                              statusMessage
+                            )}</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px;">
+                            
+                            <!-- Greeting -->
+                            <p style="margin: 0 0 20px; color: #000000; font-size: 16px; line-height: 1.6;">Hello <strong>${escapeHtml(
+                              customerName
+                            )}</strong>,</p>
+                            
+                            <!-- Status Badge -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td style="text-align: center; padding: 25px; background-color: ${statusBgColor}; border-radius: 8px; border: 2px solid ${statusColor};">
+                                        <p style="margin: 0 0 10px; color: ${statusColor}; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Current Status</p>
+                                        <p style="margin: 0; color: ${statusColor}; font-size: 32px; font-weight: bold; text-transform: uppercase;">${escapeHtml(
+    badgeText
+  )}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Action Message -->
+                            ${
+                              actionMessage
+                                ? `
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #f9f9f9; border-left: 4px solid ${statusColor}; border-radius: 4px;">
+                                        <p style="margin: 0; color: #333333; font-size: 15px; line-height: 1.6;">
+                                            ${escapeHtml(actionMessage)}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            `
+                                : ""
+                            }
+                            
+                            <!-- Booking Details -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse: collapse; margin-bottom: 30px;">
+                                <tr>
+                                    <td colspan="2" style="padding: 15px; background-color: #cd1a40; border-radius: 4px 4px 0 0;">
+                                        <p style="margin: 0; color: #ffffff; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Your Booking Details</p>
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="padding: 15px; border-bottom: 1px solid #eeeeee; width: 40%;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Package</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-bottom: 1px solid #eeeeee; width: 60%;">
+                                        <p class="mobile-text" style="margin: 0; color: #000000; font-size: 15px; font-weight: bold;">${escapeHtml(
+                                          packageName
+                                        )}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 15px; border-bottom: 1px solid #eeeeee;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Booking Date</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-bottom: 1px solid #eeeeee;">
+                                        <p class="mobile-text" style="margin: 0; color: #000000; font-size: 15px; font-weight: bold;">${escapeHtml(
+                                          displayDate
+                                        )}</p>
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="padding: 15px; border-radius: 0 0 0 4px;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Booking Time</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-radius: 0 0 4px 0;">
+                                        <p class="mobile-text" style="margin: 0; color: #000000; font-size: 15px; font-weight: bold;">${escapeHtml(
+                                          displayTime
+                                        )}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Support Section -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #f9f9f9; border-radius: 4px; text-align: center;">
+                                        <p style="margin: 0 0 5px; color: #666666; font-size: 14px; line-height: 1.6;">
+                                            Have questions about your booking?
+                                        </p>
+                                        <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.6;">
+                                            Contact us at <a href="mailto:${escapeHtml(
+                                              supportEmail
+                                            )}" style="color: #cd1a40; text-decoration: none; font-weight: 600;">${escapeHtml(
+    supportEmail
+  )}</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 40px; text-align: center; background-color: #f9f9f9; border-radius: 0 0 8px 8px;">
+                            <p style="margin: 0 0 10px; color: #000000; font-size: 16px; font-weight: bold;">${escapeHtml(
+                              companyName
+                            )}</p>
+                            <p style="margin: 0 0 15px; color: #666666; font-size: 12px;">© ${escapeHtml(
+                              String(year)
+                            )} ${escapeHtml(
+    companyName
+  )}. All rights reserved.</p>
+                            <p style="margin: 0; color: #999999; font-size: 11px;">
+                                This is an automated message, please do not reply to this email.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+};
+
 // minimal HTML escaping to avoid breaking template if inputs contain markup
 const escapeHtml = (str) =>
   String(str)
@@ -337,4 +788,6 @@ const escapeHtml = (str) =>
 export default {
   generateInvoiceTemplate,
   generateTempPasswordTemplate,
+  generateBookingInformTemplate,
+  generateInformBookingStatusTemplate,
 };

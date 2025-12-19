@@ -13,7 +13,6 @@ const updateBookingStatus = async (bookingId, newStatus) => {
   if (!validStatuses.includes(newStatus)) {
     throw new Error("Invalid status value");
   }
-
   const booking = await bookingRepository.updateBookingStatus(
     bookingId,
     newStatus

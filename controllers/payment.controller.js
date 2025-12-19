@@ -182,7 +182,7 @@ const updatePayment = async (req, res) => {
 
       await emailService.sendEmail({
         to: bookingRecord.User.email,
-        subject: "Payment Invoice - Ceylon Eye Tours",
+        subject: "Payment Invoice - Jwing Tours",
         html: template,
       });
     }
