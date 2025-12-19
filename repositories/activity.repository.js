@@ -1,6 +1,5 @@
 import { Activity } from "./../models/index.js";
-import { where, fn, col,Op } from "sequelize";
-
+import { where, fn, col, Op } from "sequelize";
 
 const createActivity = async (data) => {
   return await Activity.create(data);
@@ -32,24 +31,28 @@ const getActivityByName = async (name) => {
   });
 };
 
-const getAllActivitiesWithSearchAndPagination = async (page = 1, searchName = '',limit=10) => {
-    const offset = (page - 1) * limit;
-  
-  const whereClause = searchName 
+const getAllActivitiesWithSearchAndPagination = async (
+  page = 1,
+  searchName = "",
+  limit = 10
+) => {
+  const offset = (page - 1) * limit;
+
+  const whereClause = searchName
     ? { name: { [Op.like]: `%${searchName}%` } }
     : {};
 
   const { count, rows } = await Activity.findAndCountAll({
     where: whereClause,
     limit: parseInt(limit),
-    offset: parseInt(offset)
+    offset: parseInt(offset),
   });
 
   return {
     activities: rows,
     totalItems: count,
     totalPages: Math.ceil(count / limit),
-    currentPage: parseInt(page)
+    currentPage: parseInt(page),
   };
 };
 
@@ -60,5 +63,5 @@ export default {
   getAllActivities,
   getActivityById,
   getActivityByName,
-  getAllActivitiesWithSearchAndPagination
+  getAllActivitiesWithSearchAndPagination,
 };

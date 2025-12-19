@@ -144,7 +144,7 @@ const getActivityById = async (req, res) => {
 const getAllActivitiesWithSearchAndPagination = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const searchName = req.query.name || "";
+    const searchName = req.query.search || "";
     const pageLimit = parseInt(req.query.size) || limit;
 
     // Validation
