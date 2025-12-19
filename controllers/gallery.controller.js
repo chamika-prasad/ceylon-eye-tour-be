@@ -149,7 +149,14 @@ const deleteGalleryItem = async (req, res) => {
 const getAllGalleryWithPagination = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const pageSize =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const isApproved =
+      req.query.isApproved === "true"
+        ? true
+        : req.query.isApproved === "false"
+        ? false
+        : undefined;
 
     // Validation
     if (page < 1) {
@@ -166,7 +173,11 @@ const getAllGalleryWithPagination = async (req, res) => {
       });
     }
 
-    const result = await galleryService.getAllGalleryWithPagination(page, pageSize);
+    const result = await galleryService.getAllGalleryWithPagination(
+      page,
+      pageSize,
+      isApproved
+    );
 
     return res.status(200).json({
       success: true,
@@ -192,7 +203,10 @@ const getAllGalleryWithPagination = async (req, res) => {
 const getAllApprovedGalleryWithPagination = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+    const pageSize =
+      parseInt(req.query.pageSize) ||
+      parseInt(process.env.PAGINATION_LIMIT) ||
+      10;
 
     // Validation
     if (page < 1) {
@@ -209,7 +223,10 @@ const getAllApprovedGalleryWithPagination = async (req, res) => {
       });
     }
 
-    const result = await galleryService.getAllApprovedGalleryWithPagination(page, pageSize);
+    const result = await galleryService.getAllApprovedGalleryWithPagination(
+      page,
+      pageSize
+    );
 
     return res.status(200).json({
       success: true,

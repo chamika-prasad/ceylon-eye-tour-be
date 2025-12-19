@@ -1,4 +1,4 @@
-import { Gallery,User } from "../models/index.js";
+import { Gallery, User } from "../models/index.js";
 
 // Get all gallery items
 const getAllGallery = async () => {
@@ -76,11 +76,16 @@ const getGalleryItemById = async (id) => {
   }
 };
 
-const getAllGalleryWithPagination = async (page = 1, pageSize = 10) => {
+const getAllGalleryWithPagination = async (
+  page = 1,
+  pageSize = 10,
+  isApproved
+) => {
   const offset = (page - 1) * pageSize;
 
   try {
     const { count, rows } = await Gallery.findAndCountAll({
+      where: isApproved ? { is_approved: isApproved } : {},
       include: [
         {
           model: User,
