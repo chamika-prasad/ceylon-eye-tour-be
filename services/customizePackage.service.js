@@ -76,14 +76,45 @@ const getAllCustomizePackagesWithSearchAndPagination = async (
   searchTerm,
   limit
 ) => {
-  return await customizePackageRepository.getAllCustomizePackagesWithSearchAndPagination(
-    page,
-    searchTerm,
-    limit
+  // return await customizePackageRepository.getAllCustomizePackagesWithSearchAndPagination(
+  //   page,
+  //   searchTerm,
+  //   limit
+  // );
+  const customizePackages =
+    await customizePackageRepository.getAllCustomizePackages();
+
+  let filteredCustomizePackages = customizePackages;
+  if (searchTerm) {
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    filteredCustomizePackages = customizePackages.filter(
+      (customizePackage) =>
+        customizePackage.User.name.toLowerCase().includes(lowerSearchTerm) ||
+        customizePackage.message.toLowerCase().includes(lowerSearchTerm) ||
+        customizePackage.User.country.toLowerCase().includes(lowerSearchTerm)
+    );
+  }
+
+  const totalItems = filteredCustomizePackages.length;
+  const totalPages = Math.ceil(totalItems / limit);
+  const offset = (page - 1) * limit;
+  const paginatedCustomizePackages = filteredCustomizePackages.slice(
+    offset,
+    offset + parseInt(limit)
   );
+  return {
+    customizePackages: paginatedCustomizePackages,
+    totalItems: totalItems,
+    totalPages: totalPages,
+    currentPage: parseInt(page),
+  };
 };
 
-const getAllCustomizePackagesByUserIdWithPagination = async (userId, page,limit) => {
+const getAllCustomizePackagesByUserIdWithPagination = async (
+  userId,
+  page,
+  limit
+) => {
   return await customizePackageRepository.getAllCustomizePackagesByUserIdWithPagination(
     userId,
     page,
