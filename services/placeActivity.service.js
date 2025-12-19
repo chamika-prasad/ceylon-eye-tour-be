@@ -30,12 +30,12 @@ const getAllGroupedByPlaceWithSearchAndPagination = async (
   const totalItems = filteredPlaces.length;
   const totalPages = Math.ceil(totalItems / limit);
   const offset = (page - 1) * limit;
-  const paginatedCategories = filteredPlaces.slice(
+  const paginatedPlaceActivities = filteredPlaces.slice(
     offset,
     offset + parseInt(limit)
   );
   return {
-    places: paginatedCategories,
+    places: paginatedPlaceActivities,
     totalItems: totalItems,
     totalPages: totalPages,
     currentPage: parseInt(page),

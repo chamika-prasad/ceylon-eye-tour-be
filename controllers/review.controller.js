@@ -191,10 +191,42 @@ const deleteReview = async (req, res) => {
   }
 };
 
+const getAllReviewsWithSearchAndPagination = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const searchTerm = req.query.search || "";
+    const pageSize =
+      parseInt(req.query.size) || parseInt(process.env.PAGINATION_LIMIT) || 10;
+
+    const result = await reviewService.getAllReviewsWithSearchAndPagination(
+      searchTerm,
+      page,
+      pageSize
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Reviews retrieved successfully",
+      data: result.reviews,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving reviews",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createReview,
   getAllReviews,
   getReviewById,
   updateReview,
   deleteReview,
+  getAllReviewsWithSearchAndPagination,
 };

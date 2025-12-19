@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/add", tokenMiddleware.verifyToken, reviewController.createReview);
 router.get("/get-all", reviewController.getAllReviews);
+router.get("/get-all-paginated", reviewController.getAllReviewsWithSearchAndPagination);
 router.put("/:id", tokenMiddleware.verifyToken, reviewController.updateReview);
 router.delete(
   "/:id",
