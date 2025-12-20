@@ -127,6 +127,12 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
   try {
     const packageData = await Package.findOne({
       where: { url_prefix: urlPrefix },
+      include: [
+        {
+          model: PackageImage,
+          as: "Images",
+        },
+      ],
     });
 
     if (!packageData) {
@@ -136,7 +142,6 @@ const getPackageByUrlPrefix = async (urlPrefix) => {
     if (packageData.is_deleted) {
       return false;
     }
-
     const packagePlaces = await PackagePlace.findAll({
       where: { package_id: packageData.id },
     });
@@ -524,7 +529,7 @@ const getPackagesByCategoryIdWithSearchAndPagination = async (
     ...(searchTerm && {
       title: { [Op.like]: `%${searchTerm}%` },
     }),
-    ...(isTourTypeValid && { tour_type: tourType })
+    ...(isTourTypeValid && { tour_type: tourType }),
   };
   const { count, rows: packages } = await Package.findAndCountAll({
     where: whereClause,
