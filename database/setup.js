@@ -266,8 +266,6 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
-  `ALTER TABLE bookings
-ADD COLUMN booking_no INT NOT NULL AUTO_INCREMENT UNIQUE`,
 ];
 
 async function setupDatabase() {

@@ -6,7 +6,8 @@ const generateInvoiceTemplate = (
   customerName = "Customer",
   amount = 0,
   paymentStatus,
-  date
+  date,
+  bookingNumber = "N/A"
 ) => {
   const amt = Number(amount) || 0;
   const formattedAmount = amt.toLocaleString("en-US", {
@@ -99,6 +100,16 @@ const generateInvoiceTemplate = (
                                 <tr>
                                     <td colspan="2" style="padding:15px;background-color:#cd1a40;border-radius:4px 4px 0 0;">
                                         <p style="margin:0;color:#ffffff;font-size:14px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Invoice Details</p>
+                                    </td>
+                                </tr>
+                                <tr style="background-color:#f9f9f9;">
+                                    <td style="padding:15px;border-bottom:1px solid #eeeeee;width:50%;">
+                                        <p style="margin:0;color:#666666;font-size:13px;">Invoice Number</p>
+                                    </td>
+                                    <td style="padding:15px;text-align:right;border-bottom:1px solid #eeeeee;width:50%;">
+                                        <p class="mobile-text" style="margin:0;color:#cd1a40;font-size:14px;font-weight:bold;font-family:'Courier New',monospace;">${escapeHtml(
+                                          bookingNumber
+                                        )}</p>
                                     </td>
                                 </tr>
                                 <tr style="background-color:#f9f9f9;">
@@ -327,7 +338,8 @@ const generateTempPasswordTemplate = (
 const generateBookingInformTemplate = (
   customerName = "Customer",
   packageName = "Package",
-  date
+  date,
+  bookingNumber = "N/A"
 ) => {
   const companyName = process.env.COMPANY_NAME || "Jwin Tours";
   const supportEmail = process.env.SUPPORT_EMAIL || "support@jwintours.com";
@@ -407,6 +419,16 @@ const generateBookingInformTemplate = (
                                 <tr>
                                     <td colspan="2" style="padding: 15px; background-color: #cd1a40; border-radius: 4px 4px 0 0;">
                                         <p style="margin: 0; color: #ffffff; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Booking Details</p>
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="padding: 15px; border-bottom: 1px solid #eeeeee; width: 40%;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Booking Number</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-bottom: 1px solid #eeeeee; width: 60%;">
+                                        <p class="mobile-text" style="margin: 0; color: #cd1a40; font-size: 15px; font-weight: bold; font-family: 'Courier New', monospace;">${escapeHtml(
+                                          bookingNumber
+                                        )}</p>
                                     </td>
                                 </tr>
                                 <tr style="background-color: #f9f9f9;">
@@ -516,7 +538,8 @@ const generateInformBookingStatusTemplate = (
   customerName = "Customer",
   packageName = "Package",
   status = "confirmed",
-  date
+  date,
+  bookingNumber = "N/A"
 ) => {
   const companyName = process.env.COMPANY_NAME || "Jawing Tours";
   const supportEmail = process.env.SUPPORT_EMAIL || "support@jwintours.com";
@@ -696,6 +719,16 @@ const generateInformBookingStatusTemplate = (
                                 <tr>
                                     <td colspan="2" style="padding: 15px; background-color: #cd1a40; border-radius: 4px 4px 0 0;">
                                         <p style="margin: 0; color: #ffffff; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Your Booking Details</p>
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="padding: 15px; border-bottom: 1px solid #eeeeee; width: 40%;">
+                                        <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 600;">Booking Number</p>
+                                    </td>
+                                    <td style="padding: 15px; text-align: right; border-bottom: 1px solid #eeeeee; width: 60%;">
+                                        <p class="mobile-text" style="margin: 0; color: #cd1a40; font-size: 15px; font-weight: bold; font-family: 'Courier New', monospace;">${escapeHtml(
+                                          bookingNumber
+                                        )}</p>
                                     </td>
                                 </tr>
                                 <tr style="background-color: #f9f9f9;">

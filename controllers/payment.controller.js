@@ -206,7 +206,8 @@ const updatePayment = async (req, res) => {
         bookingRecord.User.name,
         paymentRecord.amount,
         paymentRecord.status,
-        paymentRecord.updated_at
+        paymentRecord.updated_at,
+        bookingRecord.booking_no
       );
 
       await emailService.sendEmail({

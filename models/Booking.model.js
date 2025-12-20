@@ -46,6 +46,17 @@ const Booking = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    booking_no: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      autoIncrement: true,
+      unique: true,
+      get() {
+        const rawValue = this.getDataValue("booking_no");
+        // Format as string: JT_ + zero-padded 7 digits
+        return rawValue ? `JT_${String(rawValue).padStart(7, "0")}` : null;
+      },
+    },
   },
   {
     tableName: "bookings",

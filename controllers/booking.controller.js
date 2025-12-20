@@ -67,18 +67,21 @@ const updateBookingStatus = async (req, res) => {
     let packageName =
       existingBooking?.Package?.dataValues?.title || "Custom Package";
     let customerName = customer?.name || "Customer";
+    let customerEmail = customer?.email || "Customer";
     let date = existingBooking?.start_date
       ? new Date(existingBooking?.start_date)
       : new Date();
+    let bookingNumber = existingBooking?.booking_no || "N/A";
     const template = emailTemplateService.generateInformBookingStatusTemplate(
       customerName,
       packageName,
       status,
-      date
+      date,
+      bookingNumber
     );
 
     await emailService.sendEmail({
-      to: process.env.EMAIL_USER,
+      to: customerEmail,
       subject: "Booking Updated - Jwing Tours",
       html: template,
     });
@@ -158,7 +161,8 @@ const createBooking = async (req, res) => {
     const template = emailTemplateService.generateBookingInformTemplate(
       customer.name,
       packageName,
-      new Date(newBooking.start_date)
+      new Date(newBooking.start_date),
+      newBooking.booking_no
     );
 
     await emailService.sendEmail({
