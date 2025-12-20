@@ -233,7 +233,7 @@ const SQL_STATEMENTS = [
   FOREIGN KEY (custom_package_id) REFERENCES customize_packages(id),
   FOREIGN KEY (customer_id) REFERENCES users(id),
   is_deleted BOOL NOT NULL DEFAULT 0,
-  booking_no INT NOT NULL AUTO_INCREMENT UNIQUE FIRST,
+  booking_no INT NOT NULL AUTO_INCREMENT UNIQUE,
   CONSTRAINT chk_package CHECK (
         (package_id IS NOT NULL AND custom_package_id IS NULL) OR 
         (package_id IS NULL AND custom_package_id IS NOT NULL)
@@ -267,7 +267,7 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
   `ALTER TABLE bookings
-ADD COLUMN booking_no INT NOT NULL AUTO_INCREMENT UNIQUE FIRST`,
+ADD COLUMN booking_no INT NOT NULL AUTO_INCREMENT UNIQUE`,
 ];
 
 async function setupDatabase() {
