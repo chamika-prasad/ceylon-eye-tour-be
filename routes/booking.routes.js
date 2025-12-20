@@ -25,7 +25,7 @@ router.get("/calendar", bookingController.getAllBookingsForCalendar);
 router.put(
   "/:bookingId/status",
   tokenMiddleware.verifyToken,
-  tokenMiddleware.authorizeAdmin,
+  // tokenMiddleware.authorizeAdmin,
   bookingController.updateBookingStatus
 );
 router.put(
