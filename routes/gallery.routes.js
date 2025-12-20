@@ -7,11 +7,14 @@ const router = express.Router();
 
 router.get("/get-all", galleryController.getAllGallery);
 router.get("/get-all-approved", galleryController.getAllApprovedGallery);
-router.get("/get-all-paginated", galleryController.getAllGalleryWithPagination);
 router.get(
-  "/get-all-approved-paginated",
+  "/get-all-paginated",
   tokenMiddleware.verifyToken,
   tokenMiddleware.authorizeAdmin,
+  galleryController.getAllGalleryWithPagination
+);
+router.get(
+  "/get-all-approved-paginated",
   galleryController.getAllApprovedGalleryWithPagination
 );
 router.put(
