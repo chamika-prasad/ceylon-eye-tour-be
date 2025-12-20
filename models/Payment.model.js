@@ -25,6 +25,11 @@ const Payment = sequelize.define(
       defaultValue: "pending",
     },
     status_message: DataTypes.STRING,
+    random_order_id: DataTypes.STRING,
+    is_current: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   },
   {
     tableName: "payments",

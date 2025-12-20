@@ -35,6 +35,8 @@ const getAllBookings = async () => {
         model: Payment,
         as: "Payment",
         attributes: ["id", "payment_id", "amount", "status"], // Include payment details
+        where: { is_current: true },
+        required: false, // IMPORTANT: keeps bookings even if no payment exists
       },
     ],
   });
@@ -85,6 +87,8 @@ const getBookingsByCustomerId = async (customerId) => {
         model: Payment,
         as: "Payment",
         attributes: ["id", "payment_id", "amount", "status"], // Include payment details
+        where: { is_current: true },
+        required: false, // IMPORTANT: keeps bookings even if no payment exists
       },
     ],
   });
@@ -208,6 +212,8 @@ const getAllBookingsWithSearchAndPagination = async (
         model: Payment,
         as: "Payment",
         attributes: ["id", "payment_id", "amount", "status"],
+        where: { is_current: true },
+        required: false, // IMPORTANT: keeps bookings even if no payment exists
       },
     ],
     limit: parseInt(limit),
@@ -307,6 +313,8 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
         model: Payment,
         as: "Payment",
         attributes: ["id", "payment_id", "amount", "status"],
+        where: { is_current: true },
+        required: false, // IMPORTANT: keeps bookings even if no payment exists
       },
     ],
     limit: parseInt(limit),

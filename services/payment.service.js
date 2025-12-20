@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import pkg from "crypto-js";
 import axios from "axios";
+import crypto from "crypto";
 import paymentRepository from "../repositories/payment.repository.js";
 const { MD5 } = pkg;
 dotenv.config();
@@ -56,6 +57,10 @@ const updatePayment = async (id, data) => {
   return await paymentRepository.updatePayment(id, data);
 };
 
+const setPaymentsAsNotCurrentByBookingId = async (bookingId) => {
+  return await paymentRepository.setPaymentsAsNotCurrentByBookingId(bookingId);
+};
+
 const getPaymentById = async (id) => {
   return await paymentRepository.getPaymentById(id);
 };
@@ -66,8 +71,10 @@ const getAccessToken = async () => {
     return accessToken;
   }
 
-  const AUTH_CODE = btoa(process.env.PAYHERE_APP_ID+":"+process.env.PAYHERE_APP_SECRET);
-  
+  const AUTH_CODE = btoa(
+    process.env.PAYHERE_APP_ID + ":" + process.env.PAYHERE_APP_SECRET
+  );
+
   const PAYHERE_TOKEN_URL =
     process.env.PAYHERE_MODE === "live"
       ? "https://www.payhere.lk/merchant/v1/oauth/token"
@@ -89,6 +96,25 @@ const getAccessToken = async () => {
   return accessToken;
 };
 
+const combineUuidWithRandom = async (uuid) => {
+  // Generate random string (16 hex characters)
+  let randomString = crypto.randomBytes(8).toString("hex");
+
+  // Safe separator (UUID never contains :)
+  let combinedValue = `${uuid}:${randomString}`;
+
+  return combinedValue;
+};
+
+const separateUuidAndRandom = async (combinedValue) => {
+  let [uuid, randomString] = combinedValue.split(":");
+
+  return {
+    uuid,
+    randomString,
+  };
+};
+
 export default {
   hashPaymentDetails,
   createPayment,
@@ -98,4 +124,7 @@ export default {
   updatePayment,
   getAccessToken,
   // deletePayment,
+  combineUuidWithRandom,
+  separateUuidAndRandom,
+  setPaymentsAsNotCurrentByBookingId,
 };

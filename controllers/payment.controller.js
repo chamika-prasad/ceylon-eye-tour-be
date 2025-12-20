@@ -61,31 +61,36 @@ const createPayment = async (req, res) => {
 
     const amount = booking.Package?.price || booking.CustomPackage?.price;
 
-    const newPayment = await paymentService.createPayment({
-      booking_id: bookingId,
-      amount,
-      currency,
-    });
-
+    // const newPayment = await paymentService.createPayment({
+    //   booking_id: bookingId,
+    //   amount,
+    //   currency,
+    // });
+    const paymentId = await paymentService.combineUuidWithRandom(bookingId);
     const hash = await paymentService.hashPaymentDetails(
-      newPayment.id,
+      // newPayment.id,
+      paymentId,
       amount,
       currency
     );
 
-    return res.status(201).json({
+    // return res.status(201).json({
+    return res.status(200).json({
       success: true,
-      message: "Payment created successfully",
+      // message: "Payment created successfully",
+      message: "Payment hashed successfully",
       data: {
         hash,
         amount: amount,
-        paymentId: newPayment.id,
+        // paymentId: newPayment.id,
+        paymentId: paymentId,
       },
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Error creating payment",
+      // message: "Error creating payment",
+      message: "Error hashing payment",
       error: error.message,
     });
   }
@@ -150,28 +155,52 @@ const updatePayment = async (req, res) => {
     } = req.body;
 
     const status = paymentService.getPaymentStatusString(status_code);
+    const { uuid, randomString } = await paymentService.separateUuidAndRandom(
+      order_id
+    );
+    // const updated = await paymentService.updatePayment(order_id, {
+    //   payment_id: payment_id,
+    //   method,
+    //   status_message,
+    //   status,
+    // });
 
-    const updated = await paymentService.updatePayment(order_id, {
-      payment_id: payment_id,
-      method,
-      status_message,
-      status,
-    });
+    const booking = await bookingService.getBookingById(uuid);
 
-    if (!updated) {
+    if (!booking) {
       return res.status(404).json({
         success: false,
-        message: "Payment not found or not updated",
+        message: "Booking not found",
       });
     }
 
-    const paymentRecord = await paymentService.getPaymentById(order_id);
+    const amount = booking.Package?.price || booking.CustomPackage?.price;
+    await paymentService.setPaymentsAsNotCurrentByBookingId(uuid);
+    const newPayment = await paymentService.createPayment({
+      booking_id: uuid,
+      payment_id: payment_id,
+      amount,
+      currency: "USD",
+      method,
+      status,
+      status_message,
+      random_order_id: order_id,
+    });
+
+    // if (!updated) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "Payment not found or not updated",
+    //   });
+    // }
+
+    // const paymentRecord = await paymentService.getPaymentById(order_id);
+    const paymentRecord = await paymentService.getPaymentById(newPayment.id);
     const bookingRecord = await bookingService.getBookingById(
       paymentRecord.booking_id
     );
 
     if (bookingRecord) {
-      
       const template = emailTemplateService.generateInvoiceTemplate(
         bookingRecord.Package?.title || "Custom Package",
         bookingRecord.User.name,
@@ -189,12 +218,12 @@ const updatePayment = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Payment updated successfully",
+      message: "Payment successfull",
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Error updating payment",
+      message: "Error creating payment",
       error: error.message,
     });
   }

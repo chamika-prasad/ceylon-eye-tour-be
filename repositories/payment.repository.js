@@ -33,6 +33,21 @@ const updatePayment = async (id, data) => {
   }
 };
 
+const setPaymentsAsNotCurrentByBookingId = async (bookingId) => {
+  try {
+    const [updatedCount] = await Payment.update(
+      { is_current: false },
+      { where: { booking_id: bookingId } }
+    );
+
+    return updatedCount > 0;
+  } catch (error) {
+    throw new Error(
+      `Error updating payments for booking ${bookingId}: ${error.message}`
+    );
+  }
+};
+
 const getPaymentById = async (id) => {
   return await Payment.findByPk(id);
 };
@@ -43,4 +58,5 @@ export default {
   //   getPaymentById,
   updatePayment,
   getPaymentById,
+  setPaymentsAsNotCurrentByBookingId,
 };

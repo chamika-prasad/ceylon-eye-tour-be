@@ -262,7 +262,11 @@ const SQL_STATEMENTS = [
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
-)`];
+)`,
+  `ALTER TABLE payments
+ADD COLUMN random_order_id VARCHAR(255) DEFAULT NULL,
+ADD COLUMN is_current BOOLEAN DEFAULT TRUE`,
+];
 
 async function setupDatabase() {
   let connection;
