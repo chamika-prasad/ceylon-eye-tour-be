@@ -78,7 +78,8 @@ const getAllBookingsWithSearchAndPagination = async (
   limit,
   year,
   month,
-  date
+  date,
+  status
 ) => {
   return await bookingRepository.getAllBookingsWithSearchAndPagination(
     page,
@@ -86,7 +87,8 @@ const getAllBookingsWithSearchAndPagination = async (
     limit,
     year,
     month,
-    date
+    date,
+    status
   );
 };
 
@@ -97,7 +99,8 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
   limit,
   year,
   month,
-  date
+  date,
+  status
 ) => {
   return await bookingRepository.getBookingsByCustomerIdWithSearchAndPagination(
     customerId,
@@ -106,7 +109,8 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
     limit,
     year,
     month,
-    date
+    date,
+    status
   );
 };
 

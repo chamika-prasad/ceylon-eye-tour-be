@@ -139,12 +139,17 @@ const getAllBookingsWithSearchAndPagination = async (
   limit = 10,
   year = null,
   month = null,
-  date = null
+  date = null,
+  status = "all"
 ) => {
   const offset = (page - 1) * limit;
 
   // Build where clause for searching across related tables
   const whereClause = {};
+
+  if (status !== "all") {
+    whereClause.status = status;
+  }
 
   // Add search conditions
   if (searchTerm) {
@@ -244,7 +249,8 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
   limit = 10,
   year = null,
   month = null,
-  date = null
+  date = null,
+  status = "all"
 ) => {
   const offset = (page - 1) * limit;
 
@@ -253,6 +259,10 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
     customer_id: customerId,
     is_deleted: false,
   };
+
+  if (status !== "all") {
+    whereClause.status = status;
+  }
 
   // Add search conditions
   if (searchTerm) {

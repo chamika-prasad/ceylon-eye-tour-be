@@ -356,6 +356,24 @@ const getAllBookingsWithSearchAndPagination = async (req, res) => {
     const month = req.query.month ? parseInt(req.query.month) : null;
     const date = req.query.date ? parseInt(req.query.date) : null;
 
+    const status = parseInt(req.query.status) || 0;
+
+    if (status < 0 || status > 4) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status value",
+      });
+    }
+
+    const validStatuses = [
+      "all",
+      "pending",
+      "confirmed",
+      "cancelled",
+      "completed",
+    ];
+    var statusValue = validStatuses[status];
+
     // Validation
     if (page < 1) {
       return res.status(400).json({
@@ -409,7 +427,8 @@ const getAllBookingsWithSearchAndPagination = async (req, res) => {
       pageSize,
       year,
       month,
-      date
+      date,
+      statusValue
     );
 
     return res.status(200).json({
@@ -441,6 +460,24 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
     const year = req.query.year ? parseInt(req.query.year) : null;
     const month = req.query.month ? parseInt(req.query.month) : null;
     const date = req.query.date ? parseInt(req.query.date) : null;
+
+    const status = parseInt(req.query.status) || 0;
+
+    if (status < 0 || status > 4) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status value",
+      });
+    }
+
+    const validStatuses = [
+      "all",
+      "pending",
+      "confirmed",
+      "cancelled",
+      "completed",
+    ];
+    var statusValue = validStatuses[status];
 
     // Validation
     if (page < 1) {
@@ -504,7 +541,8 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (req, res) => {
         pageSize,
         year,
         month,
-        date
+        date,
+        statusValue
       );
 
     return res.status(200).json({
