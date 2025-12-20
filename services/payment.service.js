@@ -115,6 +115,10 @@ const separateUuidAndRandom = async (combinedValue) => {
   };
 };
 
+const deletePayment = async (id) => {
+  return await paymentRepository.deletePayment(id);
+}
+
 export default {
   hashPaymentDetails,
   createPayment,
@@ -123,7 +127,7 @@ export default {
   getPaymentById,
   updatePayment,
   getAccessToken,
-  // deletePayment,
+  deletePayment,
   combineUuidWithRandom,
   separateUuidAndRandom,
   setPaymentsAsNotCurrentByBookingId,

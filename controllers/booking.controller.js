@@ -3,6 +3,7 @@ import emailTemplateService from "../services/emailTemplate.service.js";
 import authService from "../services/auth.service.js";
 import packageService from "../services/package.service.js";
 import emailService from "../services/email.service.js";
+import paymentService from "./../services/payment.service.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -56,9 +57,26 @@ const updateBookingStatus = async (req, res) => {
       });
     }
 
+    var statusValue = status;
+
+    if (status === "pending") {
+      if (existingBooking?.Payment) {
+        if (
+          existingBooking?.Payment?.dataValues?.status === "success" ||
+          existingBooking?.Payment?.dataValues?.status === "pending"
+        ) {
+          statusValue = "confirmed";
+        } else {
+          await paymentService.deletePayment(
+            existingBooking?.Payment?.dataValues?.id
+          );
+        }
+      }
+    }
+
     const updatedBooking = await bookingService.updateBookingStatus(
       bookingId,
-      status
+      statusValue
     );
     const customer = await authService.getUserById(
       existingBooking?.customer_id
@@ -89,7 +107,7 @@ const updateBookingStatus = async (req, res) => {
     return res.json({
       success: true,
       message: `Booking ${status} for booking ID ${bookingNumber}.`,
-      data: updatedBooking,
+      // data: updatedBooking,
     });
   } catch (error) {
     return res.status(400).json({

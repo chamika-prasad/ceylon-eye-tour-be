@@ -52,6 +52,11 @@ const getPaymentById = async (id) => {
   return await Payment.findByPk(id);
 };
 
+const deletePayment = async (id) => {
+  const deleted = await Payment.destroy({ where: { id } });
+  return deleted > 0;
+};
+
 export default {
   createPayment,
   //   getAllPayments,
@@ -59,4 +64,5 @@ export default {
   updatePayment,
   getPaymentById,
   setPaymentsAsNotCurrentByBookingId,
+  deletePayment,
 };

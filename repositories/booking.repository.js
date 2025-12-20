@@ -60,6 +60,13 @@ const getBookingById = async (id) => {
         as: "User",
         attributes: ["name", "email", "passport", "country"], // Include customer name and email
       },
+      {
+        model: Payment,
+        as: "Payment",
+        attributes: ["id", "status"], // Include payment details
+        where: { is_current: true },
+        required: false, // IMPORTANT: keeps bookings even if no payment exists
+      },
     ],
   });
 };
