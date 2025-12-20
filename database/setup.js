@@ -233,6 +233,7 @@ const SQL_STATEMENTS = [
   FOREIGN KEY (custom_package_id) REFERENCES customize_packages(id),
   FOREIGN KEY (customer_id) REFERENCES users(id),
   is_deleted BOOL NOT NULL DEFAULT 0,
+  booking_no INT NOT NULL AUTO_INCREMENT UNIQUE FIRST,
   CONSTRAINT chk_package CHECK (
         (package_id IS NOT NULL AND custom_package_id IS NULL) OR 
         (package_id IS NULL AND custom_package_id IS NOT NULL)
@@ -247,6 +248,8 @@ const SQL_STATEMENTS = [
   method VARCHAR(20),
   status ENUM('success','pending','canceled','failed','chargedback') DEFAULT 'pending',
   status_message VARCHAR(255),
+  random_order_id VARCHAR(255) DEFAULT NULL,
+  is_current BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (booking_id) REFERENCES bookings(id)
@@ -263,9 +266,8 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
-  `ALTER TABLE payments
-ADD COLUMN random_order_id VARCHAR(255) DEFAULT NULL,
-ADD COLUMN is_current BOOLEAN DEFAULT TRUE`,
+  `ALTER TABLE bookings
+ADD COLUMN booking_no INT NOT NULL AUTO_INCREMENT UNIQUE FIRST`,
 ];
 
 async function setupDatabase() {
