@@ -31,8 +31,8 @@ const app = express();
 const server = http.createServer(app); // Create HTTP server
 
 // Initialize Socket.IO with the HTTP server
-// initializeSocket(server,process.env.FRONTEND_URL);
-initializeSocket(server,"http://localhost:4000");
+initializeSocket(server,process.env.FRONTEND_URL);
+// initializeSocket(server,"http://localhost:4000");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
