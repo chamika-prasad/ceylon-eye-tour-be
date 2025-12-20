@@ -90,6 +90,11 @@ const getBookingsByCustomerId = async (customerId) => {
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
       },
+      {
+        model: User,
+        as: "User",
+        attributes: ["email"], // Include customer name and email
+      },
     ],
   });
 };
