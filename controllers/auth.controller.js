@@ -165,10 +165,18 @@ const updateProfile = async (req, res) => {
       // Remove old profile image
       await fileUploadService.removeFile(existingUser.profile_image);
     }
-
+    const updatedUserDetails = await authService.getUserById(userId);
+    var token = await tokenService.generateToken(
+      updatedUserDetails.dataValues.id,
+      updatedUserDetails.dataValues.name,
+      updatedUserDetails.dataValues.email,
+      updatedUserDetails.dataValues.role,
+      updatedUserDetails.dataValues.profile_image
+    );
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
+      data: token,
     });
   } catch (error) {
     return res.status(500).json({
@@ -298,6 +306,7 @@ const getUserById = async (req, res) => {
     delete user.id;
     delete user.temp_pw;
     delete user.role;
+    delete user.pw;
     delete user.created_at;
     delete user.updated_at;
 
