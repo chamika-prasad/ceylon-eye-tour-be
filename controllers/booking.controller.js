@@ -88,7 +88,7 @@ const updateBookingStatus = async (req, res) => {
 
     return res.json({
       success: true,
-      message: `Booking status updated successfully for booking ID ${bookingId}.`,
+      message: `Booking ${status} for booking ID ${bookingNumber}.`,
       data: updatedBooking,
     });
   } catch (error) {
