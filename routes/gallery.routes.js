@@ -23,7 +23,12 @@ router.put(
   tokenMiddleware.authorizeAdmin,
   galleryController.updateGalleryApproval
 );
-router.post("/add", upload.single("image"), galleryController.addGalleryItem);
+router.post(
+  "/add",
+  upload.single("image"),
+  tokenMiddleware.verifyToken,
+  galleryController.addGalleryItem
+);
 router.delete(
   "/:id",
   tokenMiddleware.verifyToken,
