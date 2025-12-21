@@ -9,10 +9,10 @@ dotenv.config();
 let accessToken = null;
 let tokenExpiry = null;
 
-const hashPaymentDetails = async (orderId, amount) => {
+const hashPaymentDetails = async (orderId, amount, currency = "USD") => {
   let merchantSecret = process.env.PAYHERE_MERCHANT_SECRET;
   let merchantId = process.env.PAYHERE_MERCHANT_ID;
-  let currency = "LKR";
+  // let currency = "USD";
 
   let hashedSecret = MD5(merchantSecret).toString().toUpperCase();
   let amountFormated = parseFloat(amount)
@@ -117,7 +117,7 @@ const separateUuidAndRandom = async (combinedValue) => {
 
 const deletePayment = async (id) => {
   return await paymentRepository.deletePayment(id);
-}
+};
 
 export default {
   hashPaymentDetails,

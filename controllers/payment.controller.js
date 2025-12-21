@@ -9,7 +9,7 @@ dotenv.config();
 
 const hashPaymentDetails = async (req, res) => {
   try {
-    const { orderId, amount, currency = "LKR" } = req.body;
+    const { orderId, amount, currency = "USD" } = req.body;
 
     if (!orderId || !amount) {
       return res.status(400).json({
@@ -17,11 +17,12 @@ const hashPaymentDetails = async (req, res) => {
         message: "Missing required fields",
       });
     }
-
+    let forignCurrency = "USD";
     const hash = await paymentService.hashPaymentDetails(
       orderId,
       amount,
-      currency
+      // currency
+      forignCurrency
     );
 
     return res.status(200).json({
@@ -66,12 +67,15 @@ const createPayment = async (req, res) => {
     //   amount,
     //   currency,
     // });
+
+    let forignCurrency = "USD";
     const paymentId = await paymentService.combineUuidWithRandom(bookingId);
     const hash = await paymentService.hashPaymentDetails(
       // newPayment.id,
       paymentId,
       amount,
-      currency
+      // currency
+      forignCurrency
     );
 
     // return res.status(201).json({
