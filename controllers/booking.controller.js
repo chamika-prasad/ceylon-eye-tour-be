@@ -184,7 +184,7 @@ const createBooking = async (req, res) => {
     );
 
     await emailService.sendEmail({
-      to: process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL,
       subject: "New Booking Created - Jwing Tours",
       html: template,
     });
