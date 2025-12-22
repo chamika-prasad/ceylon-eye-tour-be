@@ -89,9 +89,10 @@ const getAllCustomizePackagesWithSearchAndPagination = async (
     const lowerSearchTerm = searchTerm.toLowerCase();
     filteredCustomizePackages = customizePackages.filter(
       (customizePackage) =>
-        customizePackage.User.name.toLowerCase().includes(lowerSearchTerm) ||
-        customizePackage.message.toLowerCase().includes(lowerSearchTerm) ||
-        customizePackage.User.country.toLowerCase().includes(lowerSearchTerm)
+        customizePackage.User.name.toLowerCase().includes(lowerSearchTerm)
+      // ||
+      //   customizePackage.message.toLowerCase().includes(lowerSearchTerm) ||
+      //   customizePackage.User.country.toLowerCase().includes(lowerSearchTerm)
     );
   }
 
