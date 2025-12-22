@@ -173,6 +173,7 @@ const getAllCustomizePackages = async () => {
         ],
       },
     ],
+    order: [["created_at", "DESC"]],
   });
 };
 
