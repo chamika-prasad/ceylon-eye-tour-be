@@ -324,6 +324,34 @@ const getUserById = async (req, res) => {
   }
 };
 
+const googleAuth = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(email);
+    
+    const existingUser = await authService.getUserByEmail(email);
+    if (!existingUser.success) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    var token = await tokenService.generateToken(
+      existingUser.data.id,
+      existingUser.data.name,
+      existingUser.data.email,
+      existingUser.data.role,
+      existingUser.data.profile_image
+    );
+
+    return res
+      .status(200)
+      .json({ success: true, data: token, message: "User login successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Google authentication failed" });
+  }
+};
+
 export default {
   register,
   login,
@@ -331,4 +359,5 @@ export default {
   getTempPassword,
   resetPassword,
   getUserById,
+  googleAuth,
 };

@@ -15,6 +15,8 @@ router.post(
 // Route for user login
 router.post("/login", authController.login);
 
+router.post("/google", authController.googleAuth);
+
 router.put(
   "/update-profile",
   tokenMiddleware.verifyToken,
@@ -25,10 +27,6 @@ router.put(
 router.put("/get-temp-password", authController.getTempPassword);
 router.put("/reset-password", authController.resetPassword);
 
-router.get(
-  "/user",
-  tokenMiddleware.verifyToken,
-  authController.getUserById
-);
+router.get("/user", tokenMiddleware.verifyToken, authController.getUserById);
 
 export default router;
