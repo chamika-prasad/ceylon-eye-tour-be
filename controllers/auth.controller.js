@@ -5,6 +5,16 @@ import tokenService from "./../services/token.service.js";
 import fileUploadService from "../services/fileUpload.service.js";
 import emailService from "../services/email.service.js";
 import emailTemplateService from "../services/emailTemplate.service.js";
+import { OAuth2Client } from "google-auth-library";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  "postmessage"
+);
 
 // Register method
 const register = async (req, res) => {
@@ -326,9 +336,34 @@ const getUserById = async (req, res) => {
 
 const googleAuth = async (req, res) => {
   try {
-    const { email } = req.body;
-    console.log(email);
-    
+    const { code } = req.body;
+
+    if (!code) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Authorization code is required" });
+    }
+
+    const { tokens } = await client.getToken(code);
+
+    // 2️⃣ VERIFY ID TOKEN
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const email = payload["email"];
+    const isVarified = payload["email_verified"];
+
+    // If email is not verified, reject the authentication
+    if (!isVarified) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is not verified." });
+    }
+
     const existingUser = await authService.getUserByEmail(email);
     if (!existingUser.success) {
       return res

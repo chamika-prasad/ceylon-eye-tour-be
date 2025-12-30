@@ -28,6 +28,9 @@ const verifyToken = (req, res, next) => {
       return res.status(401).json({ success: false, message: decoded.message });
     }
 
+    console.log(decoded);
+    
+
     req.user = decoded.data;
     next();
   } catch (error) {
