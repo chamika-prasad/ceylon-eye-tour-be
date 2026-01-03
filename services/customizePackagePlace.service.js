@@ -1,16 +1,17 @@
 import customizePackagePlaceRepository from "../repositories/customizePackagePlace.repository.js";
 
 const updateCustomizePackagePlace = async (id, data) => {
-  const { sortOrder, dayNo, description } = data;
+  // const { sortOrder, dayNo, description } = data;
 
   const updatedRows =
     await customizePackagePlaceRepository.updateCustomizePackagePlaceFields(
       id,
-      {
-        sortOrder,
-        dayNo,
-        description,
-      }
+      data
+      // {
+      //   sortOrder,
+      //   dayNo,
+      //   description,
+      // }
     );
 
   if (updatedRows === 0) {
