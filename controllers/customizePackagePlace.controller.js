@@ -60,7 +60,7 @@ const updateCustomizePackagePlace = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "CustomizePackagePlace updated successfully",
-        // data: result,
+        data: updateData,
       });
     } else {
       return res.status(200).json({
