@@ -1,4 +1,4 @@
-import * as customReviewRepository from "../repositories/customReview.repository.js";
+import customReviewRepository from "../repositories/customReview.repository.js";
 
 const createCustomReview = async (data) => {
   return await customReviewRepository.createCustomReview(data);

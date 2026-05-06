@@ -24,7 +24,7 @@ const getCustomReviewById = async (id) => {
   return await CustomReview.findByPk(id);
 };
 
-export {
+export default {
   createCustomReview,
   updateCustomReview,
   deleteCustomReview,
