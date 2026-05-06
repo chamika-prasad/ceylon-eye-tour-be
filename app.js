@@ -23,6 +23,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import customPackageRoutes from "./routes/customizePackage.routes.js";
 import customizePackagePlaceRoutes from "./routes/customizePackagePlace.routes.js";
+import customReviewRoutes from "./routes/customReview.routes.js";
 import seedRoutes from "./routes/seed.routes.js";
 
 dotenv.config();
@@ -61,6 +62,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/chats", messageRoutes);
 app.use("/api/custom-packages", customPackageRoutes);
 app.use("/api/custom-package-places", customizePackagePlaceRoutes);
+app.use("/api/custom-reviews", customReviewRoutes);
 app.use("/api/seeds", seedRoutes);
 
 // Error handling middleware
