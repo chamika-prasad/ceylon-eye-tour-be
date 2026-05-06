@@ -27,32 +27,34 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
+          set -e
+          
           cd /root/ceylon-eye-tour-be
           
           echo "Stopping application..."
-          pm2 stop 4
+          pm2 stop 4 || { echo "Failed to stop application"; exit 1; }
           
           echo "Pulling latest code..."
-          git pull origin main
+          git pull origin main || { echo "Failed to pull latest code"; exit 1; }
           
           # Install dependencies only if package.json changed
           if [ "${{ steps.changes.outputs.package_changed }}" == "true" ]; then
             echo "package.json changed. Installing dependencies..."
-            npm install
+            npm install || { echo "Failed to install dependencies"; exit 1; }
           else
             echo "No changes in package.json. Skipping npm install."
           fi
           
           # Always run database setup
           echo "Running database setup..."
-          npm run setup-db
+          npm run setup-db || { echo "Failed to run database setup"; exit 1; }
           
           # Always run database seed
           echo "Running database seed..."
-          npm run seed-db
+          npm run seed-db || { echo "Failed to run database seed"; exit 1; }
           
           echo "Starting application..."
-          pm2 start 4
-          pm2 save
+          pm2 start 4 || { echo "Failed to start application"; exit 1; }
+          pm2 save || { echo "Failed to save pm2 state"; exit 1; }
           
           echo "Deployment completed successfully!"
