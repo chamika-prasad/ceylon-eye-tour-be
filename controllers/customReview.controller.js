@@ -45,10 +45,21 @@ const getAllCustomReviews = async (req, res) => {
   try {
     const customReviews = await customReviewService.getAllCustomReviews();
 
+    const formattedReviews = customReviews.map((review) => ({
+      id: review.id,
+      rating: review.rating,
+      review: review.review,
+      description: review.description,
+      User: {
+        name: `${review.first_name || ""} ${review.last_name || ""}`.trim(),
+        profile_image: null,
+      },
+    }));
+
     res.status(200).json({
       success: true,
       message: "Custom reviews retrieved successfully",
-      data: customReviews,
+      data: formattedReviews,
     });
   } catch (error) {
     console.error("Error retrieving custom reviews:", error);
@@ -72,10 +83,21 @@ const getCustomReviewById = async (req, res) => {
       });
     }
 
+    const formattedReview = {
+      id: customReview.id,
+      rating: customReview.rating,
+      review: customReview.review,
+      description: customReview.description,
+      User: {
+        name: `${customReview.first_name || ""} ${customReview.last_name || ""}`.trim(),
+        profile_image: null,
+      },
+    };
+
     res.status(200).json({
       success: true,
       message: "Custom review retrieved successfully",
-      data: customReview,
+      data: formattedReview,
     });
   } catch (error) {
     console.error("Error retrieving custom review:", error);
