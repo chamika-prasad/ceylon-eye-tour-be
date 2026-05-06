@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/create", customReviewController.createCustomReview);
 router.get("/get-all", customReviewController.getAllCustomReviews);
+router.get("/get-all-paginated", customReviewController.getAllCustomReviewsWithSearchAndPagination);
 router.get("/:id",tokenMiddleware.verifyToken,tokenMiddleware.authorizeAdmin, customReviewController.getCustomReviewById);
 router.put("/update/:id",tokenMiddleware.verifyToken,tokenMiddleware.authorizeAdmin, customReviewController.updateCustomReview);
 router.delete("/:id",tokenMiddleware.verifyToken,tokenMiddleware.authorizeAdmin, customReviewController.deleteCustomReview);
