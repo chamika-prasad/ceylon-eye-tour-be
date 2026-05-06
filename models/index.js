@@ -18,6 +18,7 @@ import Message from "./Message.model.js";
 import CustomizePackage from "./CustomizePackage.model.js";
 import CustomizePackagePlace from "./CustomizePackagePlace.model.js";
 import CustomizePackagePlaceActivity from "./CustomizePackagePlaceActivity.model.js";
+import CustomReview from "./CustomReview.model.js";
 
 // Define all associations here
 const initModels = () => {
@@ -331,4 +332,5 @@ export {
   CustomizePackage,
   CustomizePackagePlace,
   CustomizePackagePlaceActivity,
+  CustomReview,
 };
