@@ -266,6 +266,17 @@ const SQL_STATEMENTS = [
     FOREIGN KEY (customer_id) REFERENCES users(id),
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 )`,
+  `CREATE TABLE IF NOT EXISTS custom_reviews (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    first_name VARCHAR(100) NULL,
+    last_name VARCHAR(100) NULL,
+    email VARCHAR(100) NULL,
+    rating INT NOT NULL DEFAULT 0,
+    review TEXT,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)`,
 ];
 
 async function setupDatabase() {
