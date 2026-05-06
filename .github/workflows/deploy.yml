@@ -19,9 +19,6 @@ jobs:
       run: |
         # Check package.json
         git diff --name-only HEAD~1 HEAD | grep -q "package.json" && echo "package_changed=true" >> $GITHUB_OUTPUT || echo "package_changed=false" >> $GITHUB_OUTPUT
-        
-        # Check database/setup.js
-        git diff --name-only HEAD~1 HEAD | grep -q "database/setup.js" && echo "db_changed=true" >> $GITHUB_OUTPUT || echo "db_changed=false" >> $GITHUB_OUTPUT
 
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
@@ -46,14 +43,13 @@ jobs:
             echo "No changes in package.json. Skipping npm install."
           fi
           
-          # Run database setup only if database/setup.js changed
-          if [ "${{ steps.changes.outputs.db_changed }}" == "true" ]; then
-            echo "database/setup.js changed. Running database setup..."
-            npm run setup-db
-            # npm run seed-db  # Uncomment if seeding is needed
-          else
-            echo "No changes in database/setup.js. Skipping database setup."
-          fi
+          # Always run database setup
+          echo "Running database setup..."
+          npm run setup-db
+          
+          # Always run database seed
+          echo "Running database seed..."
+          npm run seed-db
           
           echo "Starting application..."
           pm2 start 0
