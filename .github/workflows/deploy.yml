@@ -30,7 +30,7 @@ jobs:
           cd /root/ceylon-eye-tour-be
           
           echo "Stopping application..."
-          pm2 stop 0
+          pm2 stop 4
           
           echo "Pulling latest code..."
           git pull origin main
@@ -52,7 +52,7 @@ jobs:
           npm run seed-db
           
           echo "Starting application..."
-          pm2 start 0
+          pm2 start 4
           pm2 save
           
           echo "Deployment completed successfully!"
