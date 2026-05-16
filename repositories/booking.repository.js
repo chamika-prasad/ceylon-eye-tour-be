@@ -43,6 +43,7 @@ const getAllBookings = async () => {
           "paymentType",
           "remainBalance",
           "secondPaymentRequired",
+          "sourceUrl",
         ], // Include payment details
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
@@ -60,6 +61,7 @@ const getAllBookings = async () => {
               "status_message",
               "random_order_id",
               "paymentType",
+              "sourceUrl",
             ],
             required: false,
           },
@@ -98,6 +100,7 @@ const getBookingById = async (id) => {
           "paymentType",
           "remainBalance",
           "secondPaymentRequired",
+          "sourceUrl",
         ],
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
@@ -115,6 +118,7 @@ const getBookingById = async (id) => {
               "status_message",
               "random_order_id",
               "paymentType",
+              "sourceUrl",
             ],
             required: false,
           },
@@ -154,6 +158,7 @@ const getBookingsByCustomerId = async (customerId) => {
           "paymentType",
           "remainBalance",
           "secondPaymentRequired",
+          "sourceUrl",
         ], // Include payment details
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
@@ -171,6 +176,7 @@ const getBookingsByCustomerId = async (customerId) => {
               "status_message",
               "random_order_id",
               "paymentType",
+              "sourceUrl",
             ],
             required: false,
           },
@@ -315,6 +321,7 @@ const getAllBookingsWithSearchAndPagination = async (
           "paymentType",
           "remainBalance",
           "secondPaymentRequired",
+          "sourceUrl",
         ],
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
@@ -332,6 +339,7 @@ const getAllBookingsWithSearchAndPagination = async (
               "status_message",
               "random_order_id",
               "paymentType",
+              "sourceUrl",
             ],
             required: false,
           },
@@ -447,6 +455,7 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
           "paymentType",
           "remainBalance",
           "secondPaymentRequired",
+          "sourceUrl",
         ],
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
@@ -464,6 +473,7 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
               "status_message",
               "random_order_id",
               "paymentType",
+              "sourceUrl",
             ],
             required: false,
           },
