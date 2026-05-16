@@ -180,17 +180,33 @@ const updatePayment = async (req, res) => {
       });
     }
 
-    const amount = booking.Package?.price || booking.CustomPackage?.price;
+    const bookingAmount = parseFloat(
+      booking.Package?.price || booking.CustomPackage?.price || 0
+    );
+    const payhereAmount = parseFloat(payhere_amount);
+
+    let amount = bookingAmount;
+    let remainBalance = 0;
+    let secondPaymentRequired = false;
+
+    if (!Number.isNaN(payhereAmount) && payhereAmount < bookingAmount) {
+      amount = payhereAmount;
+      remainBalance = bookingAmount - payhereAmount;
+      secondPaymentRequired = true;
+    }
+
     await paymentService.setPaymentsAsNotCurrentByBookingId(uuid);
     const newPayment = await paymentService.createPayment({
       booking_id: uuid,
       payment_id: payment_id,
       amount,
-      currency: "USD",
+      currency: payhere_currency || "USD",
       method,
       status,
       status_message,
       random_order_id: order_id,
+      remainBalance,
+      secondPaymentRequired,
     });
 
     // if (!updated) {
