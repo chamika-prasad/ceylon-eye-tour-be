@@ -642,6 +642,8 @@ async function seedDatabase() {
       "SELECT id FROM bookings LIMIT 20"
     );
 
+    const shouldSeedSecondPayments = await isTableEmpty(connection, "second_payments");
+
     if (shouldSeedPayments) {
       for (let i = 0; i < 20; i = i + 2) {
         try {
@@ -661,6 +663,43 @@ async function seedDatabase() {
       console.log("✓ Payments seeded with sample records");
     } else {
       console.log("⏩ payments already has data, skipping");
+    }
+
+    if (shouldSeedSecondPayments) {
+      const [existingPayments] = await connection.query(
+        "SELECT id, booking_id FROM payments LIMIT 20"
+      );
+
+      if (existingPayments.length > 0) {
+        for (const payment of existingPayments) {
+          try {
+            await connection.query("INSERT IGNORE INTO second_payments SET ?", {
+              id: uuidv4(),
+              booking_id: payment.booking_id,
+              payment_id: `second_${uuidv4().substring(0, 8)}`,
+              amount: (Math.random() * 250 + 20).toFixed(2),
+              currency: "USD",
+              status: ["pending", "success", "failed"][
+                Math.floor(Math.random() * 3)
+              ],
+              status_message: "Seeded second payment",
+              random_order_id: `sec_${uuidv4().substring(0, 8)}`,
+              paymentType: 1,
+              sourceUrl: null,
+              first_payment_id: payment.id,
+            });
+          } catch (error) {
+            console.error("⚠️ Failed to seed second_payments:", error.message);
+          }
+        }
+        console.log("✓ Second payments seeded with sample records");
+      } else {
+        console.log(
+          "⏩ no existing payments found to create second payments, skipping"
+        );
+      }
+    } else {
+      console.log("⏩ second_payments already has data, skipping");
     }
 
     if (shouldSeedReviews) {
