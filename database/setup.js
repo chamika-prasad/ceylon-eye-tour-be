@@ -280,9 +280,7 @@ const SQL_STATEMENTS = [
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)`,
-  `ALTER TABLE payments
-  ADD COLUMN remainBalance INT NOT NULL DEFAULT 0;`
+)`
 ];
 
 async function setupDatabase() {
