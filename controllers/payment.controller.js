@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import axios from "axios";
 import paymentService from "./../services/payment.service.js";
+import secondPaymentService from "./../services/secondPayment.service.js";
 import bookingService from "../services/booking.service.js";
 import packageService from "../services/package.service.js";
 import emailService from "../services/email.service.js";
@@ -195,19 +196,40 @@ const updatePayment = async (req, res) => {
       secondPaymentRequired = true;
     }
 
-    await paymentService.setPaymentsAsNotCurrentByBookingId(uuid);
-    const newPayment = await paymentService.createPayment({
-      booking_id: uuid,
-      payment_id: payment_id,
-      amount,
-      currency: payhere_currency || "USD",
-      method,
-      status,
-      status_message,
-      random_order_id: order_id,
-      remainBalance,
-      secondPaymentRequired,
-    });
+    // Check if booking already has a payment and secondPaymentRequired is true
+    let newPayment;
+    let isSecondPayment = false;
+    if (booking.Payment && booking.Payment.id && booking.Payment.secondPaymentRequired) {
+      // Create second payment record if first payment exists and second payment is required
+      newPayment = await secondPaymentService.createSecondPayment({
+        booking_id: uuid,
+        first_payment_id: booking.Payment.id,
+        payment_id: payment_id,
+        amount,
+        currency: payhere_currency || "USD",
+        method,
+        status,
+        status_message,
+        random_order_id: order_id,
+      });
+      isSecondPayment = true;
+    } else {
+      // Create regular payment record
+      await paymentService.setPaymentsAsNotCurrentByBookingId(uuid);
+      newPayment = await paymentService.createPayment({
+        booking_id: uuid,
+        payment_id: payment_id,
+        amount,
+        currency: payhere_currency || "USD",
+        method,
+        status,
+        status_message,
+        random_order_id: order_id,
+        remainBalance,
+        secondPaymentRequired,
+      });
+      isSecondPayment = false;
+    }
 
     // if (!updated) {
     //   return res.status(404).json({
@@ -216,8 +238,14 @@ const updatePayment = async (req, res) => {
     //   });
     // }
 
-    // const paymentRecord = await paymentService.getPaymentById(order_id);
-    const paymentRecord = await paymentService.getPaymentById(newPayment.id);
+    // Retrieve the correct payment record based on type
+    let paymentRecord;
+    if (isSecondPayment) {
+      paymentRecord = await secondPaymentService.getSecondPaymentById(newPayment.id);
+    } else {
+      paymentRecord = await paymentService.getPaymentById(newPayment.id);
+    }
+
     const bookingRecord = await bookingService.getBookingById(
       paymentRecord.booking_id
     );
