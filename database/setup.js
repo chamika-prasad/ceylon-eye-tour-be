@@ -280,7 +280,25 @@ const SQL_STATEMENTS = [
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)`
+)`,
+  `CREATE TABLE IF NOT EXISTS second_payments (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  booking_id VARCHAR(36) NOT NULL,
+  payment_id VARCHAR(255),
+  amount DECIMAL(10, 2) NOT NULL,
+  currency VARCHAR(10),
+  method VARCHAR(20),
+  status ENUM('success','pending','canceled','failed','chargedback') DEFAULT 'pending',
+  status_message VARCHAR(255) DEFAULT NULL,
+  random_order_id VARCHAR(255) DEFAULT NULL,
+  paymentType INT NOT NULL DEFAULT 0,
+  sourceUrl VARCHAR(255) DEFAULT NULL,
+  first_payment_id VARCHAR(36),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (first_payment_id) REFERENCES payments(id)
+)
+`
 ];
 
 async function setupDatabase() {

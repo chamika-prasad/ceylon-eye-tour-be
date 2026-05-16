@@ -5,6 +5,7 @@ import User from "./User.model.js";
 import Package from "./Package.model.js";
 import PackagePlace from "./PackagePlace.model.js";
 import Payment from "./Payment.model.js";
+import SecondPayment from "./SecondPayment.model.js";
 import Place from "./Place.model.js";
 import PlaceActivity from "./PlaceActivity.model.js";
 import PackageCategory from "./PackageCategory.model.js";
@@ -204,6 +205,16 @@ const initModels = () => {
     as: "Booking",
   });
 
+  Payment.hasOne(SecondPayment, {
+    foreignKey: "first_payment_id",
+    as: "SecondPayment",
+  });
+
+  SecondPayment.belongsTo(Payment, {
+    foreignKey: "first_payment_id",
+    as: "Payment",
+  });
+
   // A User can send many messages
   User.hasMany(Message, {
     foreignKey: "sender_id",
@@ -319,6 +330,7 @@ export {
   Package,
   PackagePlace,
   Payment,
+  SecondPayment,
   Place,
   PlaceActivity,
   PackageCategory,
