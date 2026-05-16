@@ -3,6 +3,7 @@ import {
   User,
   Package,
   Payment,
+  SecondPayment,
   Review,
   CustomizePackage,
 } from "../models/index.js";
@@ -34,9 +35,36 @@ const getAllBookings = async () => {
       {
         model: Payment,
         as: "Payment",
-        attributes: ["id", "payment_id", "amount", "status"], // Include payment details
+        attributes: [
+          "id",
+          "payment_id",
+          "amount",
+          "status",
+          "paymentType",
+          "remainBalance",
+          "secondPaymentRequired",
+        ], // Include payment details
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
+        include: [
+          {
+            model: SecondPayment,
+            as: "SecondPayment",
+            attributes: [
+              "id",
+              "payment_id",
+              "amount",
+              "currency",
+              "method",
+              "status",
+              "status_message",
+              "random_order_id",
+              "paymentType",
+              "first_payment_id",
+            ],
+            required: false,
+          },
+        ],
       },
     ],
   });
@@ -63,9 +91,36 @@ const getBookingById = async (id) => {
       {
         model: Payment,
         as: "Payment",
-        attributes: ["id", "status"], // Include payment details
+        attributes: [
+          "id",
+          "payment_id",
+          "amount",
+          "status",
+          "paymentType",
+          "remainBalance",
+          "secondPaymentRequired",
+        ],
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
+        include: [
+          {
+            model: SecondPayment,
+            as: "SecondPayment",
+            attributes: [
+              "id",
+              "payment_id",
+              "amount",
+              "currency",
+              "method",
+              "status",
+              "status_message",
+              "random_order_id",
+              "paymentType",
+              "first_payment_id",
+            ],
+            required: false,
+          },
+        ],
       },
     ],
   });
@@ -93,9 +148,36 @@ const getBookingsByCustomerId = async (customerId) => {
       {
         model: Payment,
         as: "Payment",
-        attributes: ["id", "payment_id", "amount", "status"], // Include payment details
+        attributes: [
+          "id",
+          "payment_id",
+          "amount",
+          "status",
+          "paymentType",
+          "remainBalance",
+          "secondPaymentRequired",
+        ], // Include payment details
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
+        include: [
+          {
+            model: SecondPayment,
+            as: "SecondPayment",
+            attributes: [
+              "id",
+              "payment_id",
+              "amount",
+              "currency",
+              "method",
+              "status",
+              "status_message",
+              "random_order_id",
+              "paymentType",
+              "first_payment_id",
+            ],
+            required: false,
+          },
+        ],
       },
       {
         model: User,
@@ -228,9 +310,36 @@ const getAllBookingsWithSearchAndPagination = async (
       {
         model: Payment,
         as: "Payment",
-        attributes: ["id", "payment_id", "amount", "status"],
+        attributes: [
+          "id",
+          "payment_id",
+          "amount",
+          "status",
+          "paymentType",
+          "remainBalance",
+          "secondPaymentRequired",
+        ],
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
+        include: [
+          {
+            model: SecondPayment,
+            as: "SecondPayment",
+            attributes: [
+              "id",
+              "payment_id",
+              "amount",
+              "currency",
+              "method",
+              "status",
+              "status_message",
+              "random_order_id",
+              "paymentType",
+              "first_payment_id",
+            ],
+            required: false,
+          },
+        ],
       },
     ],
     limit: parseInt(limit),
@@ -334,9 +443,36 @@ const getBookingsByCustomerIdWithSearchAndPagination = async (
       {
         model: Payment,
         as: "Payment",
-        attributes: ["id", "payment_id", "amount", "status"],
+        attributes: [
+          "id",
+          "payment_id",
+          "amount",
+          "status",
+          "paymentType",
+          "remainBalance",
+          "secondPaymentRequired",
+        ],
         where: { is_current: true },
         required: false, // IMPORTANT: keeps bookings even if no payment exists
+        include: [
+          {
+            model: SecondPayment,
+            as: "SecondPayment",
+            attributes: [
+              "id",
+              "payment_id",
+              "amount",
+              "currency",
+              "method",
+              "status",
+              "status_message",
+              "random_order_id",
+              "paymentType",
+              "first_payment_id",
+            ],
+            required: false,
+          },
+        ],
       },
     ],
     limit: parseInt(limit),
