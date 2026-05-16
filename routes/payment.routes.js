@@ -1,6 +1,7 @@
 import express from "express";
 import paymentController from "../controllers/payment.controller.js";
 import tokenMiddleware from "../middlewares/token.middleware.js";
+import upload from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
@@ -13,6 +14,17 @@ router.post(
 
 // ✅ Create a new payment
 router.post("/add", paymentController.createPayment);
+
+// Transfer payment (requires document upload)
+router.post(
+  "/transfer",
+  upload.single("document"),
+  tokenMiddleware.verifyToken,
+  paymentController.transferPayment
+);
+
+// Cash payment
+router.post("/cash", tokenMiddleware.verifyToken,tokenMiddleware.authorizeAdmin, paymentController.cashPayment);
 
 // // ✅ Get all payments
 // router.get("/", paymentController.getAllPayments);
