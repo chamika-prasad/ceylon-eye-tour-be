@@ -152,6 +152,8 @@ const updatePayment = async (req, res) => {
       merchant_id,
       order_id,
       payment_id,
+      payhere_amount,
+      payhere_currency,
       status_code,
       md5sig,
       method,
