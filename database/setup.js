@@ -297,9 +297,7 @@ const SQL_STATEMENTS = [
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (first_payment_id) REFERENCES payments(id)
-)`,
-`ALTER TABLE payments
-  ADD COLUMN remainBalance INT NOT NULL DEFAULT 0;`
+)`
 ];
 
 async function setupDatabase() {
