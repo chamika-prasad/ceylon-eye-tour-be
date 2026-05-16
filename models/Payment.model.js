@@ -30,6 +30,22 @@ const Payment = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    paymentType: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    secondPaymentRequired: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    sourceUrl: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    remainBalance: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
   },
   {
     tableName: "payments",
