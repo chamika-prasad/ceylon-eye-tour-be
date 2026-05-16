@@ -702,6 +702,57 @@ async function seedDatabase() {
       console.log("⏩ second_payments already has data, skipping");
     }
 
+    try {
+      await connection.query(
+        `UPDATE payments
+         SET secondPaymentRequired = TRUE
+         WHERE id IN (
+           SELECT DISTINCT first_payment_id
+           FROM second_payments
+           WHERE first_payment_id IS NOT NULL
+         )`
+      );
+      console.log("✓ Payment records updated for secondPaymentRequired where second payments exist");
+    } catch (error) {
+      console.error("⚠️ Failed to update payment secondPaymentRequired flags:", error.message);
+    }
+
+    // Keep a mix: remove half of the second payment records and clear the flag on their parent payments
+    try {
+      const [paymentRows] = await connection.query(
+        `SELECT DISTINCT first_payment_id
+         FROM second_payments
+         WHERE first_payment_id IS NOT NULL`
+      );
+
+      if (paymentRows.length > 1) {
+        const idsToRemove = paymentRows
+          .filter((_, index) => index % 2 === 0)
+          .map((row) => row.first_payment_id);
+
+        if (idsToRemove.length > 0) {
+          await connection.query(
+            `DELETE FROM second_payments WHERE first_payment_id IN (?)`,
+            [idsToRemove]
+          );
+
+          await connection.query(
+            `UPDATE payments SET secondPaymentRequired = FALSE WHERE id IN (?)`,
+            [idsToRemove]
+          );
+
+          console.log(
+            `✓ Mixed payment sample created: removed second payments for ${idsToRemove.length} parent payment(s)`
+          );
+        }
+      }
+    } catch (error) {
+      console.error(
+        "⚠️ Failed to create mixed payment/second payment sample:",
+        error.message
+      );
+    }
+
     if (shouldSeedReviews) {
       for (let i = 0; i < 10; i = i + 2) {
         const customer = customers[Math.floor(Math.random() * customers.length)];
