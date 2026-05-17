@@ -43,4 +43,9 @@ router.post(
 // // ✅ Delete payment by ID
 // router.delete("/:id", paymentController.deletePayment);
 
+router.post(
+  "/refund-second-payment",
+  paymentController.refundSecondPayment
+);
+
 export default router;

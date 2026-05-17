@@ -572,6 +572,68 @@ const refundPayment = async (req, res) => {
   }
 };
 
+const refundSecondPayment = async (req, res) => {
+  try {
+    const { payment_id, description, pyament_record_id } = req.body;
+    if (!payment_id || !description || !pyament_record_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
+    }
+
+    const paymentRecord = await secondPaymentService.getSecondPaymentById(
+      pyament_record_id
+    );
+    if (!paymentRecord) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Payment record not found" });
+    }
+
+    const token = await paymentService.getAccessToken();
+    const PAYHERE_REFUND_URL =
+      process.env.PAYHERE_MODE === "live"
+        ? "https://www.payhere.lk/merchant/v1/payment/refund"
+        : "https://sandbox.payhere.lk/merchant/v1/payment/refund";
+
+    const response = await axios.post(
+      PAYHERE_REFUND_URL,
+      { payment_id, description },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const updated = await secondPaymentService.updateSecondPayment(pyament_record_id, {
+      status: "chargedback",
+    });
+
+    if (!updated) {
+      return res.status(400).json({
+        success: false,
+        message: "Refound success but database update faild updated",
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: response.data,
+      message: "Refund successful",
+    });
+  } catch (err) {
+    console.error("Refund Error:", err.response?.data || err.message);
+
+    return res.status(err.status || 500).json({
+      success: false,
+      message: "Refund failed",
+      error: err.response?.data || err.message,
+    });
+  }
+};
+
 export default {
   hashPaymentDetails,
   createPayment,
@@ -582,4 +644,5 @@ export default {
   // getPaymentById,
   updatePayment,
   // deletePayment,
+  refundSecondPayment,
 };
