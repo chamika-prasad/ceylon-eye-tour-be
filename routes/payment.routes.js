@@ -48,4 +48,12 @@ router.post(
   paymentController.refundSecondPayment
 );
 
+// Update payment record status by type (1=Payment, 2=SecondPayment)
+router.post(
+  "/update-record-status",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  paymentController.updatePaymentRecordStatus
+);
+
 export default router;

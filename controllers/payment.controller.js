@@ -634,6 +634,86 @@ const refundSecondPayment = async (req, res) => {
   }
 };
 
+// Update payment record status by type
+const updatePaymentRecordStatus = async (req, res) => {
+  try {
+    const { type, id } = req.body;
+
+    // Validation
+    if (!type || !id) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: type and id are required",
+      });
+    }
+
+    // Validate type
+    if (type !== 1 && type !== 2) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid type. Type must be 1 (Payment) or 2 (SecondPayment)",
+      });
+    }
+
+    var status = "success";
+
+    if (type === 1) {
+      // Update Payment table
+      const payment = await paymentService.getPaymentById(id);
+      if (!payment) {
+        return res.status(404).json({
+          success: false,
+          message: "Payment record not found",
+        });
+      }
+
+      const updated = await paymentService.updatePayment(id, { status });
+      if (!updated) {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to update payment record",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Payment record status updated successfully",
+        data: { id, type: "Payment", status },
+      });
+    } else if (type === 2) {
+      // Update SecondPayment table
+      const secondPayment = await secondPaymentService.getSecondPaymentById(id);
+      if (!secondPayment) {
+        return res.status(404).json({
+          success: false,
+          message: "Second payment record not found",
+        });
+      }
+
+      const updated = await secondPaymentService.updateSecondPayment(id, { status });
+      if (!updated) {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to update second payment record",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Second payment record status updated successfully",
+        data: { id, type: "SecondPayment", status },
+      });
+    }
+  } catch (error) {
+    console.error("Error updating payment record status:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   hashPaymentDetails,
   createPayment,
@@ -645,4 +725,5 @@ export default {
   updatePayment,
   // deletePayment,
   refundSecondPayment,
+  updatePaymentRecordStatus,
 };
