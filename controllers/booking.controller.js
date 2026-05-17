@@ -59,20 +59,21 @@ const updateBookingStatus = async (req, res) => {
 
     var statusValue = status;
 
-    if (status === "pending") {
-      if (existingBooking?.Payment) {
-        if (
-          existingBooking?.Payment?.dataValues?.status === "success" ||
-          existingBooking?.Payment?.dataValues?.status === "pending"
-        ) {
-          statusValue = "confirmed";
-        } else {
-          await paymentService.deletePayment(
-            existingBooking?.Payment?.dataValues?.id
-          );
-        }
-      }
-    }
+    // if (existingBooking.status === "pending") {
+    //   if (existingBooking?.Payment) {
+    //     if (
+    //       // existingBooking?.Payment?.dataValues?.status === "success" ||
+    //       // existingBooking?.Payment?.dataValues?.status === "pending"
+    //       existingBooking?.Payment?.dataValues?.status === "success"
+    //     ) {
+    //       statusValue = "confirmed";
+    //     } else {
+    //       await paymentService.deletePayment(
+    //         existingBooking?.Payment?.dataValues?.id
+    //       );
+    //     }
+    //   }
+    // }
 
     const updatedBooking = await bookingService.updateBookingStatus(
       bookingId,
