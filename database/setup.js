@@ -297,11 +297,7 @@ const SQL_STATEMENTS = [
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (first_payment_id) REFERENCES payments(id)
-)`,
-`ALTER TABLE payments 
-MODIFY COLUMN status ENUM('success', 'pending', 'canceled', 'failed', 'chargedback', 'refund') DEFAULT 'pending'`,
-`ALTER TABLE second_payments 
-MODIFY COLUMN status ENUM('success', 'pending', 'canceled', 'failed', 'chargedback', 'refund') DEFAULT 'pending'`
+)`
 ];
 
 async function setupDatabase() {
