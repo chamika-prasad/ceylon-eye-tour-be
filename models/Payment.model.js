@@ -20,7 +20,8 @@ const Payment = sequelize.define(
         "pending",
         "canceled",
         "failed",
-        "chargedback"
+        "chargedback",
+        "refund"
       ),
       defaultValue: "pending",
     },
