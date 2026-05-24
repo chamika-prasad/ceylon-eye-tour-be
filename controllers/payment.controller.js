@@ -103,51 +103,6 @@ const createPayment = async (req, res) => {
   }
 };
 
-// // ✅ Get all payments
-// const getAllPayments = async (req, res) => {
-//   try {
-//     const payments = await paymentService.getAllPayments();
-//     return res.status(200).json({
-//       success: true,
-//       message: "Payments retrieved successfully",
-//       data: payments,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       success: false,
-//       message: "Error retrieving payments",
-//       error: error.message,
-//     });
-//   }
-// };
-
-// // ✅ Get payment by ID
-// const getPaymentById = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const payment = await paymentService.getPaymentById(id);
-
-//     if (!payment) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Payment not found",
-//       });
-//     }
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "Payment retrieved successfully",
-//       data: payment,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       success: false,
-//       message: "Error retrieving payment",
-//       error: error.message,
-//     });
-//   }
-// };
-
 // // ✅ Update payment
 const updatePayment = async (req, res) => {
   try {
