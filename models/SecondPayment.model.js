@@ -39,7 +39,8 @@ const SecondPayment = sequelize.define(
         "pending",
         "canceled",
         "failed",
-        "chargedback"
+        "chargedback",
+        "refund"
       ),
       defaultValue: "pending",
     },
