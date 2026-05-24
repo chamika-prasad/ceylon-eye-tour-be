@@ -246,7 +246,7 @@ const SQL_STATEMENTS = [
   amount DECIMAL(10, 2) NOT NULL,
   currency VARCHAR(10),
   method VARCHAR(20),
-  status ENUM('success','pending','canceled','failed','chargedback') DEFAULT 'pending',
+  status ENUM('success','pending','canceled','failed','chargedback','refund') DEFAULT 'pending',
   status_message VARCHAR(255),
   random_order_id VARCHAR(255) DEFAULT NULL,
   is_current BOOLEAN DEFAULT TRUE,
@@ -288,7 +288,7 @@ const SQL_STATEMENTS = [
   amount DECIMAL(10, 2) NOT NULL,
   currency VARCHAR(10),
   method VARCHAR(20),
-  status ENUM('success','pending','canceled','failed','chargedback') DEFAULT 'pending',
+  status ENUM('success','pending','canceled','failed','chargedback','refund') DEFAULT 'pending',
   status_message VARCHAR(255) DEFAULT NULL,
   random_order_id VARCHAR(255) DEFAULT NULL,
   paymentType INT NOT NULL DEFAULT 0,
@@ -297,7 +297,11 @@ const SQL_STATEMENTS = [
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (first_payment_id) REFERENCES payments(id)
-)`
+)`,
+`ALTER TABLE payments 
+MODIFY COLUMN status ENUM('success', 'pending', 'canceled', 'failed', 'chargedback', 'refund') DEFAULT 'pending'`,
+`ALTER TABLE second_payments 
+MODIFY COLUMN status ENUM('success', 'pending', 'canceled', 'failed', 'chargedback', 'refund') DEFAULT 'pending'`
 ];
 
 async function setupDatabase() {
