@@ -282,203 +282,203 @@ const updatePayment = async (req, res) => {
   }
 };
 
-  // Transfer payment (requires uploaded document)
-  const transferPayment = async (req, res) => {
-    try {
-      const { bookingId, amount } = req.body;
+// Transfer payment (requires uploaded document)
+const transferPayment = async (req, res) => {
+  try {
+    const { bookingId, amount } = req.body;
 
-      if (!bookingId || !amount) {
-        return res.status(400).json({
-          success: false,
-          message: "bookingId and amount are required",
-        });
-      }
-
-      if (!req.file) {
-        return res.status(400).json({
-          success: false,
-          message: "Transfer document is required",
-        });
-      }
-
-      const booking = await bookingService.getBookingById(bookingId);
-      if (!booking) {
-        return res.status(404).json({ success: false, message: "Booking not found" });
-      }
-
-      const bookingAmount = parseFloat(
-        booking.Package?.price || booking.CustomPackage?.price || 0
-      );
-      const payAmount = parseFloat(amount);
-
-      let remainBalance = 0;
-      let secondPaymentRequired = false;
-      if (!Number.isNaN(payAmount) && payAmount < bookingAmount) {
-        remainBalance = bookingAmount - payAmount;
-        secondPaymentRequired = true;
-      }
-
-      // Save uploaded file to uploads/payments using fileUploadService
-      const uploadDir = path.join("uploads", "payments");
-      const filename = await fileUploadService.uploadFile(uploadDir, req.file);
-      const sourceUrl = `/uploads/payments/${filename}`;
-
-      // Determine whether to create second payment
-      let newPayment;
-      let isSecondPayment = false;
-      if (booking.Payment && booking.Payment.id && booking.Payment.secondPaymentRequired) {
-        newPayment = await secondPaymentService.createSecondPayment({
-          booking_id: bookingId,
-          first_payment_id: booking.Payment.id,
-          payment_id: null,
-          amount: payAmount,
-          currency: "USD",
-          method: "transfer",
-          status: "pending",
-          status_message: null,
-          random_order_id: null,
-          sourceUrl,
-          paymentType: 1,
-        });
-        isSecondPayment = true;
-      } else {
-        await paymentService.setPaymentsAsNotCurrentByBookingId(bookingId);
-        newPayment = await paymentService.createPayment({
-          booking_id: bookingId,
-          payment_id: null,
-          amount: payAmount,
-          currency: "USD",
-          method: "transfer",
-          status: "pending",
-          status_message: null,
-          random_order_id: null,
-          remainBalance,
-          secondPaymentRequired,
-          sourceUrl,
-          paymentType: 1,
-        });
-        isSecondPayment = false;
-      }
-
-      // Fetch payment record for email
-      let paymentRecord = isSecondPayment
-        ? await secondPaymentService.getSecondPaymentById(newPayment.id)
-        : await paymentService.getPaymentById(newPayment.id);
-
-      const bookingRecord = await bookingService.getBookingById(paymentRecord.booking_id);
-      if (bookingRecord) {
-        const template = emailTemplateService.generateInvoiceTemplate(
-          bookingRecord.Package?.title || "Custom Package",
-          bookingRecord.User.name,
-          paymentRecord.amount,
-          paymentRecord.status,
-          paymentRecord.updated_at,
-          bookingRecord.booking_no
-        );
-
-        await emailService.sendEmail({
-          to: bookingRecord.User.email,
-          subject: "Payment Invoice - Jwing Tours",
-          html: template,
-        });
-      }
-
-      return res.status(200).json({ success: true, message: "Transfer recorded" });
-    } catch (err) {
-      return res.status(500).json({ success: false, message: "Error recording transfer", error: err.message });
+    if (!bookingId || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: "bookingId and amount are required",
+      });
     }
-  };
 
-  // Cash payment (no document required)
-  const cashPayment = async (req, res) => {
-    try {
-      const { bookingId, amount } = req.body;
-
-      if (!bookingId || !amount) {
-        return res.status(400).json({
-          success: false,
-          message: "bookingId and amount are required",
-        });
-      }
-
-      const booking = await bookingService.getBookingById(bookingId);
-      if (!booking) {
-        return res.status(404).json({ success: false, message: "Booking not found" });
-      }
-
-      const bookingAmount = parseFloat(
-        booking.Package?.price || booking.CustomPackage?.price || 0
-      );
-      const payAmount = parseFloat(amount);
-
-      let remainBalance = 0;
-      let secondPaymentRequired = false;
-      if (!Number.isNaN(payAmount) && payAmount < bookingAmount) {
-        remainBalance = bookingAmount - payAmount;
-        secondPaymentRequired = true;
-      }
-
-      let newPayment;
-      let isSecondPayment = false;
-      if (booking.Payment && booking.Payment.id && booking.Payment.secondPaymentRequired) {
-        newPayment = await secondPaymentService.createSecondPayment({
-          booking_id: bookingId,
-          first_payment_id: booking.Payment.id,
-          payment_id: null,
-          amount: payAmount,
-          currency: "USD",
-          method: "cash",
-          status: "success",
-          status_message: null,
-          random_order_id: null,
-          paymentType: 2,
-        });
-        isSecondPayment = true;
-      } else {
-        await paymentService.setPaymentsAsNotCurrentByBookingId(bookingId);
-        newPayment = await paymentService.createPayment({
-          booking_id: bookingId,
-          payment_id: null,
-          amount: payAmount,
-          currency: "USD",
-          method: "cash",
-          status: "success",
-          status_message: null,
-          random_order_id: null,
-          remainBalance,
-          secondPaymentRequired,
-          paymentType: 2,
-        });
-        isSecondPayment = false;
-      }
-
-      let paymentRecord = isSecondPayment
-        ? await secondPaymentService.getSecondPaymentById(newPayment.id)
-        : await paymentService.getPaymentById(newPayment.id);
-
-      const bookingRecord = await bookingService.getBookingById(paymentRecord.booking_id);
-      if (bookingRecord) {
-        const template = emailTemplateService.generateInvoiceTemplate(
-          bookingRecord.Package?.title || "Custom Package",
-          bookingRecord.User.name,
-          paymentRecord.amount,
-          paymentRecord.status,
-          paymentRecord.updated_at,
-          bookingRecord.booking_no
-        );
-
-        await emailService.sendEmail({
-          to: bookingRecord.User.email,
-          subject: "Payment Invoice - Jwing Tours",
-          html: template,
-        });
-      }
-
-      return res.status(200).json({ success: true, message: "Cash payment recorded" });
-    } catch (err) {
-      return res.status(500).json({ success: false, message: "Error recording cash payment", error: err.message });
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Transfer document is required",
+      });
     }
-  };
+
+    const booking = await bookingService.getBookingById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    const bookingAmount = parseFloat(
+      booking.Package?.price || booking.CustomPackage?.price || 0
+    );
+    const payAmount = parseFloat(amount);
+
+    let remainBalance = 0;
+    let secondPaymentRequired = false;
+    if (!Number.isNaN(payAmount) && payAmount < bookingAmount) {
+      remainBalance = bookingAmount - payAmount;
+      secondPaymentRequired = true;
+    }
+
+    // Save uploaded file to uploads/payments using fileUploadService
+    const uploadDir = path.join("uploads", "payments");
+    const filename = await fileUploadService.uploadFile(uploadDir, req.file);
+    const sourceUrl = `/uploads/payments/${filename}`;
+
+    // Determine whether to create second payment
+    let newPayment;
+    let isSecondPayment = false;
+    if (booking.Payment && booking.Payment.id && booking.Payment.secondPaymentRequired) {
+      newPayment = await secondPaymentService.createSecondPayment({
+        booking_id: bookingId,
+        first_payment_id: booking.Payment.id,
+        payment_id: null,
+        amount: payAmount,
+        currency: "USD",
+        method: "transfer",
+        status: "pending",
+        status_message: null,
+        random_order_id: null,
+        sourceUrl,
+        paymentType: 1,
+      });
+      isSecondPayment = true;
+    } else {
+      await paymentService.setPaymentsAsNotCurrentByBookingId(bookingId);
+      newPayment = await paymentService.createPayment({
+        booking_id: bookingId,
+        payment_id: null,
+        amount: payAmount,
+        currency: "USD",
+        method: "transfer",
+        status: "pending",
+        status_message: null,
+        random_order_id: null,
+        remainBalance,
+        secondPaymentRequired,
+        sourceUrl,
+        paymentType: 1,
+      });
+      isSecondPayment = false;
+    }
+
+    // Fetch payment record for email
+    let paymentRecord = isSecondPayment
+      ? await secondPaymentService.getSecondPaymentById(newPayment.id)
+      : await paymentService.getPaymentById(newPayment.id);
+
+    const bookingRecord = await bookingService.getBookingById(paymentRecord.booking_id);
+    if (bookingRecord) {
+      const template = emailTemplateService.generateInvoiceTemplate(
+        bookingRecord.Package?.title || "Custom Package",
+        bookingRecord.User.name,
+        paymentRecord.amount,
+        paymentRecord.status,
+        paymentRecord.updated_at,
+        bookingRecord.booking_no
+      );
+
+      await emailService.sendEmail({
+        to: bookingRecord.User.email,
+        subject: "Payment Invoice - Jwing Tours",
+        html: template,
+      });
+    }
+
+    return res.status(200).json({ success: true, message: "Transfer recorded" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Error recording transfer", error: err.message });
+  }
+};
+
+// Cash payment (no document required)
+const cashPayment = async (req, res) => {
+  try {
+    const { bookingId, amount } = req.body;
+
+    if (!bookingId || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: "bookingId and amount are required",
+      });
+    }
+
+    const booking = await bookingService.getBookingById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    const bookingAmount = parseFloat(
+      booking.Package?.price || booking.CustomPackage?.price || 0
+    );
+    const payAmount = parseFloat(amount);
+
+    let remainBalance = 0;
+    let secondPaymentRequired = false;
+    if (!Number.isNaN(payAmount) && payAmount < bookingAmount) {
+      remainBalance = bookingAmount - payAmount;
+      secondPaymentRequired = true;
+    }
+
+    let newPayment;
+    let isSecondPayment = false;
+    if (booking.Payment && booking.Payment.id && booking.Payment.secondPaymentRequired) {
+      newPayment = await secondPaymentService.createSecondPayment({
+        booking_id: bookingId,
+        first_payment_id: booking.Payment.id,
+        payment_id: null,
+        amount: payAmount,
+        currency: "USD",
+        method: "cash",
+        status: "success",
+        status_message: null,
+        random_order_id: null,
+        paymentType: 2,
+      });
+      isSecondPayment = true;
+    } else {
+      await paymentService.setPaymentsAsNotCurrentByBookingId(bookingId);
+      newPayment = await paymentService.createPayment({
+        booking_id: bookingId,
+        payment_id: null,
+        amount: payAmount,
+        currency: "USD",
+        method: "cash",
+        status: "success",
+        status_message: null,
+        random_order_id: null,
+        remainBalance,
+        secondPaymentRequired,
+        paymentType: 2,
+      });
+      isSecondPayment = false;
+    }
+
+    let paymentRecord = isSecondPayment
+      ? await secondPaymentService.getSecondPaymentById(newPayment.id)
+      : await paymentService.getPaymentById(newPayment.id);
+
+    const bookingRecord = await bookingService.getBookingById(paymentRecord.booking_id);
+    if (bookingRecord) {
+      const template = emailTemplateService.generateInvoiceTemplate(
+        bookingRecord.Package?.title || "Custom Package",
+        bookingRecord.User.name,
+        paymentRecord.amount,
+        paymentRecord.status,
+        paymentRecord.updated_at,
+        bookingRecord.booking_no
+      );
+
+      await emailService.sendEmail({
+        to: bookingRecord.User.email,
+        subject: "Payment Invoice - Jwing Tours",
+        html: template,
+      });
+    }
+
+    return res.status(200).json({ success: true, message: "Cash payment recorded" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Error recording cash payment", error: err.message });
+  }
+};
 
 // // ✅ Delete payment
 // const deletePayment = async (req, res) => {
@@ -545,14 +545,21 @@ const refundPayment = async (req, res) => {
       }
     );
 
-    const updated = await paymentService.updatePayment(pyament_record_id, {
-      status: "refund",
-    });
+    if (response && response.status && response.status == 1) {
+      const updated = await paymentService.updatePayment(pyament_record_id, {
+        status: "refund",
+      });
 
-    if (!updated) {
+      if (!updated) {
+        return res.status(400).json({
+          success: false,
+          message: "Refound success but database update faild updated",
+        });
+      }
+    } else {
       return res.status(400).json({
         success: false,
-        message: "Refound success but database update faild updated",
+        message: response?.error || response?.msg || "Something went wrong",
       });
     }
 
@@ -607,14 +614,22 @@ const refundSecondPayment = async (req, res) => {
       }
     );
 
-    const updated = await secondPaymentService.updateSecondPayment(pyament_record_id, {
-      status: "refund",
-    });
 
-    if (!updated) {
+    if (response && response.status && response.status == 1) {
+      const updated = await secondPaymentService.updateSecondPayment(pyament_record_id, {
+        status: "refund",
+      });
+
+      if (!updated) {
+        return res.status(400).json({
+          success: false,
+          message: "Refund success but database update faild updated",
+        });
+      }
+    } else {
       return res.status(400).json({
         success: false,
-        message: "Refound success but database update faild updated",
+        message: response?.error || response?.msg || "Something went wrong",
       });
     }
 
