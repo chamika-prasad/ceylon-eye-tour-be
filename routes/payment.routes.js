@@ -24,7 +24,7 @@ router.post(
 );
 
 // Cash payment
-router.post("/cash", tokenMiddleware.verifyToken,tokenMiddleware.authorizeAdmin, paymentController.cashPayment);
+router.post("/cash", tokenMiddleware.verifyToken, tokenMiddleware.authorizeAdmin, paymentController.cashPayment);
 
 // // ✅ Get all payments
 // router.get("/", paymentController.getAllPayments);
@@ -37,6 +37,7 @@ router.post("/update", paymentController.updatePayment);
 
 router.post(
   "/refund",
+  tokenMiddleware.verifyToken, tokenMiddleware.authorizeAdmin,
   paymentController.refundPayment
 );
 
@@ -45,11 +46,13 @@ router.post(
 
 router.post(
   "/refund-second-payment",
+  tokenMiddleware.verifyToken, tokenMiddleware.authorizeAdmin,
   paymentController.refundSecondPayment
 );
 
 router.post(
   "/refund-both",
+  tokenMiddleware.verifyToken, tokenMiddleware.authorizeAdmin,
   paymentController.refundBothPayments
 );
 
