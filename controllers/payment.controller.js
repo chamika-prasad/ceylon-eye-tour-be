@@ -45,12 +45,12 @@ const hashPaymentDetails = async (req, res) => {
 // ✅ Create a new payment
 const createPayment = async (req, res) => {
   try {
-    const { bookingId, currency } = req.body;
+    const { bookingId, currency, amount } = req.body;
 
-    if (!bookingId || !currency) {
+    if (!bookingId || !currency || !amount) {
       return res.status(400).json({
         success: false,
-        message: "bookingId and currency are required",
+        message: "bookingId, currency, and amount are required",
       });
     }
 
@@ -63,7 +63,7 @@ const createPayment = async (req, res) => {
       });
     }
 
-    const amount = booking.Package?.price || booking.CustomPackage?.price;
+    // const amount = booking.Package?.price || booking.CustomPackage?.price;
 
     // const newPayment = await paymentService.createPayment({
     //   booking_id: bookingId,
