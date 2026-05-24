@@ -729,6 +729,120 @@ const updatePaymentRecordStatus = async (req, res) => {
   }
 };
 
+const refundBothPayments = async (req, res) => {
+  try {
+    const {
+      first_payment_id,
+      first_pyament_record_id,
+      second_payment_id,
+      second_pyament_record_id,
+      description,
+    } = req.body;
+
+    if (!first_payment_id || !first_pyament_record_id || !second_payment_id || !second_pyament_record_id || !description) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
+    }
+
+    const firstPaymentRecord = await paymentService.getPaymentById(
+      first_pyament_record_id
+    );
+
+    if (!firstPaymentRecord) {
+      return res
+        .status(404)
+        .json({ success: false, message: "First payment record not found" });
+    }
+
+    const secondPaymentRecord = await secondPaymentService.getSecondPaymentById(
+      second_pyament_record_id
+    );
+
+    if (!secondPaymentRecord) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Second payment record not found" });
+    }
+
+    const token = await paymentService.getAccessToken();
+
+    let errorMessage = "";
+
+    const PAYHERE_REFUND_URL =
+      process.env.PAYHERE_MODE === "live"
+        ? "https://www.payhere.lk/merchant/v1/payment/refund"
+        : "https://sandbox.payhere.lk/merchant/v1/payment/refund";
+
+    const firstResponse = await axios.post(
+      PAYHERE_REFUND_URL,
+      { payment_id: first_payment_id, description },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+
+    if (firstResponse && firstResponse.status && firstResponse.status == 1) {
+      const firstUpdated = await paymentService.updateSecondPayment(first_pyament_record_id, {
+        status: "refund",
+      });
+
+      if (!firstUpdated) {
+        errorMessage = "First payment refund success but database update failed";
+      }
+
+      const secondResponse = await axios.post(
+        PAYHERE_REFUND_URL,
+        { payment_id: second_payment_id, description },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (secondResponse && secondResponse.status && secondResponse.status == 1) {
+        const secondUpdated = await secondPaymentService.updateSecondPayment(second_pyament_record_id, {
+          status: "refund",
+        });
+
+        if (!secondUpdated) {
+          errorMessage = errorMessage + "," + "Second payment refund success but database update failed";
+        }
+      } else {
+        errorMessage = errorMessage + "," + (secondResponse?.error || secondResponse?.msg || "Something went wrong in second payment refund");
+      }
+    } else {
+      errorMessage = firstResponse?.error || firstResponse?.msg || "Something went wrong in first payment refund";
+    }
+
+    if (errorMessage) {
+      return res.status(400).json({
+        success: false,
+        message: errorMessage,
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Refund successful",
+    });
+  } catch (err) {
+    console.error("Refund Error:", err.response?.data || err.message);
+
+    return res.status(err.status || 500).json({
+      success: false,
+      message: "Refund failed",
+      error: err.response?.data || err.message,
+    });
+  }
+};
+
 export default {
   hashPaymentDetails,
   createPayment,
@@ -740,5 +854,6 @@ export default {
   updatePayment,
   // deletePayment,
   refundSecondPayment,
+  refundBothPayments,
   updatePaymentRecordStatus,
 };

@@ -48,6 +48,11 @@ router.post(
   paymentController.refundSecondPayment
 );
 
+router.post(
+  "/refund-both",
+  paymentController.refundBothPayments
+);
+
 // Update payment record status by type (1=Payment, 2=SecondPayment)
 router.post(
   "/update-record-status",
