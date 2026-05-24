@@ -546,7 +546,7 @@ const refundPayment = async (req, res) => {
     );
 
     const updated = await paymentService.updatePayment(pyament_record_id, {
-      status: "chargedback",
+      status: "refund",
     });
 
     if (!updated) {
@@ -608,7 +608,7 @@ const refundSecondPayment = async (req, res) => {
     );
 
     const updated = await secondPaymentService.updateSecondPayment(pyament_record_id, {
-      status: "chargedback",
+      status: "refund",
     });
 
     if (!updated) {
