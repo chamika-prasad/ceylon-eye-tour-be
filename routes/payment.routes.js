@@ -41,6 +41,13 @@ router.post(
   paymentController.refundPayment
 );
 
+router.patch(
+  "/manual-refund",
+  tokenMiddleware.verifyToken,
+  tokenMiddleware.authorizeAdmin,
+  paymentController.manualRefund
+);
+
 // // ✅ Delete payment by ID
 // router.delete("/:id", paymentController.deletePayment);
 
