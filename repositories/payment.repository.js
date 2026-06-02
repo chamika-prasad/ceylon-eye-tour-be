@@ -57,6 +57,19 @@ const deletePayment = async (id) => {
   return deleted > 0;
 };
 
+const refundPayment = async (id, note = null) => {
+  try {
+    const [updated] = await Payment.update(
+      { is_refunded: true, refund_note: note, status: "refund" },
+      { where: { id } }
+    );
+
+    return updated > 0;
+  } catch (error) {
+    throw new Error(`Error refunding payment: ${error.message}`);
+  }
+};
+
 export default {
   createPayment,
   //   getAllPayments,
@@ -64,5 +77,6 @@ export default {
   updatePayment,
   getPaymentById,
   setPaymentsAsNotCurrentByBookingId,
+  refundPayment,
   deletePayment,
 };
