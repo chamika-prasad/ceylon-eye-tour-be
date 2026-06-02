@@ -534,6 +534,37 @@ const refundPayment = async (req, res) => {
   }
 };
 
+// Manual refund (no external gateway) - mark payment as refunded with a note
+const manualRefund = async (req, res) => {
+  try {
+    const { payment_record_id, refund_note } = req.body;
+    const id = payment_record_id;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required field: payment_record_id" });
+    }
+
+    const paymentRecord = await paymentService.getPaymentById(id);
+    if (!paymentRecord) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Payment record not found" });
+    }
+
+    const updated = await paymentService.refundPayment(id, refund_note || null);
+    if (!updated) {
+      return res.status(400).json({ success: false, message: "Failed to mark payment as refunded" });
+    }
+
+    return res.status(200).json({ success: true, message: "Payment marked as refunded" });
+  } catch (err) {
+    console.error("Manual Refund Error:", err.message);
+    return res.status(500).json({ success: false, message: "Manual refund failed", error: err.message });
+  }
+};
+
 const refundSecondPayment = async (req, res) => {
   try {
     const { payment_id, description, pyament_record_id } = req.body;
@@ -804,6 +835,7 @@ export default {
   transferPayment,
   cashPayment,
   refundPayment,
+  manualRefund,
   // getAllPayments,
   // getPaymentById,
   updatePayment,
