@@ -119,6 +119,10 @@ const deletePayment = async (id) => {
   return await paymentRepository.deletePayment(id);
 };
 
+const refundPayment = async (id, note = null) => {
+  return await paymentRepository.refundPayment(id, note);
+};
+
 export default {
   hashPaymentDetails,
   createPayment,
@@ -131,4 +135,5 @@ export default {
   combineUuidWithRandom,
   separateUuidAndRandom,
   setPaymentsAsNotCurrentByBookingId,
+  refundPayment,
 };
