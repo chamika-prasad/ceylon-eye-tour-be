@@ -47,6 +47,14 @@ const Payment = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    is_refunded: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    refund_note: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
     tableName: "payments",
